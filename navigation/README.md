@@ -60,6 +60,8 @@ mavproxy还有其他的设置，也很有意思，比如加入遥控器连接，
 
 # 3.使用代码进行任务接入
 
+Mavprocy是以命令行为端口的控制手段，没有上层api了，使用py代码控制需要使用dronekit（同时Mavproxy也提供了二次开发的接口，编写一个自己的指令也是一种可能的任务规划方式）
+
 参考资料：
 
     https://ardupilot.org/dev/docs/droneapi-tutorial.html
