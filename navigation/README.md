@@ -98,5 +98,16 @@ Mavprocy是以命令行为端口的控制手段，没有上层api了，使用py�
 
 固定翼：还不知道
 
+## （4）GPS
+
+V5+的GPS是八口的，同时还包括safety switch，如果出现了“Hardware safety switch”的preArm报错，可以在参数表中将BRD_SAFETYENABLE设为无效
+
+其他飞控可能会不同，比如pixhawk是6+2接法，自行查找文档即可
+
+# 5.飞行前配置
+
+要正常arm，必要的配置有机架选择、遥控器校准、指南针校准、加速计校准等。可以参考preArm报错来进行相应校准，可以参考
+
+     https://doc.cuav.net/flight-controller/v5-autopilot/zh-hans/pre-arm.html
 
     
