@@ -1,0 +1,3 @@
+[submodule "references/CIFAR-10_PyTorch"]
+	path = references/CIFAR-10_PyTorch
+	url = https://github.com/hanhan3344/CIFAR-10_PyTorch.git
