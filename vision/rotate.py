@@ -4,6 +4,7 @@
 import cv2
 import numpy as np
 import time
+import math
 
 def rotate(image:np.array, debug:bool=False)->np.array:
     """ 将标靶转正
@@ -79,9 +80,7 @@ def rotate(image:np.array, debug:bool=False)->np.array:
     
     # 检测图片正反
     # 得到仿射变换
-    h, w = image.shape[:2]
-    center = (h >> 1, w >> 1)
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    M = cv2.getRotationMatrix2D((0, 0), angle, 1.0)
     
     # 根据轮廓得到一个近似三角形
     _, tri = cv2.minEnclosingTriangle(used_contour.squeeze())
@@ -94,8 +93,15 @@ def rotate(image:np.array, debug:bool=False)->np.array:
         angle += 180
     
     # 更新旋转矩阵并执行旋转
+    h, w = image.shape[:2]
+    a = max(h, w) * 1.5
+    w_add = math.ceil((a - w) / 2)
+    h_add = math.ceil((a - h) / 2)
+    img = cv2.copyMakeBorder(image, h_add, h_add, w_add, w_add, cv2.BORDER_REPLICATE)
+    h, w = img.shape[:2]
+    center = (h >> 1, w >> 1)
     M = cv2.getRotationMatrix2D(center, angle, 1.0)
-    image_rotated = cv2.warpAffine(image, M, (h, w), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    image_rotated = cv2.warpAffine(img, M, (h, w), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
     if debug:
         time_end = time.time()
@@ -107,3 +113,6 @@ def rotate(image:np.array, debug:bool=False)->np.array:
         return debug_ret
     
     return image_rotated
+
+
+
