@@ -197,7 +197,9 @@ def run(
                     img = img[max(0, int(tlbr[1])-5):min(int(tlbr[3])+5, hei), max(0, int(tlbr[0])-5):min(int(tlbr[2])+5, wid)]
                     img_rotated = rotate.rotate(img)
                     # cv2.imwrite('tmp.jpg', img_rotated)
-                    img_crop = crop.crop((img_rotated))
+                    img_crop = crop.crop(img_rotated)
+                    if img_crop.shape[:2] == (0, 0):
+                        continue
                     cv2.imshow('img_crop', img_crop)
                     cv2.waitKey(0)
                     cv2.destroyWindow('img_crop')
@@ -215,7 +217,7 @@ def run(
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
-    #
+
     #
     #                 if save_crop:
     #                     tmp_path = save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
