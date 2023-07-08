@@ -1,5 +1,5 @@
 """
-程序修改自yolov5.detect.py
+程序修改自yolov5/detect.py
 
 run为主要函数，含多个参数
 
