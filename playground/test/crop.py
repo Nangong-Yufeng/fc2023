@@ -1,23 +1,39 @@
+"""
+提取转正标靶的数字矩形框
+"""
 import cv2
 import numpy as np
 
 def crop(img):
+    """
+    提取转正标靶的数字矩形框
+
+    Args:
+        img: 待处理图片，是openCV的BGR格式
+    Returns:
+        数字矩形框图片，是openCV的BGR格式; 若未检测到数字矩形框，返回长宽为0的图片，也是openCV的BGR格式
+    """
 # img = cv2.imread("../playground/images/test05193.jpg")
 # img = rotate(img)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     _, imgb = cv2.threshold(img_gray, 180, 255, cv2.THRESH_BINARY)
 
+    # 膨胀操作，消除中间数字的黑色，将数字所以区域染为全白
     kernel = np.ones((3, 3), dtype=np.uint8)
     imgb = cv2.dilate(imgb, kernel, 1) # 1:迭代次数，也就是执行几次膨胀操作
 
-    cv2.imshow('img', imgb)
-    cv2.waitKey(0)
-    cv2.destroyWindow('img')
+    # cv2.imshow('img', imgb)
+    # cv2.waitKey(0)
+    # cv2.destroyWindow('img')
+
+    # 找到所有边界，按边界的外界最小矩形的面积大小排序
     contours, _ = cv2.findContours(imgb, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     rects = [cv2.minAreaRect(contour) for contour in contours]
     rects.sort(key=lambda x: x[1][0]*x[1][1], reverse=True)
 
+    # 寻找近似为正方形的框，即为数字框
+    # 限制正方形的最小面积，避免图中仍有小的黑色正方形框
     center_x = 0
     center_y = 0
     for rect in rects:
