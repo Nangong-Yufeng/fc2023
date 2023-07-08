@@ -1,3 +1,12 @@
+"""
+程序修改自yolov5.detect.py
+
+run为主要函数，含多个参数
+
+main中调用run所传参数为主要参数，相关注释写在main中
+
+"""
+
 # YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
 """
 Run YOLOv5 detection inference on images, videos, directories, globs, YouTube, webcam, streams, etc.
@@ -267,7 +276,11 @@ def run(
     #     strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
 
 if __name__ == '__main__':
-    # opt = parse_opt()
-    # main(opt)
-    #
-    run(weights=ROOT / 'best.pt', source=ROOT / 'video.mp4', data=ROOT / '0515.yaml', conf_thres=0.7, device='0', view_img=True, vid_stride=90)
+    # weights 训练出来的权重文件
+    # source 待检测的源文件，0为电脑自带摄像头
+    # data 配置数据文件, 包括image/label/classes等信息
+    # conf_thres 置信度阈值，小于该阈值的框不输出
+    # device 设置设备CPU/CUDA
+    # view_img 是否展示画框之后的视频/图片
+    # vid_stride 视频每几帧做一次检测
+    run(weights=ROOT / 'best.pt', source=0, data=ROOT / '0515.yaml', conf_thres=0.7, device='0', view_img=True, vid_stride=90)
