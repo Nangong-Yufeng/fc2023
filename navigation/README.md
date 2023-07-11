@@ -69,10 +69,16 @@ dronekit参考资料：
 
     https://ardupilot.org/dev/docs/droneapi-tutorial.html
 
-ps：听说了dronekit已经很久没维护，但没想到因为mavlink任务协议的改变导致不能用了，垃圾玩意浪费我时间
+ps：听说了dronekit已经很久没维护，但没想到因为mavlink任务协议的改变导致其cmd类不能和ardupilot正常通信了，尝试了使用simple_goto的方法代替跑航点，在模拟器中可行，但是有可能可靠度不足。
 
 （另外Mavproxy也提供了二次开发的接口，编写一个自己的指令也是一种可能的任务规划方式）
 
+考察后认为pymavlink是比较好的选择，官方文档参考：
+
+    https://mavlink.io/en/mavgen_python/
+    https://github.com/mavlink/MAVSDK-Python
+
+## pymavlink学习笔记
 
 
 
