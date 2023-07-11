@@ -49,6 +49,10 @@ Mavproxy的运行可以参考官方网站sitl中的视频，很原始的图形�
     mode auto #设置模式为自动，飞机会自动执行航点任务
     mode manual #切换为手动，飞机会退出航点任务
 
+关于不同飞行模式的解释，参考：
+
+    https://doc.cuav.net/tutorial/plane/flight-modes.html
+
 mavproxy还有其他的设置，也很有意思，比如加入遥控器连接，挖个坑，很想试一试。
 
 要观察三维姿态图像的话，可以运行flightgear。在Tools/autotest文件夹中打开终端，运行
@@ -77,10 +81,6 @@ ps：听说了dronekit已经很久没维护，但没想到因为mavlink任务协
 
     https://mavlink.io/en/mavgen_python/
     https://github.com/mavlink/MAVSDK-Python
-
-## pymavlink学习笔记
-
-
 
 
 # 4.硬件连接
