@@ -23,3 +23,7 @@
     https://mavlink.io/zh/messages/common.html#PROTOCOL_VERSION
 
 其他参数blocking决定是否阻塞，timeout设定了阻塞时间等等，具体可参考编译器提示或翻阅源代码
+
+## 遭遇问题
+
+系统显示mavlink是2.4.9版本，但是仅mavlink2支持的各种信息都无法读取，原因不明
