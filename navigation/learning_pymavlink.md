@@ -43,78 +43,40 @@
 
 4  ACRO
 
-5
+5  FBWA
 
-FBWA
+6  FBWB
 
-6
+7  CRUISE
 
-FBWB
+8  AUTOTUNE 
 
-7
+10 Auto  （ps：我也不知道为啥没有9， 但就是没有）
 
-CRUISE
+11 RTL
 
-8
+12 Loiter
 
-AUTOTUNE
+13 TAKEOFF
 
-10
+14 AVOID_ADSB
 
-Auto
+15 Guided
 
-11
+17 QSTABILIZE
 
-RTL
+18 QHOVER
 
-12
+19 QLOITER
 
-Loiter
+20 QLAND
 
-13
+21 QRTL
 
-TAKEOFF
+22 QAUTOTUNE
 
-14
+23 QACRO
 
-AVOID_ADSB
+24 THERMAL
 
-15
-
-Guided
-
-17
-
-QSTABILIZE
-
-18
-
-QHOVER
-
-19
-
-QLOITER
-
-20
-
-QLAND
-
-21
-
-QRTL
-
-22
-
-QAUTOTUNE
-
-23
-
-QACRO
-
-24
-
-THERMAL
-
-25
-
-Loiter to QLand
+25 Loiter to QLand
