@@ -80,3 +80,21 @@
 24 THERMAL
 
 25 Loiter to QLand
+
+# 命令发送
+
+使用 
+        
+    the_connection.mav.command_long_send()
+或
+
+    the_connection.mav.command_int_send()
+的方式可以向飞行器发送指令，参数格式参考COMMAND_LONG,COMMAND_INT文档即可
+
+## 遭遇问题
+
+使用COMMAND_INT遇到以下的报错：
+    
+    struct.error: required argument is not an integer
+
+不太清楚具体原因，但可能和参数设置有关。比如设置经纬度时需要输入 *10^7后的数值，输入格式错误时出现报错，输入正确后可以正常运行。
