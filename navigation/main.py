@@ -16,4 +16,4 @@ while True:
         break
     target = Target_position(position)
     target.distance(the_connection)
-    time.sleep(10)
+    time.sleep(5)
