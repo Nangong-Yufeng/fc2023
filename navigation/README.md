@@ -1,5 +1,15 @@
 # navigation文档说明
 
+## 学习参考资料
+
+github上的一个示例代码库
+
+       https://github.com/mustafa-gokce/ardupilot-software-development/tree/main/pymavlink
+
+youtube上的一个使用基本教程
+
+       
+
 ## 需要安装的环境
 
    ### pymavlink环境
