@@ -55,14 +55,18 @@ def mode_set(the_connection, mode):
 
 
 def set_home(the_connection, mode, position_re):
+
+    #设置home点
     the_connection.mav.command_int_send(the_connection.target_system, the_connection.target_component, 3,
-                                         mavutil.mavlink.MAV_CMD_DO_SET_HOME, 0, 0, mode, 0, 0, 0, position_re.lat, position_re.lon, position_re.alt)
+                                         mavutil.mavlink.MAV_CMD_DO_SET_HOME, 0, 0, mode, 0, 0, 0, int(position_re.lat * 1e7), int(position_re.lon * 1e7), position_re.alt)
     msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
+
+    #mode为1表示使用当前位置为home点，mode为0则为指定位置
     if msg.result == 0 and mode == 1:
         print("set current location as home successfully")
         return 0
     elif msg.result == 0 and mode == 0:
-        print("successfully set home as lat = %s, lon = %s, re_alt = %s meters" %(position_re.lat / 10000000, position_re.lon / 10000000, position_re.alt))
+        print("successfully set home as lat = %s, lon = %s, re_alt = %s meters" %(position_re.lat, position_re.lon, position_re.alt))
         return 0
     else:
         print("home set failed")
