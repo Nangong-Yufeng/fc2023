@@ -18,7 +18,9 @@ mavlink源代码：
 
        https://github.com/ArduPilot/pymavlink/tree/master/tools
 
-       
+mavlink官网pymavlink教程和消息表：
+
+       https://mavlink.io/en/mavgen_python
 
 ## 需要安装的环境
 
