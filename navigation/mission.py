@@ -16,4 +16,34 @@ def send_mission(the_connection, wp, seq):
                                                                        mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
     the_connection.mav.send(mission_message)
 
-    #print(the_connection.recv_match(type="COMMAND_ACK", blocking=True))
+def mission_upload(the_connection, wp):
+
+    #上传航点数量信息
+    send_mission_list(the_connection, wp)
+
+    while True:
+        message = the_connection.recv_match(blocking=True)
+        message = message.to_dict()
+
+        #验证是否为MISSION_REQUEST
+        if message["mavpackettype"] == mavutil.mavlink.MAVLink_mission_request_message.msgname:
+
+            #验证是否为mission items类型
+            if message["mission_type"] == mavutil.mavlink.MAV_MISSION_TYPE_MISSION:
+                seq = message["seq"]
+
+                #发送航点信息
+                send_mission(the_connection, wp, seq)
+                print(wp[seq])
+
+        elif message["mavpackettype"] == mavutil.mavlink.MAVLink_mission_ack_message.msgname:
+
+            #若回传信息为任务被接受（mission_ack信息）
+            if message["mission_type"] == mavutil.mavlink.MAV_MISSION_TYPE_MISSION and \
+                    message["type"] == mavutil.mavlink.MAV_MISSION_ACCEPTED:
+
+                print("Mission uploaded successfully")
+                break
+
+def clear_waypoint(the_connection):
+    pass
