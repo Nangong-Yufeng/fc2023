@@ -1,5 +1,12 @@
 # navigation文档说明
 
+## 需要安装的环境
+
+   ### pymavlink环境
+       pip install pymavlink
+   ### geopy插件
+       pip install geopy
+
 ## main 
    主函数
 
