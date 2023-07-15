@@ -34,7 +34,6 @@ def mission_upload(the_connection, wp):
 
                 #发送航点信息
                 send_mission(the_connection, wp, seq)
-                print(wp[seq])
 
         elif message["mavpackettype"] == mavutil.mavlink.MAVLink_mission_ack_message.msgname:
 

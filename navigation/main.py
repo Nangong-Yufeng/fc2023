@@ -17,7 +17,7 @@ if(mode_set(the_connection, 5) < -1):
     sys.exit(1)
 
 #设置飞行器home点
-position = Position_relative(-353622066, 1491651135, 10)
+position = Position_relative(-35.3622066, 149.1651135, 0)
 if set_home(the_connection, 0, position) < -1:
     sys.exit(1)
 
@@ -26,7 +26,7 @@ wp1 = Waypoint(-35.3598036, 149.1647555, 30)
 wp2 = Waypoint(-35.3600394, 149.1604871, 20)
 wp3 = Waypoint(-35.3654404, 149.1611205, 50)
 wp4 = Waypoint(-35.3654516, 149.1654714, 80)
-wp = [wp1, wp2, wp3, wp4]
+wp = [position, wp1, wp2, wp3, wp4]
 
 #上传航点任务
 mission_upload(the_connection, wp)
