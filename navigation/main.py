@@ -2,7 +2,7 @@ import time
 import sys
 from pymavlink import mavutil
 from preflight import arm, mode_set, set_home
-from mission import mission_upload
+from mission import mission_upload, clear_waypoint, mission_current
 from class_list import Position_relative, Waypoint
 
 #连接飞行器
@@ -12,14 +12,19 @@ the_connection = mavutil.mavlink_connection('udpin:localhost:14550')
 if(arm(the_connection) < -1):
     sys.exit(1)
 
+#用于清除当前的mission_list，不过好像有没有都一样
+clear_waypoint(the_connection)
+
 #设置飞行器模式
-if(mode_set(the_connection, 5) < -1):
+if(mode_set(the_connection, 13) < -1):
     sys.exit(1)
 
 #设置飞行器home点
 position = Position_relative(-35.3622066, 149.1651135, 0)
 if set_home(the_connection, 0, position) < -1:
     sys.exit(1)
+
+time.sleep(2)
 
 #设置航点
 wp1 = Waypoint(-35.3598036, 149.1647555, 30)
@@ -33,3 +38,7 @@ mission_upload(the_connection, wp)
 
 if(mode_set(the_connection, 10) < -1):
     sys.exit(1)
+
+while True:
+    mission_current(the_connection, wp)
+    time.sleep(1)

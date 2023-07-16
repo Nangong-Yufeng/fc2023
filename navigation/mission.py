@@ -45,4 +45,11 @@ def mission_upload(the_connection, wp):
                 break
 
 def clear_waypoint(the_connection):
-    pass
+    msg = mavutil.mavlink.MAVLink_mission_clear_all_message(the_connection.target_system,the_connection.target_component,
+                                                            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+    the_connection.mav.send(msg)
+
+def mission_current(the_connection,wp):
+    mission_msg = the_connection.recv_match(type="MISSION_CURRENT", blocking=True)
+    print(mission_msg.seq)
+    wp[mission_msg.seq].distance(the_connection)
