@@ -44,7 +44,7 @@ Mavproxy的运行可以参考官方网站sitl中的视频，很原始的图形�
 在此记录一些比较基本的指令过程
 
     mode guided  #设置为导引模式
-    arm throttle  #解锁飞机（如果是旋翼机，解锁后要即使起飞，否则15s左右飞机会自动disarm）
+    arm throttle  #解锁飞机（如果是旋翼机，解锁后要及时起飞，否则15s左右飞机会自动disarm）
     wp load ../Tools/autotest/Generic_Missions/CMAC-circuit.txt #载入航点文件（注意一下，ap文档里的斜杠是反的）
     mode auto #设置模式为自动，飞机会自动执行航点任务
     mode manual #切换为手动，飞机会退出航点任务
@@ -65,7 +65,7 @@ mavproxy还有其他的设置，也很有意思，比如加入遥控器连接，
 
 # 3.使用代码进行任务接入
 
-Mavprocy是以命令行为端口的控制手段，没有上层api了
+Mavproxy是以命令行为端口的控制手段，没有上层api了
 
 使用py代码控制的一个选择是使用dronekit，但是dronekit已经很多年未维护更新了，其mavlink协议已经落后，似乎已经不能正常使用了。
 
@@ -82,6 +82,7 @@ ps：听说了dronekit已经很久没维护，但没想到因为mavlink任务协
     https://mavlink.io/en/mavgen_python/
     https://github.com/mavlink/MAVSDK-Python
 
+pymavlink更多内容参考README
 
 # 4.硬件连接
 
@@ -113,7 +114,7 @@ ps：听说了dronekit已经很久没维护，但没想到因为mavlink任务协
 
 多旋翼：按照雷讯文档，M1-M4连接四个电调即可
 
-固定翼：M1副翼，M2升降，M3油门，M4偏航
+固定翼：M1副翼，M2升降，M3油门，M4偏航，其余通道可以自定义
 
 ## （4）GPS
 
@@ -129,14 +130,13 @@ V5+的GPS是八口的，同时还包括safety switch，如果出现了“Hardwar
 
 ## ps
 
-第一次配置建议到有正常gps信号（比如主楼前）的地方进行，刚开始时就算强制arm了各种电机还是不会反应，但解决所有prearm报错正常arm一次后，就可以通过force arm启动电机了，算是比较玄学的问题，因此不建议在没有gps的环境下浪费时间
-
+第一次配置建议到有正常gps信号（比如主楼前）的地方进行，刚开始时就算force arm了电机还是不反应；但解决所有prearm报错正常arm一次后，就可以通过force arm启动电机了，算是比较玄学的问题，因此不建议在没有gps的环境下浪费时间
 
 # 6.芜湖起飞
 
 ## 关于航点
 
-多旋翼以自己起飞的位置作为home点，而固定翼会以第一次连接到gps的位置作为home点（大概）
+多旋翼以自己起飞的位置作为home点；固定翼会以第一次连接到gps的位置作为home点（大概），建议自己设一个home点
 
 ## 关于地图
 
@@ -154,4 +154,6 @@ V5+的GPS是八口的，同时还包括safety switch，如果出现了“Hardwar
 
 ### 固定翼
 
-我不知道
+多旋翼默认使用旋钮作为模型选择开关，主要使用MANUAL,STABELIZE,FBWA,AUTO,RTL
+
+MANUAL和直接连接收机是一样的；STABELIZE会使飞机保持平飞；FBWA是辅助飞行的优质选择，但是不能自动维持高度（FBWB可以定高）
