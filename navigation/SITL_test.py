@@ -27,7 +27,7 @@ home_position = Position_relative(-35.3622066, 149.1651135, 0)
 if set_home(the_connection, 0, home_position) < -1:
     sys.exit(1)
 
-time.sleep(2)
+time.sleep(1)
 
 #设置航点
 wp1 = Waypoint(-35.3598036, 149.1647555, 30)
@@ -37,7 +37,7 @@ wp4 = Waypoint(-35.3654516, 149.1654714, 80)
 wp = [wp2, wp3]
 
 #上传航点任务
-wp_line = cruse_wp_planning(the_connection, wp, 100)
+wp_line = cruse_wp_planning(wp, 30)
 mission_upload(the_connection, wp_line, home_position)
 
 
@@ -47,4 +47,6 @@ if(mode_set(the_connection, 10) < -1):
 #set_speed(the_connection, 15)
 
 while True:
-    mission_current(the_connection, wp_line)
+    #mission_current(the_connection, wp_line)
+    msg = the_connection.recv_match(type='EKF_STATUS_REPORT', blocking=True)
+    print(msg)

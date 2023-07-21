@@ -67,16 +67,15 @@ def mission_current(the_connection,wp):
 
 
 #根据上传的两个坐标点，通过自动设置更多的坐标点，生成一个两坐标之间的直线航线
-def cruse_wp_planning(vehicle, wp, num):
+def cruse_wp_planning(wp, num):
+
     lat_len = (wp[1].lat - wp[0].lat)
     lon_len = (wp[1].lon - wp[0].lon)
     alt_len = (wp[1].alt - wp[0].alt)
-    print(lat_len)
     lat_len /= num
     lon_len /= num
     alt_len /= num
 
-    print(lat_len)
     wp_list = [wp[0]]
 
     i = 0
@@ -86,8 +85,6 @@ def cruse_wp_planning(vehicle, wp, num):
         i+=1
 
     wp_list.append(wp[1])
-    print(wp_list[0])
-
     return wp_list
 
 
