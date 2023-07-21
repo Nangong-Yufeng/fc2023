@@ -67,7 +67,7 @@ ENV DEBIAN_FRONTEND teletype
 # Update Ubuntu drivers
 # https://www.maketecheasier.com/install-nvidia-drivers-ubuntu/
 
-# DDP test
+# DDP target_detect
 # python -m torch.distributed.run --nproc_per_node 2 --master_port 1 train.py --epochs 3
 
 # GCP VM from Image

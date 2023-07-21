@@ -108,7 +108,7 @@ def is_docker() -> bool:
 
 
 def is_writeable(dir, test=False):
-    # Return True if directory has write permissions, test opening a file with write permissions if test=True
+    # Return True if directory has write permissions, target_detect opening a file with write permissions if target_detect=True
     if not test:
         return os.access(dir, os.W_OK)  # possible issues on Windows
     file = Path(dir) / 'tmp.txt'
@@ -455,7 +455,7 @@ def check_imshow(warn=False):
     try:
         assert not is_jupyter()
         assert not is_docker()
-        cv2.imshow('test', np.zeros((1, 1, 3)))
+        cv2.imshow('target_detect', np.zeros((1, 1, 3)))
         cv2.waitKey(1)
         cv2.destroyAllWindows()
         cv2.waitKey(1)
@@ -547,7 +547,7 @@ def check_dataset(data, autodownload=True):
     if not path.is_absolute():
         path = (ROOT / path).resolve()
         data['path'] = path  # download scripts
-    for k in 'train', 'val', 'test':
+    for k in 'train', 'val', 'target_detect':
         if data.get(k):  # prepend path
             if isinstance(data[k], str):
                 x = (path / data[k]).resolve()
@@ -558,7 +558,7 @@ def check_dataset(data, autodownload=True):
                 data[k] = [str((path / x).resolve()) for x in data[k]]
 
     # Parse yaml
-    train, val, test, s = (data.get(x) for x in ('train', 'val', 'test', 'download'))
+    train, val, test, s = (data.get(x) for x in ('train', 'val', 'target_detect', 'download'))
     if val:
         val = [Path(x).resolve() for x in (val if isinstance(val, list) else [val])]  # val path
         if not all(x.exists() for x in val):

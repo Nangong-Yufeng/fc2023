@@ -963,11 +963,11 @@ def extract_boxes(path=DATASETS_DIR / 'coco128'):  # from utils.dataloaders impo
 
 
 def autosplit(path=DATASETS_DIR / 'coco128/images', weights=(0.9, 0.1, 0.0), annotated_only=False):
-    """ Autosplit a dataset into train/val/test splits and save path/autosplit_*.txt files
+    """ Autosplit a dataset into train/val/target_detect splits and save path/autosplit_*.txt files
     Usage: from utils.dataloaders import *; autosplit()
     Arguments
         path:            Path to images directory
-        weights:         Train, val, test weights (list, tuple)
+        weights:         Train, val, target_detect weights (list, tuple)
         annotated_only:  Only use images with an annotated txt file
     """
     path = Path(path)  # images dir
@@ -1118,9 +1118,9 @@ class HUBDatasetStats():
             # Update labels to integer class and 6 decimal place floats
             return [[int(c), *(round(x, 4) for x in points)] for c, *points in labels]
 
-        for split in 'train', 'val', 'test':
+        for split in 'train', 'val', 'target_detect':
             if self.data.get(split) is None:
-                self.stats[split] = None  # i.e. no test set
+                self.stats[split] = None  # i.e. no target_detect set
                 continue
             dataset = LoadImagesAndLabels(self.data[split])  # load dataset
             x = np.array([
@@ -1149,7 +1149,7 @@ class HUBDatasetStats():
 
     def process_images(self):
         # Compress images for Ultralytics HUB
-        for split in 'train', 'val', 'test':
+        for split in 'train', 'val', 'target_detect':
             if self.data.get(split) is None:
                 continue
             dataset = LoadImagesAndLabels(self.data[split])  # load dataset

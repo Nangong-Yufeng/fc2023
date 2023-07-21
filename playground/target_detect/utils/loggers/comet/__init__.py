@@ -326,14 +326,14 @@ class CometLogger:
         path = str((ROOT / Path(self.data_dict['path'])).resolve())
 
         metadata = self.data_dict.copy()
-        for key in ['train', 'val', 'test']:
+        for key in ['train', 'val', 'target_detect']:
             split_path = metadata.get(key)
             if split_path is not None:
                 metadata[key] = split_path.replace(path, '')
 
         artifact = comet_ml.Artifact(name=dataset_name, artifact_type='dataset', metadata=metadata)
         for key in metadata.keys():
-            if key in ['train', 'val', 'test']:
+            if key in ['train', 'val', 'target_detect']:
                 if isinstance(self.upload_dataset, str) and (key != self.upload_dataset):
                     continue
 
@@ -368,7 +368,7 @@ class CometLogger:
     def update_data_paths(self, data_dict):
         path = data_dict.get('path', '')
 
-        for split in ['train', 'val', 'test']:
+        for split in ['train', 'val', 'target_detect']:
             if data_dict.get(split):
                 split_path = data_dict.get(split)
                 data_dict[split] = (f'{path}/{split_path}' if isinstance(split, str) else [
