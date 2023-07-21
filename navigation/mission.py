@@ -1,4 +1,5 @@
 from pymavlink import mavutil
+from math import fabs
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -53,3 +54,11 @@ def mission_current(the_connection,wp):
     mission_msg = the_connection.recv_match(type="MISSION_CURRENT", blocking=True)
     print(mission_msg.seq)
     wp[mission_msg.seq].distance(the_connection)
+    print(mission_msg)
+
+#根据上传的两个坐标点，通过自动设置更多的坐标点，生成一个两坐标之间的直线航线
+def cruse_wp_planning(vehicle, wp, num):
+    lat_len = fabs(wp[0].lat - wp[1].lat)
+    lon_len = fabs(wp[0].lon - wp[1].lon)
+
+    pass

@@ -21,7 +21,7 @@ def mode_set(the_connection, mode):
     #使用long信息发送模式设置指令
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0, 1, mode, 0, 0, 0, 0, 0)
-    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
+    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
     result = msg.result
 
     #根据com_ack判断模式设置结果
