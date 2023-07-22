@@ -2,9 +2,10 @@ import time
 import sys
 from pymavlink import mavutil
 from preflight import arm, mode_set, set_home
-from mission import mission_upload, clear_waypoint, mission_current, cruse_wp_planning
+from mission import mission_upload, clear_waypoint, mission_current, wp_straight_course, wp_circle_course, wp_turn_course
 from class_list import Position_relative, Waypoint
 from set_para import set_speed
+from get_para import gain_posture_para, gain_wp_now
 
 #连接飞行器
 the_connection = mavutil.mavlink_connection('udpin:localhost:14550')
@@ -34,19 +35,24 @@ wp1 = Waypoint(-35.3598036, 149.1647555, 30)
 wp2 = Waypoint(-35.3600394, 149.1604871, 20)
 wp3 = Waypoint(-35.3654404, 149.1611205, 50)
 wp4 = Waypoint(-35.3654516, 149.1654714, 80)
-wp = [wp2, wp3]
+wp = [wp2, wp1]
+wp_new = [wp1, wp4]
 
 #上传航点任务
-wp_line = cruse_wp_planning(wp, 30)
-mission_upload(the_connection, wp_line, home_position)
+wp_line = wp_straight_course(wp, 30)
+wp_circle = wp_circle_course(wp, 50, -1)
+#wp_turn_course()
+
+mission_upload(the_connection, wp_circle, home_position)
 
 
 if(mode_set(the_connection, 10) < -1):
     sys.exit(1)
 
 #set_speed(the_connection, 15)
+#
+#mission_upload(the_connection, wp_new, home_position)
 
 while True:
     #mission_current(the_connection, wp_line)
-    msg = the_connection.recv_match(type='EKF_STATUS_REPORT', blocking=True)
-    print(msg)
+    gain_wp_now(the_connection)
