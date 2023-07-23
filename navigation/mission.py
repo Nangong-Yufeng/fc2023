@@ -2,6 +2,9 @@ import time
 from pymavlink import mavutil
 import math
 from class_list import Waypoint
+from get_para import gain_mission, waypoint_reached
+from preflight import mode_set
+import sys
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -117,8 +120,9 @@ def wp_circle_course(wp, precision, direction=1):
     wp_list.append(wp[1])
     return wp_list
 
-#生成一字航线型的掉头航线, 参数可决定转弯半径、转弯方向（顺或逆）
-def wp_turn_course(wp_now, wp_target, precision, radius, direction):
+
+#自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转弯半径、转弯方向（顺或逆）
+def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precision, radius, line_course, direction):
     lat_len = wp_now.lat - wp_target.lat
     lon_len = wp_now.lon - wp_target.lon
     theta = math.atan(lat_len / lon_len)
@@ -126,13 +130,43 @@ def wp_turn_course(wp_now, wp_target, precision, radius, direction):
     #暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
     d_lat = 2 * radius * math.sin(theta) * 1e-5
     d_lon = 2 * (radius / 1.1) * math.cos(theta) * 1e-5
+    s_lat = line_course * math.sin(theta) * 1e-5
+    s_lon = line_course * math.cos(theta) * 1e-5
 
-    target = Waypoint(wp_now.lat+d_lat, wp_now.lon+d_lon, wp_now.alt)
-    wp = [wp_now, wp_target]
-    wp2 = [wp_target, wp_now]
+    wp_near = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
+    wp_far = Waypoint(wp_now.lat++s_lat+d_lat, wp_now.lon++s_lon+d_lon, wp_now.alt)
+    wp_line1 = [wp_now, wp_near]
+    wp_circle1 = [wp_near, wp_far]
+    wp_circle2 = [wp_far, wp_near]
+    wp_line2 = [wp_near, wp_target]
 
-    wp_list = wp_circle_course(wp, precision, direction)
-    wp_list2 = wp_circle_course(wp2, precision, direction)
+    #直线开始进入掉头航线
+    wp_line1_list = wp_straight_course(wp_line1, precision)
 
-    wp_list.extend(wp_list2)
-    return wp_list
+    #掉头部分航路点
+    wp_circle_list = wp_circle_course(wp_circle1, precision, direction)
+    wp_circle_list.extend(wp_circle_course(wp_circle2, precision, direction))
+
+    #完成掉头进入直线投弹航线
+    wp_line2_list = wp_straight_course(wp_line2, precision)
+
+    #逐个上传任务
+    if upload_mission_till_completed(the_connection, wp_line1_list, home_position) == 0:
+        print("fly_away completed")
+    if upload_mission_till_completed(the_connection, wp_circle_list, home_position) == 0:
+        print("turn completed")
+    if upload_mission_till_completed(the_connection, wp_line2_list, home_position) == 0:
+        print("bomb_drop completed")
+
+
+#上传航点集并阻塞程序直到完成全部预定航点任务
+def upload_mission_till_completed(the_connection, wp, home_position):
+    mission_upload(the_connection, wp, home_position)
+
+    if (mode_set(the_connection, 10) < -1):
+        sys.exit(1)
+
+    wp_list_len = gain_mission(the_connection)
+    while(waypoint_reached(the_connection) < wp_list_len):
+        pass
+    return 0
