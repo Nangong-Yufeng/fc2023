@@ -1,8 +1,10 @@
 import time
-
 from pymavlink import mavutil
-from math import fabs
+import math
 from class_list import Waypoint
+from get_para import gain_mission, waypoint_reached
+from preflight import mode_set
+import sys
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -67,27 +69,104 @@ def mission_current(the_connection,wp):
 
 
 #根据上传的两个坐标点，通过自动设置更多的坐标点，生成一个两坐标之间的直线航线
-def cruse_wp_planning(vehicle, wp, num):
+def wp_straight_course(wp, precision):
+
     lat_len = (wp[1].lat - wp[0].lat)
     lon_len = (wp[1].lon - wp[0].lon)
     alt_len = (wp[1].alt - wp[0].alt)
-    print(lat_len)
-    lat_len /= num
-    lon_len /= num
-    alt_len /= num
+    lat_len /= precision
+    lon_len /= precision
+    alt_len /= precision
 
-    print(lat_len)
     wp_list = [wp[0]]
 
     i = 0
-    for i in range(0, num):
+    for i in range(0, precision):
         wp_new = Waypoint(wp_list[i].lat+lat_len, wp_list[i].lon+lon_len, wp_list[i].alt+alt_len)
         wp_list.append(wp_new)
         i+=1
 
     wp_list.append(wp[1])
-    print(wp_list[0])
-
     return wp_list
 
 
+#在两点之间形成近似圆弧航线（direction取1为顺时针，取-1为逆时针，默认顺时针）
+def wp_circle_course(wp, precision, direction=1):
+    lat_len = wp[1].lat - wp[0].lat
+    lon_len = wp[1].lon - wp[0].lon
+    alt_len = wp[1].alt - wp[0].alt
+
+    #注意使用弧度制
+    theta_start = math.atan(lat_len/lon_len)
+    if lon_len <= 0: #一四象限
+        pass
+    else: #二三象限
+        theta_start += math.pi
+
+    radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.48 #非常粗略
+    theta_step = math.pi / precision
+    center = Waypoint(wp[0].lat+0.5*lat_len, wp[0].lon+0.5*lon_len, wp[0].alt+0.5*alt_len)
+
+    wp_list = [wp[0]]
+    for i in range(0, precision):
+        theta = theta_start + direction * theta_step * (i+1)
+        lat_new = center.lat + radius * math.sin(theta)
+        lon_new = center.lon + radius * math.cos(theta)
+        alt_new = wp[0].alt + alt_len / precision * (i+1)
+        wp_new = Waypoint(lat_new, lon_new, alt_new)
+        wp_list.append(wp_new)
+        i += 1
+
+    wp_list.append(wp[1])
+    return wp_list
+
+
+#自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转弯半径、转弯方向（顺或逆）
+def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precision, radius, line_course, direction):
+    lat_len = wp_now.lat - wp_target.lat
+    lon_len = wp_now.lon - wp_target.lon
+    theta = math.atan(lat_len / lon_len)
+
+    #暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
+    d_lat = 2 * radius * math.sin(theta) * 1e-5
+    d_lon = 2 * (radius / 1.1) * math.cos(theta) * 1e-5
+    s_lat = line_course * math.sin(theta) * 1e-5
+    s_lon = line_course * math.cos(theta) * 1e-5
+
+    wp_near = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
+    wp_far = Waypoint(wp_now.lat++s_lat+d_lat, wp_now.lon++s_lon+d_lon, wp_now.alt)
+    wp_line1 = [wp_now, wp_near]
+    wp_circle1 = [wp_near, wp_far]
+    wp_circle2 = [wp_far, wp_near]
+    wp_line2 = [wp_near, wp_target]
+
+    #直线开始进入掉头航线
+    wp_line1_list = wp_straight_course(wp_line1, precision)
+
+    #掉头部分航路点
+    wp_circle_list = wp_circle_course(wp_circle1, precision, direction)
+    wp_circle_list.extend(wp_circle_course(wp_circle2, precision, direction))
+
+    #完成掉头进入直线投弹航线
+    wp_line2_list = wp_straight_course(wp_line2, precision)
+
+    #逐个上传任务
+    if upload_mission_till_completed(the_connection, wp_line1_list, home_position) == 0:
+        print("fly_away completed")
+    if upload_mission_till_completed(the_connection, wp_circle_list, home_position) == 0:
+        print("turn completed")
+    if upload_mission_till_completed(the_connection, wp_line2_list, home_position) == 0:
+        print("bomb_drop completed")
+
+
+#上传航点集并阻塞程序直到完成全部预定航点任务
+def upload_mission_till_completed(the_connection, wp, home_position):
+    mission_upload(the_connection, wp, home_position)
+
+    if (mode_set(the_connection, 10) < -1):
+        sys.exit(1)
+
+    wp_list_len = gain_mission(the_connection)
+    while(waypoint_reached(the_connection) < wp_list_len):
+        pass
+    return 0
