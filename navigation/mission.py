@@ -90,26 +90,45 @@ def wp_straight_course(wp, precision):
     return wp_list
 
 
-#在两点之间形成近似圆弧航线（direction取1为顺时针，取-1为逆时针，默认顺时针）
-def wp_circle_course(wp, precision, direction=1):
+#在两点之间形成近似圆弧航线（angle指定弧线的圆心角角度，direction取1为顺时针，取-1为逆时针，默认顺时针）
+def wp_circle_course(wp, precision, angle, direction=1):
     lat_len = wp[1].lat - wp[0].lat
     lon_len = wp[1].lon - wp[0].lon
     alt_len = wp[1].alt - wp[0].alt
 
+    #半圆因为角度计算关系不能直接用下面的方法，但我懒得加一个专门的半圆航线了
+    if angle == 180:
+        angle = 179.9
+
+    angle = angle * math.pi / 180 #转为弧度制
+
     #注意使用弧度制
     theta_start = math.atan(lat_len/lon_len)
-    if lon_len <= 0: #一四象限
+    if lon_len >= 0: #一四象限
         pass
     else: #二三象限
         theta_start += math.pi
 
-    radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.48 #非常粗略
-    theta_step = math.pi / precision
-    center = Waypoint(wp[0].lat+0.5*lat_len, wp[0].lon+0.5*lon_len, wp[0].alt+0.5*alt_len)
+    radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.45 / math.sin(angle*0.5)#非常粗略
+    theta_step = angle / precision
+    midpoint = Waypoint(wp[0].lat+0.5*lat_len, wp[0].lon+0.5*lon_len, wp[0].alt+0.5*alt_len)
+    if direction >= 0:
+        center = Waypoint(wp[0].lat+radius*math.sin(0.5*math.pi+theta_start-0.5*angle),
+                          wp[0].lon+radius*math.cos(0.5*math.pi+theta_start-0.5*angle),
+                          wp[0].alt+0.5*alt_len)
 
+    else:
+        center = Waypoint(wp[0].lat+radius*math.sin(-0.5*math.pi+theta_start+0.5*angle),
+                          wp[0].lon+radius*math.cos(-0.5*math.pi+theta_start+0.5*angle),
+                          wp[0].alt+0.5*alt_len)
+
+    #print(center.lat, center.lon)
     wp_list = [wp[0]]
     for i in range(0, precision):
-        theta = theta_start + direction * theta_step * (i+1)
+        if direction >= 0:
+           theta = (+theta_start - math.pi*0.5 - angle*0.5) + theta_step * (i+1) #顺时针适用
+        else:
+           theta = (+theta_start + math.pi*0.5 + angle*0.5) - theta_step * (i+1) #逆时针适用
         lat_new = center.lat + radius * math.sin(theta)
         lon_new = center.lon + radius * math.cos(theta)
         alt_new = wp[0].alt + alt_len / precision * (i+1)
@@ -150,13 +169,13 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     #完成掉头进入直线投弹航线
     wp_line2_list = wp_straight_course(wp_line2, precision)
 
+    wp_bomb_drop = wp_line1_list
+    wp_bomb_drop.extend(wp_circle_list)
+    wp_bomb_drop.extend(wp_line2_list)
+
     #逐个上传任务
-    if upload_mission_till_completed(the_connection, wp_line1_list, home_position) == 0:
-        print("fly_away completed")
-    if upload_mission_till_completed(the_connection, wp_circle_list, home_position) == 0:
-        print("turn completed")
-    if upload_mission_till_completed(the_connection, wp_line2_list, home_position) == 0:
-        print("bomb_drop completed")
+    if upload_mission_till_completed(the_connection, wp_bomb_drop, home_position) == 0:
+        print("bombs away!")
 
 
 #上传航点集并阻塞程序直到完成全部预定航点任务
@@ -170,3 +189,15 @@ def upload_mission_till_completed(the_connection, wp, home_position):
     while(waypoint_reached(the_connection) < wp_list_len):
         pass
     return 0
+
+
+def loiter_at_present(the_connection, alt):
+    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, 30, 0, 0, 0, alt)
+    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
+    result = msg.result
+    if result == 0:
+        return 0
+    else:
+        print("loiter failed")
+        return -10
