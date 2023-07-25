@@ -1,11 +1,14 @@
 """
 这是将在比赛时被运行的文件
 """
+from utils import title
 
-print("Hello, world!")
 
-# 1. 与飞机连接
+# 0. ~
+title.printTitle()
 
-# 2. 我吃饭去
+# 1. 飞行前准备
+
+# 2. 
 
 # 
