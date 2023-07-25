@@ -54,6 +54,7 @@
 
    ### upload_mission_till_completed(the_connection, wp, home_position):
    上传航点任务并执行，同时会阻塞至到达最后一个航点才继续其他代码
+   # 可能需要一个故障判断！
 
    ### loiter_at_present(the_connection, alt):
    在当前位置盘旋，直到模式切换或受到新的任务

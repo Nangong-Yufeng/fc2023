@@ -5,6 +5,8 @@ class Position_relative:
         self.lat = lat
         self.lon = lon
         self.alt = alt
+    def show(self):
+        print("lat: %s, lon: %s, alt:%s" %(self.lat, self.lon, self.alt))
 
 class Waypoint(Position_relative):
     def __init__(self, lat, lon, alt):
