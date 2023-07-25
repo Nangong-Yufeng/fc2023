@@ -2,7 +2,7 @@ import time
 import sys
 from pymavlink import mavutil
 from preflight import arm, mode_set, set_home
-from mission import mission_upload, clear_waypoint, mission_current, wp_straight_course, wp_circle_course, upload_mission_till_completed, execute_bomb_course, loiter_at_present
+from mission import clear_waypoint,upload_mission_till_completed, execute_bomb_course, loiter_at_present, loiter, wp_circle_course, wp_straight_course
 from class_list import Position_relative, Waypoint
 from set_para import set_speed
 from get_para import gain_posture_para, position_now, gain_mission, waypoint_reached
@@ -36,24 +36,19 @@ wp4 = Waypoint(-35.3654516, 149.1654714, 80)
 wp5 = Waypoint(-35.35941937, 149.16062729, 10)
 
 wp = [wp4, wp2]
-'''mission1 = wp_circle_course(wp, 30, 300, -1)
-upload_mission_till_completed(the_connection, mission1, home_position)
 '''
 #飞往侦察点
 mission1 = [wp2]
 upload_mission_till_completed(the_connection, mission1, home_position)
-
+'''
 if loiter_at_present(the_connection, 50) < -1:
     sys.exit(1)
 
 if input("假设视觉已返回坐标信息，输入零以继续： ") == 0:
     pass
 
- #loiter模式中读到的实际上是环绕点的坐标，而非飞机实际的坐标
 #执行投弹航线
-execute_bomb_course(the_connection, home_position, position_now(the_connection), wp5, precision=20, line_course=100, direction=1, radius=150)
+execute_bomb_course(the_connection, home_position, position_now(the_connection), wp5, precision=5, line_course=200, direction=1, radius=150)
 
 if(mode_set(the_connection, 11) < -1):
     sys.exit(1)
-
-#lat : -353601364, lon : 1491610398

@@ -166,6 +166,8 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
 
     wp1 = Waypoint(wp_mid.lat+half_chord_len*math.sin(-direction*math.pi*0.5+theta), wp_mid.lon+half_chord_len*math.cos(-direction*math.pi*0.5+theta),wp_now.alt)
     wp2 = Waypoint(wp_mid.lat+half_chord_len*math.sin(direction*math.pi*0.5+theta), wp_mid.lon+half_chord_len*math.cos(direction*math.pi*0.5+theta),wp_now.alt)
+    wp1.show()
+    wp2.show()
 
     wp_line1 = [wp_now, wp_start]
     wp_circle1 = [wp_start, wp1]
@@ -174,16 +176,16 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     wp_line2 = [wp_start, wp_target]
 
     #直线开始进入掉头航线
-    #wp_line1_list = wp_straight_course(wp_line1, precision)
-    wp_line1_list = [wp_start]
+    wp_line1_list = wp_straight_course(wp_line1, 10)
+    #wp_line1_list = [wp_start]
 
     #掉头部分航路点
-    wp_circle_list = wp_circle_course(wp_circle1, precision, 30, -direction)
-    wp_circle_list.extend(wp_circle_course(wp_circle2, precision*2, 200, direction))
-    wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, -direction))
+    wp_circle_list = wp_circle_course(wp_circle1, precision, 45, -direction)
+    wp_circle_list.extend(wp_circle_course(wp_circle2, precision*2, 180, direction))
+    wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 60, -direction))
 
     #完成掉头进入直线投弹航线
-    wp_line2_list = wp_straight_course(wp_line2, precision)
+    wp_line2_list = wp_straight_course(wp_line2, 3)
 
     wp_bomb_drop = wp_line1_list
     wp_bomb_drop.extend(wp_circle_list)
@@ -210,6 +212,18 @@ def upload_mission_till_completed(the_connection, wp, home_position):
 def loiter_at_present(the_connection, alt):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, 30, 0, 0, 0, alt)
+    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
+    result = msg.result
+    if result == 0:
+        return 0
+    else:
+        print("loiter failed")
+        return -10
+
+
+def loiter(the_connection, lat, lon, alt):
+    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, 30, 0, lat, lon, alt)
     msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
     result = msg.result
     if result == 0:
