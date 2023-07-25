@@ -36,7 +36,7 @@ wp4 = Waypoint(-35.3654516, 149.1654714, 80)
 wp5 = Waypoint(-35.35941937, 149.16062729, 10)
 
 wp = [wp4, wp2]
-mission1 = wp_circle_course(wp, 30, 300, -1)
+'''mission1 = wp_circle_course(wp, 30, 300, -1)
 upload_mission_till_completed(the_connection, mission1, home_position)
 '''
 #飞往侦察点
@@ -49,12 +49,11 @@ if loiter_at_present(the_connection, 50) < -1:
 if input("假设视觉已返回坐标信息，输入零以继续： ") == 0:
     pass
 
+ #loiter模式中读到的实际上是环绕点的坐标，而非飞机实际的坐标
 #执行投弹航线
-execute_bomb_course(the_connection, home_position, position_now(the_connection), wp5, precision=10, radius=50, line_course=200, direction=1)
+execute_bomb_course(the_connection, home_position, position_now(the_connection), wp5, precision=20, line_course=100, direction=1, radius=150)
 
 if(mode_set(the_connection, 11) < -1):
     sys.exit(1)
 
-'''
-
-
+#lat : -353601364, lon : 1491610398

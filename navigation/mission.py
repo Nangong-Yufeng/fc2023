@@ -5,6 +5,7 @@ from class_list import Waypoint
 from get_para import gain_mission, waypoint_reached
 from preflight import mode_set
 import sys
+import numpy
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -109,9 +110,11 @@ def wp_circle_course(wp, precision, angle, direction=1):
     else: #二三象限
         theta_start += math.pi
 
+    #计算半径和角度步长
     radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.45 / math.sin(angle*0.5)#非常粗略
     theta_step = angle / precision
-    midpoint = Waypoint(wp[0].lat+0.5*lat_len, wp[0].lon+0.5*lon_len, wp[0].alt+0.5*alt_len)
+
+    #判断圆心位置
     if direction >= 0:
         center = Waypoint(wp[0].lat+radius*math.sin(0.5*math.pi+theta_start-0.5*angle),
                           wp[0].lon+radius*math.cos(0.5*math.pi+theta_start-0.5*angle),
@@ -122,7 +125,6 @@ def wp_circle_course(wp, precision, angle, direction=1):
                           wp[0].lon+radius*math.cos(-0.5*math.pi+theta_start+0.5*angle),
                           wp[0].alt+0.5*alt_len)
 
-    #print(center.lat, center.lon)
     wp_list = [wp[0]]
     for i in range(0, precision):
         if direction >= 0:
@@ -140,31 +142,45 @@ def wp_circle_course(wp, precision, angle, direction=1):
     return wp_list
 
 
-#自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转弯半径、转弯方向（顺或逆）
-def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precision, radius, line_course, direction):
+#自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（顺或逆）
+def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precision, line_course, direction, radius=50):
     lat_len = wp_now.lat - wp_target.lat
     lon_len = wp_now.lon - wp_target.lon
     theta = math.atan(lat_len / lon_len)
+    if lon_len >= 0: #一四象限
+        pass
+    else: #二三象限
+        theta += math.pi
 
     #暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
-    d_lat = 2 * radius * math.sin(theta) * 1e-5
-    d_lon = 2 * (radius / 1.1) * math.cos(theta) * 1e-5
+    #d_lat = 2 * radius * math.sin(theta) * 1e-5
+    #d_lon = 2 * (radius / 1.1) * math.cos(theta) * 1e-5
     s_lat = line_course * math.sin(theta) * 1e-5
     s_lon = line_course * math.cos(theta) * 1e-5
 
-    wp_near = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
-    wp_far = Waypoint(wp_now.lat++s_lat+d_lat, wp_now.lon++s_lon+d_lon, wp_now.alt)
-    wp_line1 = [wp_now, wp_near]
-    wp_circle1 = [wp_near, wp_far]
-    wp_circle2 = [wp_far, wp_near]
-    wp_line2 = [wp_near, wp_target]
+    #生成两端直线和三段弧线组成的掉头航线
+    wp_start = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
+    wp_mid = Waypoint(wp_start.lat+s_lat*0.5, wp_start.lon+s_lon*0.5, wp_now.alt)
+
+    half_chord_len = 0.5*radius*1e-5 #转向处的半弦长
+
+    wp1 = Waypoint(wp_mid.lat+half_chord_len*math.sin(-direction*math.pi*0.5+theta), wp_mid.lon+half_chord_len*math.cos(-direction*math.pi*0.5+theta),wp_now.alt)
+    wp2 = Waypoint(wp_mid.lat+half_chord_len*math.sin(direction*math.pi*0.5+theta), wp_mid.lon+half_chord_len*math.cos(direction*math.pi*0.5+theta),wp_now.alt)
+
+    wp_line1 = [wp_now, wp_start]
+    wp_circle1 = [wp_start, wp1]
+    wp_circle2 = [wp1, wp2]
+    wp_circle3 = [wp2, wp_start]
+    wp_line2 = [wp_start, wp_target]
 
     #直线开始进入掉头航线
-    wp_line1_list = wp_straight_course(wp_line1, precision)
+    #wp_line1_list = wp_straight_course(wp_line1, precision)
+    wp_line1_list = [wp_start]
 
     #掉头部分航路点
-    wp_circle_list = wp_circle_course(wp_circle1, precision, direction)
-    wp_circle_list.extend(wp_circle_course(wp_circle2, precision, direction))
+    wp_circle_list = wp_circle_course(wp_circle1, precision, 30, -direction)
+    wp_circle_list.extend(wp_circle_course(wp_circle2, precision*2, 200, direction))
+    wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, -direction))
 
     #完成掉头进入直线投弹航线
     wp_line2_list = wp_straight_course(wp_line2, precision)
@@ -173,7 +189,7 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     wp_bomb_drop.extend(wp_circle_list)
     wp_bomb_drop.extend(wp_line2_list)
 
-    #逐个上传任务
+    #上传任务
     if upload_mission_till_completed(the_connection, wp_bomb_drop, home_position) == 0:
         print("bombs away!")
 
