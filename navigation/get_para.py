@@ -9,6 +9,7 @@ def gain_posture_para(the_connection):
 
 def position_now(the_connection):
     msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
+    print(msg)
     wp_now = Position_relative(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3)
     return wp_now
 
