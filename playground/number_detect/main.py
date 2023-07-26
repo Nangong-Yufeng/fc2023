@@ -96,7 +96,7 @@ def test():
             _,predicted = torch.max(outputs.data,dim = 1)
             total +=labels.size(0)
             correct +=(predicted ==labels).sum().item()
-            print("Accuracy on test set: %d %% " %(100 *correct/total))
+            print("Accuracy on target_detect set: %d %% " %(100 *correct/total))
             print("-------",predicted)
 
 if __name__ == '__main__':
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     #开始训练和测试
     for epoch in range(100):
         train(epoch)
-        #test()
+        #target_detect()
 
     #未完待续：yza传入的图片，先使用RGB2GRAY转为灰度图片，创建好testloader，再传入test中，输出predicted即可
     #这部分需要对接的时候再进行写入
