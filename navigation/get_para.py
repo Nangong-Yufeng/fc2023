@@ -50,4 +50,4 @@ def gain_mission(vehicle):
     #for mission_item in mission_item_list:
         #print("Seq", mission_item["seq"],"Latitude", mission_item["x"] * 1e-7,"Longitude", mission_item["y"] * 1e-7,"Altitude", mission_item["z"])
 
-    return count-1
+    return count-3

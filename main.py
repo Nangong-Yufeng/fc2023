@@ -3,7 +3,6 @@
 """
 from utils import title
 
-
 # 0. ~
 title.printTitle()
 

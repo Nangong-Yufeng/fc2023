@@ -84,6 +84,7 @@ def wp_straight_course(wp, precision):
     i = 0
     for i in range(0, precision):
         wp_new = Waypoint(wp_list[i].lat+lat_len, wp_list[i].lon+lon_len, wp_list[i].alt+alt_len)
+        wp_new.show()
         wp_list.append(wp_new)
         i+=1
 
@@ -135,6 +136,7 @@ def wp_circle_course(wp, precision, angle, direction=1):
         lon_new = center.lon + radius * math.cos(theta)
         alt_new = wp[0].alt + alt_len / precision * (i+1)
         wp_new = Waypoint(lat_new, lon_new, alt_new)
+        wp_new.show()
         wp_list.append(wp_new)
         i += 1
 
@@ -200,8 +202,7 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
 def upload_mission_till_completed(the_connection, wp, home_position):
     mission_upload(the_connection, wp, home_position)
 
-    if (mode_set(the_connection, 10) < -1):
-        sys.exit(1)
+    mode_set(the_connection, 10)
 
     wp_list_len = gain_mission(the_connection)
     while(waypoint_reached(the_connection) < wp_list_len):
