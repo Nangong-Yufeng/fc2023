@@ -9,7 +9,6 @@ def gain_posture_para(the_connection):
 
 def position_now(the_connection):
     msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
-    print(msg)
     wp_now = Position_relative(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3)
     return wp_now
 
@@ -50,4 +49,4 @@ def gain_mission(vehicle):
     #for mission_item in mission_item_list:
         #print("Seq", mission_item["seq"],"Latitude", mission_item["x"] * 1e-7,"Longitude", mission_item["y"] * 1e-7,"Altitude", mission_item["z"])
 
-    return count-3
+    return count-1
