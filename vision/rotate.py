@@ -54,13 +54,15 @@ def rotate(image:np.array, debug:bool=False)->np.array:
     angle = 0.
     rect = None
     used_contour = None
+    used_rect_size = 0.
     for contour in contours:
         rect = cv2.minAreaRect(contour)  # 最小的外接矩形
         width, height = rect[1]
-        if width * height > 100:  # 使用外接矩形的面积来筛选合适的
+        if width * height > 100 and width * height > used_rect_size:  # 使用外接矩形的面积来筛选合适的
             # 旋转角度
             angle = cv2.minAreaRect(contour)[2]
             used_contour = contour
+            used_rect_size = width * height
             if (height < width):
                 angle -= 90
     
@@ -71,11 +73,15 @@ def rotate(image:np.array, debug:bool=False)->np.array:
         time_end = time.time()
         print(f"利用轮廓获取角度：{1000*(time_end-time_start)}ms")
         image_with_rect = image.copy()
-        box = cv2.boxPoints(rect).astype(np.int)
+        rect = cv2.minAreaRect(used_contour)
+        box = cv2.boxPoints(rect).astype(np.uint8)
         for i in range(4):
             cv2.circle(image_with_rect, center=tuple(box[i]), radius=3, color=(0, 0, 0), thickness=2)
             cv2.line(image_with_rect, tuple(box[i]), tuple(box[(i+1)%4]), color=(0, 0, 255), thickness=1)
         debug_ret['with_rect'] = image_with_rect
+        cv2.imshow('haha', image_with_rect)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         time_start = time.time()
     
     # 检测图片正反
@@ -113,6 +119,3 @@ def rotate(image:np.array, debug:bool=False)->np.array:
         return debug_ret
     
     return image_rotated
-
-
-
