@@ -1,0 +1,84 @@
+7.26 16.07飞行
+
+/usr/bin/python3.8 /home/bobo/文档/fc2023/navigation/flight_test.py 
+GLOBAL_POSITION_INT {time_boot_ms : 171224, lat : 225902488, lon : 1139748700, alt : 47770, relative_alt : -1618, vx : 0, vy : 1, vz : -2, hdg : 18631}
+successfully set home as lat = 22.5903516, lon = 113.9755156, re_alt = 0 meters
+lat: 22.59072678, lon: 113.97520636, alt:120.0
+lat: 22.590526960000002, lon: 113.97519292, alt:120.0
+lat: 22.590327140000003, lon: 113.97517948, alt:120.0
+lat: 22.590127320000004, lon: 113.97516603999999, alt:120.0
+lat: 22.589927500000005, lon: 113.97515259999999, alt:120.0
+Mission uploaded successfully
+set mode AUTO successfully
+Total mission item count: 8
+lat: 22.589860272156944, lon: 113.97516288054855, alt:120.0
+lat: 22.58979950621155, lon: 113.97519342187206, alt:120.0
+lat: 22.58975114380504, lon: 113.97524123766648, alt:120.0
+lat: 22.5897199137714, lon: 113.97530165254511, alt:120.0
+lat: 22.589708869756123, lon: 113.97536875919373, alt:120.0
+lat: 22.58971909163341, lon: 113.97543599598265, alt:120.0
+lat: 22.58974957991699, lon: 113.97549678855724, alt:120.0
+lat: 22.58979735348906, lon: 113.97554519267248, alt:120.0
+lat: 22.58985774109134, lon: 113.97557647541615, alt:120.0
+lat: 22.589924838076676, lon: 113.9755875779888, alt:120.0
+Mission uploaded successfully
+
+error：
+Traceback (most recent call last):
+  File "/home/bobo/文档/fc2023/navigation/flight_test.py", line 35, in <module>
+    upload_mission_till_completed(the_connection, wp_circle_course(wp_circle1, 10, 180, 1), home_position)
+  File "/home/bobo/文档/fc2023/navigation/mission.py", line 205, in upload_mission_till_completed
+    if (mode_set(the_connection, 10) < -1):
+  File "/home/bobo/文档/fc2023/navigation/preflight.py", line 25, in mode_set
+    result = msg.result
+AttributeError: 'NoneType' object has no attribute 'result'
+
+7.26 16.34飞行
+/usr/bin/python3.8 /home/bobo/文档/fc2023/navigation/flight_test.py 
+GLOBAL_POSITION_INT {time_boot_ms : 138903, lat : 225902826, lon : 1139748719, alt : 49220, relative_alt : -3155, vx : 5, vy : 19, vz : 11, hdg : 12784}
+successfully set home as lat = 22.5903516, lon = 113.9755156, re_alt = 0 meters
+lat: 22.59072678, lon: 113.97520636, alt:120.0
+lat: 22.590526960000002, lon: 113.97519292, alt:120.0
+lat: 22.590327140000003, lon: 113.97517948, alt:120.0
+lat: 22.590127320000004, lon: 113.97516603999999, alt:120.0
+lat: 22.589927500000005, lon: 113.97515259999999, alt:120.0
+lat: 22.589860272156944, lon: 113.97516288054855, alt:120.0
+lat: 22.58979950621155, lon: 113.97519342187206, alt:120.0
+lat: 22.58975114380504, lon: 113.97524123766648, alt:120.0
+lat: 22.5897199137714, lon: 113.97530165254511, alt:120.0
+lat: 22.589708869756123, lon: 113.97536875919373, alt:120.0
+lat: 22.58971909163341, lon: 113.97543599598265, alt:120.0
+lat: 22.58974957991699, lon: 113.97549678855724, alt:120.0
+lat: 22.58979735348906, lon: 113.97554519267248, alt:120.0
+lat: 22.58985774109134, lon: 113.97557647541615, alt:120.0
+lat: 22.589924838076676, lon: 113.9755875779888, alt:120.0
+lat: 22.59012354, lon: 113.9755938, alt:120.0
+lat: 22.590322280000002, lon: 113.9755938, alt:120.0
+lat: 22.590521020000004, lon: 113.9755938, alt:120.0
+lat: 22.590719760000006, lon: 113.9755938, alt:120.0
+lat: 22.590918500000008, lon: 113.9755938, alt:120.0
+lat: 22.59097562701364, lon: 113.9755859702087, alt:120.0
+lat: 22.591027542873597, lon: 113.97556087947726, alt:120.0
+lat: 22.591069171292297, lon: 113.97552098115555, alt:120.0
+lat: 22.591096441879216, lon: 113.97547017646671, alt:120.0
+lat: 22.591106688140112, lon: 113.97541343304897, alt:120.0
+lat: 22.59109890820452, lon: 113.9753562992243, alt:120.0
+lat: 22.591073862787763, lon: 113.97530436148831, alt:120.0
+lat: 22.591034000808886, lon: 113.97526269826763, alt:120.0
+lat: 22.590983219937463, lon: 113.97523538335564, alt:120.0
+lat: 22.59092648548288, lon: 113.97522508758068, alt:120.0
+Mission uploaded successfully
+set mode AUTO successfully
+Total mission item count: 39
+Traceback (most recent call last):
+  File "/home/bobo/文档/fc2023/navigation/flight_test.py", line 39, in <module>
+    upload_mission_till_completed(the_connection, wp_list, home_position)
+  File "/home/bobo/文档/fc2023/navigation/mission.py", line 207, in upload_mission_till_completed
+    wp_list_len = gain_mission(the_connection)
+  File "/home/bobo/文档/fc2023/navigation/get_para.py", line 46, in gain_mission
+    message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_item_int_message.msgname,blocking=True)
+  File "/usr/local/lib/python3.8/dist-packages/pymavlink/mavutil.py", line 524, in recv_match
+    self.select(0.05)
+  File "/usr/local/lib/python3.8/dist-packages/pymavlink/mavutil.py", line 338, in select
+    (rin, win, xin) = select.select([self.fd], [], [], timeout)
+KeyboardInterrupt

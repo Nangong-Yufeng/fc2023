@@ -2,10 +2,9 @@ import time
 from pymavlink import mavutil
 import math
 from class_list import Waypoint
-from get_para import gain_mission, waypoint_reached
+from get_para import gain_mission, waypoint_reached, position_now
 from preflight import mode_set
-import sys
-import numpy
+from error_process import error_process
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -84,6 +83,7 @@ def wp_straight_course(wp, precision):
     i = 0
     for i in range(0, precision):
         wp_new = Waypoint(wp_list[i].lat+lat_len, wp_list[i].lon+lon_len, wp_list[i].alt+alt_len)
+        wp_new.show()
         wp_list.append(wp_new)
         i+=1
 
@@ -135,6 +135,7 @@ def wp_circle_course(wp, precision, angle, direction=1):
         lon_new = center.lon + radius * math.cos(theta)
         alt_new = wp[0].alt + alt_len / precision * (i+1)
         wp_new = Waypoint(lat_new, lon_new, alt_new)
+        wp_new.show()
         wp_list.append(wp_new)
         i += 1
 
@@ -176,12 +177,12 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     wp_line2 = [wp_start, wp_target]
 
     #直线开始进入掉头航线
-    wp_line1_list = wp_straight_course(wp_line1, 10)
+    wp_line1_list = wp_straight_course(wp_line1, 3)
     #wp_line1_list = [wp_start]
 
     #掉头部分航路点
     wp_circle_list = wp_circle_course(wp_circle1, precision, 45, -direction)
-    wp_circle_list.extend(wp_circle_course(wp_circle2, precision*2, 180, direction))
+    wp_circle_list.extend(wp_circle_course(wp_circle2, precision, 180, direction))
     wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 60, -direction))
 
     #完成掉头进入直线投弹航线
@@ -192,21 +193,26 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     wp_bomb_drop.extend(wp_line2_list)
 
     #上传任务
-    if upload_mission_till_completed(the_connection, wp_bomb_drop, home_position) == 0:
-        print("bombs away!")
+    upload_mission_till_completed(the_connection, wp_bomb_drop, home_position)
+    print("bombs away!")
 
 
 #上传航点集并阻塞程序直到完成全部预定航点任务
 def upload_mission_till_completed(the_connection, wp, home_position):
     mission_upload(the_connection, wp, home_position)
 
-    if (mode_set(the_connection, 10) < -1):
-        sys.exit(1)
+    mode_set(the_connection, 10)
 
     wp_list_len = gain_mission(the_connection)
-    while(waypoint_reached(the_connection) < wp_list_len):
-        pass
-    return 0
+    print(wp_list_len)
+
+    while True:
+        wp = waypoint_reached(the_connection)
+        print(wp)
+        if wp < wp_list_len:
+            continue
+        else:
+            break
 
 
 def loiter_at_present(the_connection, alt):
@@ -215,19 +221,9 @@ def loiter_at_present(the_connection, alt):
     msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
     result = msg.result
     if result == 0:
-        return 0
+        lat = position_now(the_connection).lat
+        lon = position_now(the_connection).lon
+        print("loiter at present of lat: ",lat, "lon: ", lon, "alt: ", alt)
     else:
-        print("loiter failed")
-        return -10
-
-
-def loiter(the_connection, lat, lon, alt):
-    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
-                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, 30, 0, lat, lon, alt)
-    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
-    result = msg.result
-    if result == 0:
-        return 0
-    else:
-        print("loiter failed")
-        return -10
+       print("loiter failed")
+       error_process(the_connection)

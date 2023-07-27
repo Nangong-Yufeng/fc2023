@@ -16,7 +16,6 @@ from vision.MyLoadImage import MyLoadIamge
 
 from vision.detect import detect
 
-
 # 0. ~
 title.printTitle()
 
