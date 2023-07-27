@@ -1,2 +1,5 @@
 pymavlink
 geopy
+PyQt5
+PyQtWebEngine
+folium
