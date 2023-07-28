@@ -208,7 +208,7 @@ def upload_mission_till_completed(the_connection, wp, home_position):
 
     while True:
         wp = waypoint_reached(the_connection)
-        print(wp)
+        print("reaching waypoint", wp)
         if wp < wp_list_len:
             continue
         else:
