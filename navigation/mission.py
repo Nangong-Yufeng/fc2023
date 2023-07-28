@@ -165,8 +165,12 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
 
     half_chord_len = 0.5*radius*1e-5 #转向处的半弦长
 
-    wp1 = Waypoint(wp_mid.lat+half_chord_len*math.sin(-direction*math.pi*0.5+theta), wp_mid.lon+half_chord_len*math.cos(-direction*math.pi*0.5+theta),wp_now.alt)
-    wp2 = Waypoint(wp_mid.lat+half_chord_len*math.sin(direction*math.pi*0.5+theta), wp_mid.lon+half_chord_len*math.cos(direction*math.pi*0.5+theta),wp_now.alt)
+    wp1 = Waypoint(wp_mid.lat+half_chord_len*math.sin(-direction*math.pi*0.5+theta+math.pi*0.05),
+                   wp_mid.lon+half_chord_len*math.cos(-direction*math.pi*0.5+theta+math.pi*0.05),
+                   wp_now.alt)
+    wp2 = Waypoint(wp_mid.lat+half_chord_len*math.sin(direction*math.pi*0.5+theta+math.pi*0.05),
+                   wp_mid.lon+half_chord_len*math.cos(direction*math.pi*0.5+theta+math.pi*0.05),
+                   wp_now.alt)
     wp1.show()
     wp2.show()
 
@@ -181,9 +185,9 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     #wp_line1_list = [wp_start]
 
     #掉头部分航路点
-    wp_circle_list = wp_circle_course(wp_circle1, precision, 45, -direction)
-    wp_circle_list.extend(wp_circle_course(wp_circle2, precision, 180, direction))
-    wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 60, -direction))
+    wp_circle_list = wp_circle_course(wp_circle1, precision, 30, -direction)
+    wp_circle_list.extend(wp_circle_course(wp_circle2, 2*precision, 270, direction))
+    wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, -direction))
 
     #完成掉头进入直线投弹航线
     wp_line2_list = wp_straight_course(wp_line2, 3)

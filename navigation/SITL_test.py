@@ -42,11 +42,11 @@ upload_mission_till_completed(the_connection, mission1, home_position)
 loiter_at_present(the_connection, 50)
 
 
-if input("假设视觉已返回坐标信息，输入零以继续： ") == 0:
+if input("假设视觉已返回坐标信息，输入零以继续： ") == '0':
     pass
 
 #执行投弹航线
-execute_bomb_course(the_connection, home_position, position_now(the_connection), wp1, precision=5, line_course=200, direction=1, radius=150)
+execute_bomb_course(the_connection, home_position, position_now(the_connection), wp1, precision=3, line_course=200, direction=1, radius=150)
 
 mode_set(the_connection, 11)
 
