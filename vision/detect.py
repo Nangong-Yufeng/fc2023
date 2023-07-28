@@ -89,16 +89,17 @@ def detect(
 
             # Write results
             for *xyxy, conf, cls in reversed(det):  # reversed反转列表顺序
-                tlbr = torch.tensor(xyxy).view(1, 4).view(-1).tolist()
+                tlbr = torch.tensor(xyxy).view(1, 4).view(-1).tolist()  # 框的左上右下坐标
                 img = im0_copy.copy()
                 hei = img.shape[0]
                 wid = img.shape[1]
                 img = img[max(0, int(tlbr[1]) - 5):min(int(tlbr[3]) + 5, hei),
-                      max(0, int(tlbr[0]) - 5):min(int(tlbr[2]) + 5, wid)]
+                      max(0, int(tlbr[0]) - 5):min(int(tlbr[2]) + 5, wid)]  # 对原图切片，截取标靶
                 img_rotated = rotate(img)
                 img_crop = crop(img_rotated)
-                if img_crop.shape[:2] == (0, 0):
+                if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形
                     continue
+
                 # 在原图上画框
                 if view_img:  # Add bbox to image
                     c = int(cls)  # integer class
