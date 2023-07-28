@@ -18,6 +18,7 @@ def arm(the_connection, times=5):
             time.sleep(2)
             count += 1
             print("receive None msg, retry No.", count)
+            result = -1
             continue
       else:
             error_process(the_connection)
@@ -44,6 +45,7 @@ def mode_set(the_connection, mode, times=5):
             time.sleep(2)
             count += 1
             print("receive None msg, retry No.", count)
+            result = -1
             continue
       else:
             error_process(the_connection)
@@ -77,12 +79,27 @@ def mode_set(the_connection, mode, times=5):
         error_process(the_connection)
 
 
-def set_home(the_connection, mode, position_re):
+def set_home(the_connection, mode, position_re, times=5):
 
     #设置home点
-    the_connection.mav.command_int_send(the_connection.target_system, the_connection.target_component, 3,
-                                         mavutil.mavlink.MAV_CMD_DO_SET_HOME, 0, 0, mode, 0, 0, 0, int(position_re.lat * 1e7), int(position_re.lon * 1e7), position_re.alt)
-    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
+    count = 0
+    while True:
+        the_connection.mav.command_int_send(the_connection.target_system, the_connection.target_component, 3,
+                                            mavutil.mavlink.MAV_CMD_DO_SET_HOME, 0, 0, mode, 0, 0, 0,
+                                            int(position_re.lat * 1e7), int(position_re.lon * 1e7), position_re.alt)
+        msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+
+        if is_none_return(msg) == False:
+            result = msg.result
+            break
+        elif count < times:
+            time.sleep(2)
+            count += 1
+            print("receive None msg, retry No.", count)
+            result = -1
+            continue
+        else:
+            error_process(the_connection)
 
     #mode为1表示使用当前位置为home点，mode为0则为指定位置
     if msg.result == 0 and mode == 1:

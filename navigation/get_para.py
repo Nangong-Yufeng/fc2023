@@ -1,6 +1,6 @@
 from pymavlink import mavutil
 from class_list import Position_relative
-import math
+from error_process import rec_match_received
 
 def gain_posture_para(the_connection):
     msg = the_connection.recv_match(type='ATTITUDE', blocking=True)
@@ -8,7 +8,8 @@ def gain_posture_para(the_connection):
     print(msg)
 
 def position_now(the_connection):
-    msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
+    msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
+    #msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
     wp_now = Position_relative(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3)
     return wp_now
 
@@ -24,7 +25,8 @@ def gain_mission(vehicle):
                                                            mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
     vehicle.mav.send(message)
 
-    message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_count_message.msgname,blocking=True)
+    message = rec_match_received(vehicle, mavutil.mavlink.MAVLink_mission_count_message.msgname)
+    #message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_count_message.msgname,blocking=True)
     message = message.to_dict()
 
     count = message["count"]
