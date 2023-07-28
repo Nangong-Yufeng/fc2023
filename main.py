@@ -34,7 +34,7 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 # 参数
 source = 0  # 视频源 0: 电脑自带摄像头； 1： 外部摄像头
-device = 'CPU'  # 硬件 '0'：GPU 或 'CPU'：CPU
+device = '0'  # 硬件 '0'：GPU 或 'CPU'：CPU
 weights = ROOT / 'vision/best.pt'  # 权重文件
 data = ROOT / 'vision/0515.yaml'  # 类别等信息
 imgsz = (640, 640)  # 新图大小
