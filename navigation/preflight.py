@@ -1,6 +1,6 @@
 import time
 from pymavlink import mavutil
-from error_process import error_process, is_none_return
+from error_process import error_process, is_none_return, rec_match_received
 
 def arm(the_connection, times=5):
     the_connection.wait_heartbeat()
@@ -22,12 +22,22 @@ def arm(the_connection, times=5):
             continue
       else:
             error_process(the_connection)
+
+
+
     # 使用long信息发送arm的command
     if result == 0:
         print("arm successfully")
     else:
         print("arm failed")
-        error_process(the_connection)
+        msg = rec_match_received(the_connection, "GPS_RAW_INT")
+        if msg.fix_type == 3:
+            force_arm(the_connection)
+        else:
+            error_process(the_connection)
+
+
+
 
 def mode_set(the_connection, mode, times=5):
 
@@ -111,3 +121,33 @@ def set_home(the_connection, mode, position_re, times=5):
         print("home set failed")
         error_process(the_connection)
 
+
+def force_arm(the_connection, times=5):
+    if input('解锁失败，但GPS连接正常，输入0以强制解锁 ') == '0':
+        pass
+    else:
+        print("arm failed")
+        error_process(the_connection)
+
+    count = 0
+    while True:
+        the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 21196, 0, 0, 0, 0, 0)
+        msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+
+        if is_none_return(msg) == False:
+            result = msg.result
+            break
+        elif count < times:
+            time.sleep(2)
+            count += 1
+            print("receive None msg, retry No.", count)
+            result = -1
+            continue
+        else:
+            error_process(the_connection)
+
+    if result == 0:
+        print("force arm successfully")
+    else:
+        error_process(the_connection)
