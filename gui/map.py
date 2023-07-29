@@ -39,14 +39,6 @@ class MapWindow(QWidget):
         # 创建一个Folium地图对象
         self.map = folium.Map(location=location, zoom_start=1000)
         self.map.add_child(folium.LatLngPopup())
-        # self.path = folium.PolyLine([
-        #     (22.5903516, 113.9755356),
-        #     (22.5904516, 113.9755356),
-        #     (22.5905516, 113.9755356),
-        #     (22.5906516, 113.9755356),
-        #     (22.5907516, 113.9755356),
-        #     (22.5908516, 113.9755356),
-        # ]).add_to(self.map)
         if MapWindow.targetPoints:
             for p in MapWindow.targetPoints:
                 folium.Marker(p).add_to(self.map)
