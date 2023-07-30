@@ -15,7 +15,7 @@ title.printTitle()
 """
 标靶识别
 """
-vis = Vision()
+vis = Vision(source=0, device='0', conf_thres=0.7)
 
 itv = 50  # 每次检测的间隔时间，单位ms
 pre = int(time.time() * 1000)  # 上次检测完的时间

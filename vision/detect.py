@@ -21,7 +21,10 @@ from vision.crop import crop
 
 
 class Vision:
-    def __init__(self):
+    """
+
+    """
+    def __init__(self, source=0, device='0', conf_thres=0.7):
         FILE = Path(__file__).resolve()
         ROOT = FILE.parents[0]  # YOLOv5 root directory
         if str(ROOT) not in sys.path:
@@ -29,14 +32,14 @@ class Vision:
         ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
         # 参数
-        source = 0  # 视频源 0: 电脑自带摄像头； 1： 外部摄像头
-        device = '0'  # 硬件 '0'：GPU 或 'CPU'：CPU
+        # source = 0  # 视频源 0: 电脑自带摄像头； 1： 外部摄像头
+        # device = '0'  # 硬件 '0'：GPU 或 'CPU'：CPU
         weights = ROOT / 'best.pt'  # 权重文件
         data = ROOT / '0515.yaml'  # 类别等信息
         imgsz = (640, 640)  # 新图大小
         half = False  # use FP16 half-precision inference
         dnn = False  # use OpenCV DNN for ONNX inference
-        self.conf_thres = 0.7  # 置信度阈值
+        self.conf_thres = conf_thres  # 置信度阈值
 
         device = select_device(device)
         self.model = DetectMultiBackend(weights, device=device, dnn=dnn, data=data, fp16=half)
@@ -49,11 +52,11 @@ class Vision:
         self.cap = cv2.VideoCapture(source)
 
 
-    # @smart_inference_mode()
+    @smart_inference_mode()
     def detect(
         self,
-        im0:np.array,  # 原图
-        im:np.array,  # 新图
+        im0: np.array,  # 原图
+        im: np.array,  # 新图
         model,  # 模型文件
         conf_thres=0.25,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
@@ -142,12 +145,19 @@ class Vision:
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
+
             im0 = annotator.result()
             # 若设置展示，则画出图片/视频
             if view_img:
                 cv2.imshow('0', im0)
                 cv2.waitKey(1)
+
     def run(self):
+        """ 对视频截图（抽帧），检测标靶，返回数值与坐标
+
+        Return:
+             未完成
+        """
         ret, im0 = self.cap.read()  # 截图
         im = MyLoadIamge(im0=im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
         self.detect(im0=im0, im=im, model=self.model, conf_thres=self.conf_thres)
