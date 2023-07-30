@@ -6,7 +6,10 @@ from preflight import mode_set
 from error_process import error_process
 from gui import putPathPoint, setTargetPoints, runGui, setMapLocation
 from threading import Thread
+from trajectory import trajectory_cal
 
+
+# 通用任务函数
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -70,20 +73,20 @@ def upload_mission_till_completed(the_connection, wp, home_position):
     mode_set(the_connection, 10)
 
     wp_list_len = gain_mission(the_connection)
-    #print(wp_list_len)
 
     #在到达最后航点前，实时显示动态轨迹
-    while mission_current(the_connection, wp) < (wp_list_len - 1):
+    while mission_current(the_connection) < (wp_list_len-3):
         po_now = position_now(the_connection)
         point = (po_now.lat, po_now.lon)
         putPathPoint(point)
 
     while True:
-        wp_num = waypoint_reached(the_connection)
+        wp_num = waypoint_reached(the_connection, wp, wp_list_len)
         if wp_num < wp_list_len:
-            print("reaching waypoint", wp_num)
+            #print("reaching waypoint", wp_num)
             continue
         else:
+            print("reaching last waypoint", wp_num)
             break
 
 
@@ -92,6 +95,8 @@ def clear_waypoint(the_connection):
                                                             mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
     the_connection.mav.send(msg)
 
+
+# 指定形状航线生成函数
 
 #根据上传的两个坐标点，通过自动设置更多的坐标点，生成一个两坐标之间的直线航线
 def wp_straight_course(wp, precision):
@@ -168,8 +173,13 @@ def wp_circle_course(wp, precision, angle, direction=1):
     return wp_list
 
 
+# 投弹相关函数
+
 #自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（顺或逆）
-def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precision, line_course, direction, radius=50):
+#修正，采用半圆航线飞至一定距离后，弧形航线进场投弹；后半段航线不变，前半段改变
+def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precision, course_len, direction, radius):
+
+#自动生成航路点集
     lat_len = wp_now.lat - wp_target.lat
     lon_len = wp_now.lon - wp_target.lon
     theta = math.atan(lat_len / lon_len)
@@ -181,12 +191,18 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     #暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
     #d_lat = 2 * radius * math.sin(theta) * 1e-5
     #d_lon = 2 * (radius / 1.1) * math.cos(theta) * 1e-5
-    s_lat = line_course * math.sin(theta) * 1e-5
-    s_lon = line_course * math.cos(theta) * 1e-5
+    s_lat = course_len * math.sin(theta) * 1e-5
+    s_lon = course_len * math.cos(theta) * 1e-5
+    #将任务结尾设定在越过目标点一定距离的地方
+    flyby_len = 100
+    flyby_lat = flyby_len*math.sin(theta+math.pi) * 1e-5
+    flyby_lon = flyby_len*math.cos(theta+math.pi) * 1e-5
 
     #生成两端直线和三段弧线组成的掉头航线
     wp_start = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
     wp_mid = Waypoint(wp_start.lat+s_lat*0.5, wp_start.lon+s_lon*0.5, wp_now.alt)
+    wp_end = Waypoint(wp_target.lat+flyby_lat, wp_target.lon+flyby_lon, 15)
+    wp_far = Waypoint(wp_now.lat+2*s_lat, wp_now.lon+2*s_lon, wp_now.alt)
 
     half_chord_len = 0.5*radius*1e-5 #转向处的半弦长
 
@@ -197,21 +213,46 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
                    wp_mid.lon+half_chord_len*math.cos(direction*math.pi*0.5+theta+math.pi*0.05),
                    wp_now.alt)
 
+    wp_circle1 = [wp_now, wp_far]
+    wp_circle2 = [wp_far, wp1]
+    wp_circle3 = [wp1, wp_start]
+    wp_line1 = [wp_start, wp_target]
+    wp_line2 = [wp_target, wp_end]
+
+    #转过270度对准航线
+    wp_circle_list = wp_circle_course(wp_circle1, 2*precision,180, -direction)
+    wp_circle_list.pop(0)
+    wp_circle_list.pop(-1) #取出重复的航点
+    wp_circle_list.extend(wp_circle_course(wp_circle2, precision-1, 120, -direction))
+    wp_circle_list.pop(-1)
+    wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, direction))
+    #wp_circle_list.pop(-1)
+    wp_circle_list.pop(-1)
+
+    #直线进入投弹航线
+    wp_line_list = wp_straight_course(wp_line1, precision)
+    wp_line_list.pop(-1)
+    wp_line_list.extend(wp_straight_course(wp_line2, precision))
+
+    wp_bomb_drop = wp_circle_list
+    wp_bomb_drop.extend(wp_line_list)
+    '''
     wp_line1 = [wp_now, wp_start]
     wp_circle1 = [wp_start, wp1]
     wp_circle2 = [wp1, wp2]
     wp_circle3 = [wp2, wp_start]
     wp_line2 = [wp_start, wp_target]
+    wp_line3 = [wp_target, wp_end]
 
     #直线开始进入掉头航线
     wp_line1_list = wp_straight_course(wp_line1, 3)
+    wp_line1_list.pop(0) #起点航线有些奇怪，简单地去掉开头几个航点能让飞机跑的更好，后续加入飞机的方向可能会更好一些
     wp_line1_list.pop(0)
-    #wp_line1_list.pop()
     #wp_line1_list = [wp_start]
 
     #掉头部分航路点
     wp_circle_list = wp_circle_course(wp_circle1, precision, 30, -direction)
-    wp_circle_list.pop(-1)
+    wp_circle_list.pop(-1) #取出重复的航点
     wp_circle_list.extend(wp_circle_course(wp_circle2, 2*precision, 270, direction))
     wp_circle_list.pop(-1)
     wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, -direction))
@@ -220,11 +261,14 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
 
     #完成掉头进入直线投弹航线
     wp_line2_list = wp_straight_course(wp_line2, 3)
+    wp_line2_list.pop(-1)
+    wp_line3_list = wp_straight_course(wp_line3, 3)
 
     wp_bomb_drop = wp_line1_list
     wp_bomb_drop.extend(wp_circle_list)
     wp_bomb_drop.extend(wp_line2_list)
-
+    wp_bomb_drop.extend(wp_line3_list)
+    '''
     # 开启地图脚本并在地图中显示静态航点
     Thread(target=runGui).start()
     setMapLocation((home_position.lat, home_position.lon))
@@ -234,10 +278,23 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
         # print(waypoint_print_list)
     setTargetPoints(waypoint_print_list)
 
+#上传并等待任务执行
+
     #上传任务
     upload_mission_till_completed(the_connection, wp_bomb_drop, home_position)
     print("bombs away!")
 
+def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
+    wp_target = Waypoint(-35.35941937, 149.16062729, 0)
+    #经过投弹解算后认为的落点与目标的距离
+    distance = trajectory_cal(the_connection, 0.5, wp_target)
+
+
+
+
+
+
+# 飞机动作控制函数
 
 def loiter_at_present(the_connection, alt):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
