@@ -1,6 +1,5 @@
 #故障处理函数
 import time
-from pymavlink import mavutil
 import sys
 
 def error_process(the_connection):
@@ -27,7 +26,7 @@ def rec_match_received(the_connection, type, times=5):
         elif count < times:
             time.sleep(2)
             count += 1
-            print("receive None msg, retry No.", count)
+            print("None message match ", type, "retry No.", count)
             continue
         else:
             error_process(the_connection)

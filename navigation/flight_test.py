@@ -12,6 +12,8 @@ print(msg)
 
 mode_set(the_connection, 2)
 
+arm(the_connection)
+
 #设置飞行器home点
 home_position = Position_relative(22.5903516, 113.9755156, 0)
 if set_home(the_connection, 0, home_position) < -1:
@@ -40,7 +42,7 @@ wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
 
 upload_mission_till_completed(the_connection, wp_list, home_position)
 
-'''  
+'''
 upload_mission_till_completed(the_connection, wp_circle_course(wp_circle1, 10, 180, 1), home_position)
 upload_mission_till_completed(the_connection, wp_straight_course(wp_line2, 5), home_position)
 upload_mission_till_completed(the_connection, wp_circle_course(wp_circle2, 10, 180, 1), home_position)
