@@ -39,6 +39,8 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     import time, math, tqdm
     # 设置静态target点
+    #MapWindow.setMapLocation((22.59072678, 113.97520636))
+
     MapWindow.setTargetPoints([
         (22.59072678, 113.97520636),
         (22.59052696, 113.97519292),
@@ -46,7 +48,7 @@ if __name__ == '__main__':
 
     # 新开一个线程运行GUI
     Thread(target=runGui).start()
-    
+
     # 往路径点队列里 put 1000个点，每个点间隔0.01s
     c_x, c_y = MapWindow.DEFAULT_LOCATION
     for t in tqdm.tqdm(range(1000)):

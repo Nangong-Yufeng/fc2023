@@ -1,6 +1,8 @@
 from pymavlink import mavutil
 from class_list import Position_relative, posture_inform
 from error_process import rec_match_received
+from gui import putPathPoint
+import time
 
 def gain_posture_para(the_connection):
     msg = rec_match_received(the_connection, 'ATTITUDE')
@@ -14,7 +16,11 @@ def position_now(the_connection):
     return wp_now
 
 def waypoint_reached(the_connection):
+
     msg = the_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=True)
+    #po_now = position_now(the_connection)
+    #point = (po_now.lat, po_now.lon)
+    #putPathPoint(point)
     return msg.seq
 
 
@@ -52,3 +58,8 @@ def gain_mission(vehicle):
         #print("Seq", mission_item["seq"],"Latitude", mission_item["x"] * 1e-7,"Longitude", mission_item["y"] * 1e-7,"Altitude", mission_item["z"])
 
     return count-1
+
+def mission_current(the_connection,wp):
+    mission_msg = rec_match_received(the_connection, "MISSION_CURRENT")
+    return mission_msg.seq
+
