@@ -1,15 +1,15 @@
 from pymavlink import mavutil
-from class_list import Position_relative
+from class_list import Position_relative, posture_inform
 from error_process import rec_match_received
 
 def gain_posture_para(the_connection):
-    msg = the_connection.recv_match(type='ATTITUDE', blocking=True)
-    #msg = the_connection.recv_match(type='SIMSTATE', blocking=True)
-    print(msg)
+    msg = rec_match_received(the_connection, 'ATTITUDE')
+    pose = posture_inform(msg.time_boot_ms, msg.roll, msg.pitch, msg.yaw,
+                          msg.rollspeed, msg.pitchspeed, msg.yawspeed)
+    return pose
 
 def position_now(the_connection):
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
-    #msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
     wp_now = Position_relative(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3)
     return wp_now
 

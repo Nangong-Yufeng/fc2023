@@ -5,6 +5,7 @@ from class_list import Waypoint
 from get_para import gain_mission, waypoint_reached, position_now
 from preflight import mode_set
 from error_process import error_process
+from gui.function_for_nav import static_map_show
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -30,6 +31,11 @@ def mission_upload(the_connection, wp, home_position):
 
     #上传航点数量信息
     send_mission_list(the_connection, wp)
+
+    waypoint_print_list = []
+    for count in range(len(wp)):
+        waypoint_print_list.extend((wp[count].lat, wp[count].lon))
+    static_map_show(waypoint_print_list)
 
     while True:
         message = the_connection.recv_match(blocking=True)
@@ -91,7 +97,7 @@ def wp_straight_course(wp, precision):
     return wp_list
 
 
-#在两点之间形成近似圆弧航线（angle指定弧线的圆心角角度，direction取1为顺时针，取-1为逆时针，默认顺时针）
+#在两点之间形成近似圆弧航线（angle指定弧线的圆心角角度，direction取-1为顺时针，取1为逆时针，默认逆时针）
 def wp_circle_course(wp, precision, angle, direction=1):
     lat_len = wp[1].lat - wp[0].lat
     lon_len = wp[1].lon - wp[0].lon
@@ -171,8 +177,6 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     wp2 = Waypoint(wp_mid.lat+half_chord_len*math.sin(direction*math.pi*0.5+theta+math.pi*0.05),
                    wp_mid.lon+half_chord_len*math.cos(direction*math.pi*0.5+theta+math.pi*0.05),
                    wp_now.alt)
-    wp1.show()
-    wp2.show()
 
     wp_line1 = [wp_now, wp_start]
     wp_circle1 = [wp_start, wp1]
@@ -182,12 +186,16 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
 
     #直线开始进入掉头航线
     wp_line1_list = wp_straight_course(wp_line1, 3)
+    wp_line1_list.pop()
     #wp_line1_list = [wp_start]
 
     #掉头部分航路点
     wp_circle_list = wp_circle_course(wp_circle1, precision, 30, -direction)
+    wp_circle_list.pop()
     wp_circle_list.extend(wp_circle_course(wp_circle2, 2*precision, 270, direction))
+    wp_circle_list.pop()
     wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, -direction))
+    wp_circle_list.pop()
 
     #完成掉头进入直线投弹航线
     wp_line2_list = wp_straight_course(wp_line2, 3)

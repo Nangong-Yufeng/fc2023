@@ -2,7 +2,7 @@ from threading import Thread
 from map import MapWindow
 from PyQt5.QtWidgets import QMainWindow, QApplication, QSplitter
 from PyQt5.QtCore import QTimer
-
+import platformSetting, sys
 
 def runGui():
     """运行GUI程序
@@ -10,7 +10,8 @@ def runGui():
     Returns:
         app.exec_(): QApplication的返回值
     """
-    app = QApplication([])
+    platformSetting.setting()
+    app = QApplication(sys.argv)
     window = MainWindow()
     return app.exec_()
 
@@ -47,7 +48,7 @@ if __name__ == '__main__':
     Thread(target=runGui).start()
     
     # 往路径点队列里 put 1000个点，每个点间隔0.01s
-    c_x, c_y = MapWindow.location
+    c_x, c_y = MapWindow.DEFAULT_LOCATION
     for t in tqdm.tqdm(range(1000)):
         t = t/1000
         r = 5 * (0.1 + t)

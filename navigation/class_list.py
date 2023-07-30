@@ -19,3 +19,13 @@ class Waypoint(Position_relative):
         local = (the_connection.location().lat , the_connection.location().lng )
         target_distance = geopy.distance.GeodesicDistance(target, local).meters
         print(target_distance)
+
+class posture_inform:
+    def __init__(self, time, roll, pitch, yaw, roll_speed, pitch_speed, yaw_speed):
+        self.time=time
+        self.roll=roll
+        self.pitch=pitch
+        self.yaw=yaw
+        self.roll_speed=roll_speed
+        self.pitch_speed=pitch_speed
+        self.yaw_speed=yaw_speed
