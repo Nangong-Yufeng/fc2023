@@ -38,7 +38,7 @@ wp4 = Waypoint(-35.3654516, 149.1654714, 80)
 wp5 = Waypoint(-35.35941937, 149.16062729, 10)
 
 wp = [wp4, wp2]
-
+'''
 #飞往侦察点
 mission1 = [wp1]
 upload_mission_till_completed(the_connection, mission1, home_position)
@@ -47,7 +47,7 @@ loiter_at_present(the_connection, 50)
 
 if input("假设视觉已返回坐标信息，输入零以继续： ") == '0':
     pass
-
+'''
 
 #执行投弹航线
 execute_bomb_course(the_connection, home_position, position_now(the_connection), wp1, precision=3, line_course=200, direction=1, radius=150)

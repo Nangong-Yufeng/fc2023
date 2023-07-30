@@ -216,6 +216,7 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     wp_circle_list.pop(-1)
     wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, -direction))
     wp_circle_list.pop(-1)
+    wp_circle_list.pop(-1)
 
     #完成掉头进入直线投弹航线
     wp_line2_list = wp_straight_course(wp_line2, 3)

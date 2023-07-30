@@ -38,7 +38,7 @@ class MapWindow(QWidget):
         """
         
         # 创建一个Folium地图对象
-        self.map = folium.Map(location=location, zoom_start=100000)
+        self.map = folium.Map(location=location, zoom_start=16)
         self.map.add_child(folium.LatLngPopup())
         if MapWindow.targetPoints:
             for p in MapWindow.targetPoints:
