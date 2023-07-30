@@ -5,8 +5,7 @@ from class_list import Waypoint
 from get_para import gain_mission, waypoint_reached, position_now
 from preflight import mode_set
 from error_process import error_process
-#from gui import setTargetPoints, putPathPoint, runGui
-from threading import Thread
+from gui.function_for_nav import static_map_show
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -36,9 +35,7 @@ def mission_upload(the_connection, wp, home_position):
     waypoint_print_list = []
     for count in range(len(wp)):
         waypoint_print_list.extend((wp[count].lat, wp[count].lon))
-
-    #setTargetPoints(waypoint_print_list)
-    #Thread(target=runGui).start()
+    static_map_show(waypoint_print_list)
 
     while True:
         message = the_connection.recv_match(blocking=True)
