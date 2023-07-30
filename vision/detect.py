@@ -21,10 +21,15 @@ from vision.crop import crop
 
 
 class Vision:
-    """
-
+    """完成视觉工作的所有任务
     """
     def __init__(self, source=0, device='0', conf_thres=0.7):
+        """构造函数
+
+        :param source: 视频源 0: 电脑自带摄像头； 1： 外部摄像头
+        :param device: 硬件 '0'：GPU； 'CPU'：CPU
+        :param conf_thres: 置信度阈值
+        """
         FILE = Path(__file__).resolve()
         ROOT = FILE.parents[0]  # YOLOv5 root directory
         if str(ROOT) not in sys.path:
@@ -32,14 +37,12 @@ class Vision:
         ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
         # 参数
-        # source = 0  # 视频源 0: 电脑自带摄像头； 1： 外部摄像头
-        # device = '0'  # 硬件 '0'：GPU 或 'CPU'：CPU
         weights = ROOT / 'best.pt'  # 权重文件
         data = ROOT / '0515.yaml'  # 类别等信息
         imgsz = (640, 640)  # 新图大小
         half = False  # use FP16 half-precision inference
         dnn = False  # use OpenCV DNN for ONNX inference
-        self.conf_thres = conf_thres  # 置信度阈值
+        self.conf_thres = conf_thres
 
         device = select_device(device)
         self.model = DetectMultiBackend(weights, device=device, dnn=dnn, data=data, fp16=half)
