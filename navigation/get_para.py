@@ -1,8 +1,9 @@
 import time
 
 from pymavlink import mavutil
-from class_list import Position_relative, posture_inform
+from class_list import Position_relative, posture_inform, track_point
 from error_process import rec_match_received
+import random
 
 
 def gain_posture_para(the_connection):
@@ -13,31 +14,14 @@ def gain_posture_para(the_connection):
 
 def position_now(the_connection):
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
-    wp_now = Position_relative(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3)
+    wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms)
     return wp_now
 
-def waypoint_reached(the_connection, wp, wp_list_len):
+def waypoint_reached(the_connection):
 
-    seq = mission_current(the_connection)
-    print("seq ",seq)
-    print("wp_len ", wp_list_len)
-    if(seq <= wp_list_len):
-        msg = the_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=True)
-        return msg.seq
-    else:
-        distance_old = distance_new = 1000000
-        count = 0
-        while count < 10:
-          distance_old = distance_new
-          distance_new = wp[wp_list_len].distance(the_connection)
-
-          if(distance_old < distance_new):
-              count+=1
-              time.sleep(0.1)
-          else:
-              continue
-        return wp_list_len
-
+    msg = the_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=True)
+    print("reaching waypoint", msg.seq)
+    return msg.seq
 
 
 
@@ -68,16 +52,29 @@ def gain_mission(vehicle):
 
         vehicle.mav.send(message)
 
-        message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_item_int_message.msgname,blocking=True)
+        message = rec_match_received(vehicle, mavutil.mavlink.MAVLink_mission_item_int_message.msgname)
         message = message.to_dict()
         mission_item_list.append(message)
-
-    #for mission_item in mission_item_list:
-        #print("Seq", mission_item["seq"],"Latitude", mission_item["x"] * 1e-7,"Longitude", mission_item["y"] * 1e-7,"Altitude", mission_item["z"])
-
+    '''for mission_item in mission_item_list:
+        print("Seq", mission_item["seq"],"Latitude", mission_item["x"] * 1e-7,"Longitude", mission_item["y"] * 1e-7,"Altitude", mission_item["z"])
+    '''
     return count-1
 
 def mission_current(the_connection):
     mission_msg = rec_match_received(the_connection, "MISSION_CURRENT")
     return mission_msg.seq
 
+
+#track_list是由track_point对象组成的list
+def gain_track_of_time(the_connection, track_list, time_last=500):
+    track = position_now(the_connection)
+    track_list.append(track)
+
+    #默认保存过去500个位置信息，往前的消息删除（实际上程序的刷新频率达不到ms级，大概是每秒一次）
+    if len(track_list) > time_last:
+        track_list.pop(0)
+    else:
+        pass
+
+    num = random.choice(range(len(track_list)))
+    print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)

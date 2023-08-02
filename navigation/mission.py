@@ -1,9 +1,9 @@
 from pymavlink import mavutil
 import math
-from class_list import Waypoint
-from get_para import gain_mission, waypoint_reached, position_now, mission_current
+from class_list import Waypoint, track_point
+from get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
 from preflight import mode_set
-from error_process import error_process
+from error_process import error_process, rec_match_received
 from gui import putPathPoint, setTargetPoints, runGui, setMapLocation
 from threading import Thread
 from trajectory import trajectory_cal
@@ -27,6 +27,14 @@ def send_mission(the_connection, wp, seq):
                                                                        wp[seq].alt,
                                                                        mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
     the_connection.mav.send(mission_message)
+
+
+def mission_accomplished(the_connection, wp_list_len):
+    msg = rec_match_received(the_connection, 'MISSION_CURRENT')
+    if msg.seq == wp_list_len and msg.mission_state == 5:
+        return 1
+    else:
+        return -10
 
 
 def mission_upload(the_connection, wp, home_position):
@@ -67,27 +75,23 @@ def mission_upload(the_connection, wp, home_position):
                 break
 
 #上传航点集并阻塞程序直到完成全部预定航点任务，并且打印动态参数
-def upload_mission_till_completed(the_connection, wp, home_position):
+def upload_mission_till_completed(the_connection, wp, home_position, track_list):
     mission_upload(the_connection, wp, home_position)
 
     mode_set(the_connection, 10)
 
+    #注意其是此函数的局部变量，但因为记录的位置消息只需要在执行次程序的过程中使用，认为可以不用作为全局变量
+
     wp_list_len = gain_mission(the_connection)
 
-    #在到达最后航点前，实时显示动态轨迹
-    while mission_current(the_connection) < (wp_list_len-3):
+    #在到达最后航点前，实时显示动态轨迹，并记录track point
+    while mission_accomplished(the_connection, wp_list_len) < 0:
+        gain_track_of_time(the_connection, track_list)
         po_now = position_now(the_connection)
         point = (po_now.lat, po_now.lon)
         putPathPoint(point)
 
-    while True:
-        wp_num = waypoint_reached(the_connection, wp, wp_list_len)
-        if wp_num < wp_list_len:
-            #print("reaching waypoint", wp_num)
-            continue
-        else:
-            print("reaching last waypoint", wp_num)
-            break
+    print("reaching last waypoint of NO.", wp_list_len, ", mission accomplished!")
 
 
 def clear_waypoint(the_connection):
@@ -177,7 +181,7 @@ def wp_circle_course(wp, precision, angle, direction=1):
 
 #自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（顺或逆）
 #修正，采用半圆航线飞至一定距离后，弧形航线进场投弹；后半段航线不变，前半段改变
-def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precision, course_len, direction, radius):
+def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_target, precision, course_len, direction, radius):
 
 #自动生成航路点集
     lat_len = wp_now.lat - wp_target.lat
@@ -198,13 +202,13 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     flyby_lat = flyby_len*math.sin(theta+math.pi) * 1e-5
     flyby_lon = flyby_len*math.cos(theta+math.pi) * 1e-5
 
-    #生成两端直线和三段弧线组成的掉头航线
+    #生成两段弧线和一段直线组成的掉头航线
     wp_start = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
     wp_mid = Waypoint(wp_start.lat+s_lat*0.5, wp_start.lon+s_lon*0.5, wp_now.alt)
     wp_end = Waypoint(wp_target.lat+flyby_lat, wp_target.lon+flyby_lon, 15)
     wp_far = Waypoint(wp_now.lat+2*s_lat, wp_now.lon+2*s_lon, wp_now.alt)
 
-    half_chord_len = 0.5*radius*1e-5 #转向处的半弦长
+    half_chord_len = 0.6*radius*1e-5 #转向处的半弦长
 
     wp1 = Waypoint(wp_mid.lat+half_chord_len*math.sin(-direction*math.pi*0.5+theta+math.pi*0.05),
                    wp_mid.lon+half_chord_len*math.cos(-direction*math.pi*0.5+theta+math.pi*0.05),
@@ -223,10 +227,10 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
     wp_circle_list = wp_circle_course(wp_circle1, 2*precision,180, -direction)
     wp_circle_list.pop(0)
     wp_circle_list.pop(-1) #取出重复的航点
-    wp_circle_list.extend(wp_circle_course(wp_circle2, precision-1, 120, -direction))
+    wp_circle_list.extend(wp_circle_course(wp_circle2, precision-1, 150, -direction))
     wp_circle_list.pop(-1)
     wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, direction))
-    #wp_circle_list.pop(-1)
+    wp_circle_list.pop(-1)
     wp_circle_list.pop(-1)
 
     #直线进入投弹航线
@@ -278,10 +282,11 @@ def execute_bomb_course(the_connection, home_position, wp_now, wp_target, precis
         # print(waypoint_print_list)
     setTargetPoints(waypoint_print_list)
 
+
 #上传并等待任务执行
 
     #上传任务
-    upload_mission_till_completed(the_connection, wp_bomb_drop, home_position)
+    upload_mission_till_completed(the_connection, wp_bomb_drop, home_position, track_list)
     print("bombs away!")
 
 def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):

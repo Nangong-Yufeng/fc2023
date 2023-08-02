@@ -31,7 +31,7 @@ def arm(the_connection, times=5):
     else:
         print("arm failed")
         msg = rec_match_received(the_connection, "GPS_RAW_INT")
-        if msg.fix_type == 3:
+        if msg.fix_type == 3 or msg.fix_type == 4:
             force_arm(the_connection)
         else:
             error_process(the_connection)
@@ -134,6 +134,7 @@ def force_arm(the_connection, times=5):
         the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                              mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 21196, 0, 0, 0, 0, 0)
         msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+        print(msg)
 
         if is_none_return(msg) == False:
             result = msg.result
