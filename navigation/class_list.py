@@ -29,13 +29,13 @@ class track_point(Position_relative):
 
 class posture_inform:
     def __init__(self, time, roll, pitch, yaw, roll_speed, pitch_speed, yaw_speed):
-        self.time=time
-        self.roll=roll
-        self.pitch=pitch
-        self.yaw=yaw
-        self.roll_speed=roll_speed
-        self.pitch_speed=pitch_speed
-        self.yaw_speed=yaw_speed
+        self.time = time
+        self.roll = roll
+        self.pitch = pitch
+        self.yaw = yaw
+        self.roll_speed = roll_speed
+        self.pitch_speed = pitch_speed
+        self.yaw_speed = yaw_speed
 
 #视觉识别到靶标后返回的信息类
 class vision_position:
