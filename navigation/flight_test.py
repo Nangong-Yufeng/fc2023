@@ -3,16 +3,15 @@ import sys
 sys.path.append('../gui')
 from pymavlink import mavutil
 from preflight import arm, mode_set, set_home
-from mission import mission_upload, clear_waypoint, mission_current, wp_straight_course, wp_circle_course, upload_mission_till_completed
+from mission import mission_upload, clear_waypoint, mission_current, wp_straight_course, wp_circle_course, upload_mission_till_completed, bomb_drop
 from class_list import Position_relative, Waypoint
 
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB1', baud=57600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
-msg = the_connection.recv_match(type="GLOBAL_POSITION_INT", blocking=True)
-print(msg)
+mode_set(the_connection, 0)
 
-mode_set(the_connection, 2)
-
+bomb_drop(the_connection)
+'''
 arm(the_connection)
 
 #设置飞行器home点
@@ -22,7 +21,7 @@ set_home(the_connection, 0, home_position)
 
 time.sleep(1)
 
-'''
+
 #设置航点
 #wp1 = Waypoint(22.5898966, 113.9750207, 100)
 wp2 = Waypoint(22.5899248, 113.9755938, 120)

@@ -12,10 +12,12 @@ def gain_posture_para(the_connection):
                           msg.rollspeed, msg.pitchspeed, msg.yawspeed)
     return pose
 
+
 def position_now(the_connection):
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
     wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms)
     return wp_now
+
 
 def waypoint_reached(the_connection):
 
@@ -24,9 +26,7 @@ def waypoint_reached(the_connection):
     return msg.seq
 
 
-
-
-#获取并打印任务航点列表
+# 获取并打印任务航点列表
 def gain_mission(vehicle):
     message = mavutil.mavlink.MAVLink_mission_request_list_message(target_system=vehicle.target_system,
                                                            target_component=vehicle.target_component,
@@ -38,7 +38,7 @@ def gain_mission(vehicle):
     message = message.to_dict()
 
     count = message["count"]
-    print("Total mission item count:", count)
+    print("Total mission item count:", count-1)
 
     # create mission item list
     mission_item_list = []
@@ -65,12 +65,12 @@ def mission_current(the_connection):
     return mission_msg.seq
 
 
-#track_list是由track_point对象组成的list
+# track_list是由track_point对象组成的list
 def gain_track_of_time(the_connection, track_list, time_last=500):
     track = position_now(the_connection)
     track_list.append(track)
 
-    #默认保存过去500个位置信息，往前的消息删除（实际上程序的刷新频率达不到ms级，大概是每秒一次）
+    # 默认保存过去500个位置信息，往前的消息删除（实际上程序的刷新频率达不到ms级，大概是每秒一次）
     if len(track_list) > time_last:
         track_list.pop(0)
     else:
