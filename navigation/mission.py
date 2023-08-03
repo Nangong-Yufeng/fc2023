@@ -323,3 +323,16 @@ def loiter_at_present(the_connection, alt):
        print("loiter failed")
        error_process(the_connection)
 
+# 环形飞行航线（仅测试用）
+def yard_fly(the_connection, wp, home_position, track_list):
+    wp_line1 = [wp[3], wp[0]]
+    wp_circle1 = [wp[0], wp[1]]
+    wp_line2 = [wp[1], wp[2]]
+    wp_circle2 = [wp[2], wp[3]]
+
+    wp_list = wp_straight_course(wp_line1, 3)
+    wp_list.extend(wp_circle_course(wp_circle1, 3, 180, 1))
+    wp_list.extend(wp_straight_course(wp_line2, 3))
+    wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
+
+    upload_mission_till_completed(the_connection, wp_list, home_position, track_list)
