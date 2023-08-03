@@ -5,23 +5,28 @@ from error_process import error_process, is_none_return, rec_match_received
 def arm(the_connection, times=5):
     the_connection.wait_heartbeat()
 
-    count = 0
-    while True:
-      the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
-                                             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0)
-      msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+    if input("输入0以解锁飞机（若飞机在飞行过程中，输入其他任意内容跳过解锁： ") != '0':
+       print("arming")
 
-      if is_none_return(msg) == False:
+       count = 0
+       while True:
+          the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0)
+          msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+
+          if is_none_return(msg) == False:
             result = msg.result
             break
-      elif count < times:
+          elif count < times:
             time.sleep(2)
             count += 1
             print("receive None msg, retry No.", count)
             result = -1
             continue
-      else:
+          else:
             error_process(the_connection)
+    else:
+        pass
 
 
 
@@ -89,7 +94,7 @@ def mode_set(the_connection, mode, times=5):
         error_process(the_connection)
 
 
-def set_home(the_connection, mode, position_re, times=5):
+def set_home(the_connection, position_re, times=5, mode=0):
 
     #设置home点
     count = 0

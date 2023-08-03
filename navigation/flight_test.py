@@ -11,7 +11,7 @@ the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 mode_set(the_connection, 0)
 
 bomb_drop(the_connection)
-'''
+
 arm(the_connection)
 
 #设置飞行器home点
@@ -47,4 +47,4 @@ upload_mission_till_completed(the_connection, wp_list, home_position)
 upload_mission_till_completed(the_connection, wp_circle_course(wp_circle1, 10, 180, 1), home_position)
 upload_mission_till_completed(the_connection, wp_straight_course(wp_line2, 5), home_position)
 upload_mission_till_completed(the_connection, wp_circle_course(wp_circle2, 10, 180, 1), home_position)
-'''
+
