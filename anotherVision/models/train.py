@@ -18,15 +18,15 @@ def train_loop(dataloader, net, loss_fn, optimizer):
             print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
 
 def test_loop(dataloader, net, loss_fn):
-    #evaluation mode,keep the paraments unchanged
-    model.eval()
+    # evaluation mode,keep the paraments unchanged
+    net.eval()
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
     test_loss, correct_num = 0, 0
     with torch.no_grad():
-        for input_data , real_label in dataloader:
+        for input_data, real_label in dataloader:
             prediction = net(input_data)
-            test_loss += loss_fn(pred, y).item()
+            test_loss += loss_fn(prediction, real_label).item()
             correct_num += (prediction.argmax(1) == real_label).type(torch.float).sum().item()
 
         average_test_loss = test_loss / num_batches
