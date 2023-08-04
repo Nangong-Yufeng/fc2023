@@ -1,12 +1,12 @@
 import torch.nn as nn
 
 
-class Net(nn.Module):
+class Model(nn.Module):
     def __init__(self) -> None:
-        super(Net, self).__init__()
+        super(Model, self).__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(
-                in_channels=1,  # gray image(1,28,28),the size which can not be changed depends on EMNIST
+                in_channels=1,  # gray image(1,28,28),the size which can not be changed depends on MNIST
                 out_channels=16,
                 kernel_size=5,
                 stride=1,
