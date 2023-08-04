@@ -27,8 +27,8 @@ my_test_data = datasets.MNIST(
     transform=ToTensor()
 )
 
-my_train_dataloader = DataLoader(my_training_data, batch_size=my_batch_size)
-my_test_dataloader = DataLoader(my_test_data, batch_size=my_batch_size)
+my_train_dataloader = DataLoader(my_training_data, batch_size=my_batch_size, shuffle=True)
+my_test_dataloader = DataLoader(my_test_data, batch_size=my_batch_size, shuffle=True)
 
 def train_loop(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
