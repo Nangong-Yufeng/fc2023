@@ -1,4 +1,5 @@
 import os
+import torch
 from torch.utils.data import Dataset
 from PIL import Image
 
@@ -29,3 +30,10 @@ class CustomPrintedDigitsDataset(Dataset):
             image = self.transform(image)
 
         return image, label
+
+    @staticmethod
+    def collate_fn(self, batch):
+        images, labels = tuple(zip(*batch))
+        images = torch.stack(images, dim=0)
+        labels = torch.as_tensor(labels)
+        return images, labels

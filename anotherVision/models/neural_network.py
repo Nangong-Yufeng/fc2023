@@ -4,6 +4,7 @@ import torch.nn as nn
 class Model(nn.Module):
     def __init__(self) -> None:
         super(Model, self).__init__()
+        self.flatten = nn.Flatten()
         self.conv1 = nn.Sequential(
             nn.Conv2d(
                 in_channels=1,  # gray image(1,28,28),the size which can not be changed depends on MNIST
