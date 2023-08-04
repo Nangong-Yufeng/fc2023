@@ -7,7 +7,7 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 
 my_learning_rate = 1e-3
-my_batch_size = 100
+my_batch_size = 64
 my_epochs = 10
 my_model = model.Model()
 my_loss_fn = nn.CrossEntropyLoss()
