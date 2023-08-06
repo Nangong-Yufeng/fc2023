@@ -51,6 +51,16 @@ def split_data(root: str, test_rate: float = 0.2):
 
     print("{} images were found in the dataset.".format(sum(every_class_num_list)))
     print("{} images for training.".format(len(train_images_path_list)))
-    print("{} images for validation.".format(len(test_images_path_list)))
+    print("{} images for testing.".format(len(test_images_path_list)))
 
-    return train_images_path_list, train_images_label_list, test_images_path_list, test_images_label_list
+    images_path_list_dir = {
+        "train": train_images_path_list,
+        "test": test_images_path_list
+    }
+
+    images_label_list_dir = {
+        "train": train_images_label_list,
+        "test": test_images_label_list
+    }
+
+    return images_path_list_dir, images_label_list_dir

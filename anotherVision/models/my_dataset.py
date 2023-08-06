@@ -2,38 +2,43 @@ import os
 import torch
 from torch.utils.data import Dataset
 from PIL import Image
+from torchvision import transforms
 
 # The custom dataset is necessary.
 class CustomPrintedDigitsDataset(Dataset):
-    def __init__(self, root_dir, transform=None):
-        self.root_dir = root_dir
+    def __init__(self, images_path: list, images_class: list, transform: object = None):
+        self.images_path = images_path
+        self.images_class = images_class
         self.transform = transform
-        # List to store image paths and labels
-        self.samples = []
-
-        # Load samples from the root directory
-        for label in os.listdir(self.root_dir):
-            label_dir = os.path.join(self.root_dir, label)
-            if os.path.isdir(label_dir):
-                for img_name in os.listdir(label_dir):
-                    img_path = os.path.join(label_dir, img_name)
-                    self.samples.append((img_path, int(label)))
 
     def __len__(self):
-        return len(self.samples)
+        return len(self.images_path)
 
-    def __getitem__(self, index):
-        img_path, label = self.samples[index]
-        # convert to grayscale
-        image = Image.open(img_path).convert('L')
-        if self.transform:
-            image = self.transform(image)
+    def __getitem__(self, item):
+        img = Image.open(self.images_path[item])
+        # RGB为彩色图片，L为灰度图片
+        if img.mode != 'L':
+            raise ValueError("image: {} isn't RGB mode.".format(self.images_path[item]))
+        label = self.images_class[item]
 
-        return image, label
+        if self.transform is not None:
+            img = self.transform(img)
+
+        return img, label
 
     @staticmethod
-    def collate_fn(self, batch):
+    def collate_fn(batch):
         images, labels = tuple(zip(*batch))
         images = torch.stack(images, dim=0)
         labels = torch.as_tensor(labels)
         return images, labels
+
+
+data_transform = {
+    "train": transforms.Compose([transforms.RandomResizedCrop(28),
+                                transforms.RandomHorizontalFlip(),
+                                transforms.ToTensor(),
+                                transforms.Normalize((0.1307,), (0.3081,))]),
+    "test": transforms.Compose([transforms.RandomResizedCrop(28),
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.1307,), (0.3081,))])}
