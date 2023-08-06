@@ -4,6 +4,7 @@ import random
 
 
 def split_data(root: str, val_rate: float = 0.2):
+    random.seed(0)  # 保证随机结果可复现
     assert os.path.exists(root), "dataset root: {} does not exist.".format(root)
 
     # 遍历文件夹，一个文件夹对应一个类别
