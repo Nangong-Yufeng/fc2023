@@ -3,7 +3,7 @@ import json
 import random
 
 
-def split_data(root: str, val_rate: float = 0.2):
+def split_data(root: str, test_rate: float = 0.2):
     random.seed(0)  # 保证随机结果可复现
     assert os.path.exists(root), "dataset root: {} does not exist.".format(root)
 
@@ -13,17 +13,17 @@ def split_data(root: str, val_rate: float = 0.2):
     # 排序，保证顺序一致
     number_class_list.sort()
 
-    # 生成类别名称以及对应的数字索引, key是字符型数字， val是数字
-    class_indices = dict((key, val) for val, key in enumerate(number_class_list))
+    # 生成类别名称以及对应的数字索引, key是字符型数字， index是数字
+    class_indices = dict((name_class, index) for index, name_class in enumerate(number_class_list))
 
-    json_str = json.dumps(dict((val, key) for key, val in class_indices.items()), indent=4)
+    json_str = json.dumps(dict((index, name_class) for name_class, index in class_indices.items()), indent=4)
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
 
     train_images_path_list = []  # 存储训练集的所有图片路径
     train_images_label_list = []  # 存储训练集图片对应索引信息
-    val_images_path_list = []  # 存储验证集的所有图片路径
-    val_images_label_list = []  # 存储验证集图片对应索引信息
+    test_images_path_list = []  # 存储验证集的所有图片路径
+    test_images_label_list = []  # 存储验证集图片对应索引信息
     every_class_num_list = []  # 存储每个类别的样本总数
     supported_list = [".jpg", ".JPG", ".png", ".PNG"]  # 支持的文件后缀类型
 
@@ -38,12 +38,12 @@ def split_data(root: str, val_rate: float = 0.2):
         # 记录该类别的样本数量
         every_class_num_list.append(len(image_paths))
         # 按比例随机采样验证样本
-        val_path = random.sample(image_paths, k=int(len(image_paths) * val_rate))
+        test_path = random.sample(image_paths, k=int(len(image_paths) * test_rate))
 
         for img_path in image_paths:
-            if img_path in val_path:  # 如果该路径在采样的验证集样本中则存入验证集
-                val_images_path_list.append(img_path)
-                val_images_label_list.append(image_class)
+            if img_path in test_path:  # 如果该路径在采样的验证集样本中则存入验证集
+                test_images_path_list.append(img_path)
+                test_images_label_list.append(image_class)
             else:  # 否则存入训练集
                 train_images_path_list.append(img_path)
                 # label的list里装着int型数字
@@ -51,6 +51,6 @@ def split_data(root: str, val_rate: float = 0.2):
 
     print("{} images were found in the dataset.".format(sum(every_class_num_list)))
     print("{} images for training.".format(len(train_images_path_list)))
-    print("{} images for validation.".format(len(val_images_path_list)))
+    print("{} images for validation.".format(len(test_images_path_list)))
 
-    return train_images_path_list, train_images_label_list, val_images_path_list, val_images_label_list
+    return train_images_path_list, train_images_label_list, test_images_path_list, test_images_label_list
