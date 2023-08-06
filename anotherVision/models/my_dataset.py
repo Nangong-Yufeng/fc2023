@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 
-# MINST数据集的精度不够时再考虑自己标数据集，问过学长，说是没必要，作为方案二
+# The custom dataset is necessary.
 class CustomPrintedDigitsDataset(Dataset):
     def __init__(self, root_dir, transform=None):
         self.root_dir = root_dir
