@@ -7,12 +7,12 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 class MapWindow(QWidget):
     """显示地图的QWidget, 实现参考 https://learndataanalysis.org/display-folium-maps-in-pyqt5/
     """
-    #DEFAULT_LOCATION = (22.5903516, 113.9755356) # University Town Sports Center of Shenzhen
-    DEFAULT_LOCATION = (-35.3622066, 149.1651135)
+    DEFAULT_LOCATION = (22.5903516, 113.9755356) # University Town Sports Center of Shenzhen
+    #DEFAULT_LOCATION = (-35.3622066, 149.1651135)
     pathQueue = Queue(maxsize=0)
     targetPoints = None
 
-    def __init__(self, parent=None, location = DEFAULT_LOCATION):#tuple[float, float]=TEST_LOCATION):
+    def __init__(self, parent=None, location=DEFAULT_LOCATION):#tuple[float, float]=TEST_LOCATION):
         super().__init__(parent)
         self.initUI()
         self.path = None
@@ -38,7 +38,7 @@ class MapWindow(QWidget):
         """
         
         # 创建一个Folium地图对象
-        self.map = folium.Map(location=location, zoom_start=16)
+        self.map = folium.Map(location=location, zoom_start=17)
         self.map.add_child(folium.LatLngPopup())
         if MapWindow.targetPoints:
             for p in MapWindow.targetPoints:

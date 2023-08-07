@@ -1,9 +1,6 @@
 import time
 import sys
 from pymavlink import mavutil
-from preflight import arm, mode_set, set_home
-from mission import mission_upload, clear_waypoint, mission_current
-from class_list import Position_relative, Waypoint
 
 #设置空速大小
 def set_speed(vehicle, desired_flight_speed):

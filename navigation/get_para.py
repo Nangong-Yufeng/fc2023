@@ -75,6 +75,7 @@ def gain_track_of_time(the_connection, track_list, time_last=500):
         track_list.pop(0)
     else:
         pass
-
+    '''
     num = random.choice(range(len(track_list)))
     print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
+    '''

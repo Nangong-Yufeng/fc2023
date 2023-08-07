@@ -5,7 +5,7 @@ from error_process import error_process, is_none_return, rec_match_received
 def arm(the_connection, times=5):
     the_connection.wait_heartbeat()
 
-    if input("输入0以解锁飞机（若飞机在飞行过程中，输入其他任意内容跳过解锁： ") != '0':
+    if input("输入0以解锁飞机（若飞机在飞行过程中，输入其他任意内容跳过解锁)： ") == '0':
        print("arming")
 
        count = 0
@@ -25,23 +25,19 @@ def arm(the_connection, times=5):
             continue
           else:
             error_process(the_connection)
+
+            # 使用long信息发送arm的command
+            if result == 0:
+                print("arm successfully")
+            else:
+                print("arm failed")
+                msg = rec_match_received(the_connection, "GPS_RAW_INT")
+                if msg.fix_type == 3 or msg.fix_type == 4:
+                    force_arm(the_connection)
+                else:
+                    error_process(the_connection)
     else:
         pass
-
-
-
-    # 使用long信息发送arm的command
-    if result == 0:
-        print("arm successfully")
-    else:
-        print("arm failed")
-        msg = rec_match_received(the_connection, "GPS_RAW_INT")
-        if msg.fix_type == 3 or msg.fix_type == 4:
-            force_arm(the_connection)
-        else:
-            error_process(the_connection)
-
-
 
 
 def mode_set(the_connection, mode, times=5):

@@ -1,10 +1,13 @@
 """
-这是将在比赛时被运行的文件
+这是将在比赛时被运行的文件,目前对navigation包的引用尚存在问题
 """
 from utils import title
 import time
 from vision.detect import Vision
-from navigation import arm, mode_set, set_home, Waypoint, yard_fly
+import navigation.error_process
+from navigation.preflight import arm, mode_set, set_home
+from navigation.class_list import Waypoint
+from navigation.mission import yard_fly
 from pymavlink import mavutil
 
 '''
