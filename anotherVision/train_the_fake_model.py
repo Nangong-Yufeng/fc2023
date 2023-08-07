@@ -1,10 +1,10 @@
 from time import sleep
 import torch
 from utils import getWeightPath
-from models.a_fake_number_recognizing_model import Net
+from models.neural_network import Model
 
 if __name__ == "__main__":
-    net = Net()
+    net = Model()
     print("i am training...")
     sleep(1)
     print("finish!") 
