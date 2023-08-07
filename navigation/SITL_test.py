@@ -19,11 +19,9 @@ clear_waypoint(the_connection)
 # 设置飞行器模式
 mode_set(the_connection, 13)
 
-time.sleep(1)
-
 # 设置飞行器home点
 home_position = Position_relative(-35.3622066, 149.1651135, 0)
-set_home(the_connection, 0, home_position)
+set_home(the_connection, home_position)
 
 # 用于记录航点位置和到达该处的时间戳
 track_list = []

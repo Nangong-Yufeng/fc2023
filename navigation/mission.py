@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../gui')
 from pymavlink import mavutil
 import math
 from class_list import Waypoint, track_point
@@ -78,6 +80,9 @@ def mission_upload(the_connection, wp, home_position):
 def upload_mission_till_completed(the_connection, wp, home_position, track_list):
     mission_upload(the_connection, wp, home_position)
 
+    if input("任务上传完成，输入任意内容开始自动飞行： "):
+        print("loitering")
+
     mode_set(the_connection, 10)
 
     # 注意其是此函数的局部变量，但因为记录的位置消息只需要在执行次程序的过程中使用，认为可以不用作为全局变量
@@ -89,7 +94,7 @@ def upload_mission_till_completed(the_connection, wp, home_position, track_list)
         gain_track_of_time(the_connection, track_list)
         po_now = position_now(the_connection)
         point = (po_now.lat, po_now.lon)
-        putPathPoint(point)
+        #putPathPoint(point)
 
     print("reaching last waypoint of NO.", wp_list_len, ", mission accomplished!")
 
@@ -288,6 +293,7 @@ def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_ta
     # 上传任务
     upload_mission_till_completed(the_connection, wp_bomb_drop, home_position, track_list)
     print("bombs away!")
+    print(len(track_list))
 
 def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
     wp_target = Waypoint(-35.35941937, 149.16062729, 0)
@@ -334,5 +340,13 @@ def yard_fly(the_connection, wp, home_position, track_list):
     wp_list.extend(wp_circle_course(wp_circle1, 3, 180, 1))
     wp_list.extend(wp_straight_course(wp_line2, 3))
     wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
+
+    Thread(target=runGui).start()
+    setMapLocation((home_position.lat, home_position.lon))
+    waypoint_print_list = []
+    for count in range(len(wp)):
+        waypoint_print_list.append((wp[count].lat, wp[count].lon))
+        # print(waypoint_print_list)
+    setTargetPoints(waypoint_print_list)
 
     upload_mission_till_completed(the_connection, wp_list, home_position, track_list)
