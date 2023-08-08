@@ -27,39 +27,40 @@ def arm(the_connection, times=5):
             error_process(the_connection)
 
             # 使用long信息发送arm的command
-            if result == 0:
-                print("arm successfully")
-            else:
-                print("arm failed")
-                msg = rec_match_received(the_connection, "GPS_RAW_INT")
-                if msg.fix_type == 3 or msg.fix_type == 4:
-                    force_arm(the_connection)
-                else:
-                    error_process(the_connection)
+       if result == 0:
+          print("arm successfully")
+       else:
+          print("arm failed")
+          msg = rec_match_received(the_connection, "GPS_RAW_INT")
+          if msg.fix_type == 3 or msg.fix_type == 4:
+            force_arm(the_connection)
+          else:
+            error_process(the_connection)
     else:
+        print("skip arm")
         pass
 
 
 def mode_set(the_connection, mode, times=5):
 
     count = 0
-    #使用long信息发送模式设置指令,进行信息判断(times可以指定重试的次数）
+    # 使用long信息发送模式设置指令,进行信息判断(times可以指定重试的次数）
     while True:
-      the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+       the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0, 1, mode, 0, 0, 0, 0, 0)
-      msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+       msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
 
-      if is_none_return(msg) == False:
-            result = msg.result
-            break
-      elif count < times:
-            time.sleep(2)
-            count += 1
-            print("receive None msg, retry No.", count)
-            result = -1
-            continue
-      else:
-            error_process(the_connection)
+       if not is_none_return(msg):
+          result = msg.result
+          break
+       elif count < times:
+          time.sleep(1)
+          count += 1
+          print("receive None msg, retry No.", count)
+          result = -1
+          continue
+       else:
+          error_process(the_connection)
 
     #根据com_ack判断模式设置结果
     if result == 0:
@@ -87,7 +88,11 @@ def mode_set(the_connection, mode, times=5):
             print("other mode set successfully")
         return mode
     else:
-        error_process(the_connection)
+        print("failed to set mode")
+        if input("输入0以尝试重新设置飞行模式（输入其他结束程序）： ") == '0':
+           return -2
+        else:
+           error_process(the_connection)
 
 
 def set_home(the_connection, position_re, times=5, mode=0):

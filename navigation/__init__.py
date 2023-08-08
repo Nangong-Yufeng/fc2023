@@ -1,11 +1,11 @@
-'''
 import sys
 sys.path.append('../gui')
-import geopy, class_list, error_process, get_para, mission, preflight, set_para
+from class_list import Waypoint
+from preflight import arm, mode_set, set_home
+from mission import yard_fly
 
-arm = preflight.arm
-mode_set = preflight.mode_set
-set_home = preflight.set_home
-Waypoint = class_list.Waypoint
-yard_fly = mission.yard_fly
-'''
+arm = arm
+mode_set = mode_set
+set_home = set_home
+Waypoint = Waypoint
+yard_fly = yard_fly

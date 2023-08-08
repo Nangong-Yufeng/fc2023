@@ -36,6 +36,7 @@ def mission_accomplished(the_connection, wp_list_len):
     if msg.seq == wp_list_len and msg.mission_state == 5:
         return 1
     else:
+        print("seq: ", msg.seq, "state: ", msg.mission_state)
         return -10
 
 
@@ -76,12 +77,13 @@ def mission_upload(the_connection, wp, home_position):
                 print("Mission uploaded successfully")
                 break
 
+
 # 上传航点集并阻塞程序直到完成全部预定航点任务，并且打印动态参数
 def upload_mission_till_completed(the_connection, wp, home_position, track_list):
     mission_upload(the_connection, wp, home_position)
 
     if input("任务上传完成，输入任意内容开始自动飞行： "):
-        print("loitering")
+        pass
 
     mode_set(the_connection, 10)
 
@@ -91,10 +93,12 @@ def upload_mission_till_completed(the_connection, wp, home_position, track_list)
 
     # 在到达最后航点前，实时显示动态轨迹，并记录track point
     while mission_accomplished(the_connection, wp_list_len) < 0:
+
         gain_track_of_time(the_connection, track_list)
         po_now = position_now(the_connection)
         point = (po_now.lat, po_now.lon)
-        #putPathPoint(point)
+        putPathPoint(point)
+
 
     print("reaching last waypoint of NO.", wp_list_len, ", mission accomplished!")
 
@@ -295,6 +299,7 @@ def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_ta
     print("bombs away!")
     print(len(track_list))
 
+
 def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
     wp_target = Waypoint(-35.35941937, 149.16062729, 0)
     # 经过投弹解算后认为的落点与目标的距离
@@ -329,6 +334,7 @@ def loiter_at_present(the_connection, alt):
        print("loiter failed")
        error_process(the_connection)
 
+
 # 环形飞行航线（仅测试用）
 def yard_fly(the_connection, wp, home_position, track_list):
     wp_line1 = [wp[3], wp[0]]
@@ -336,17 +342,26 @@ def yard_fly(the_connection, wp, home_position, track_list):
     wp_line2 = [wp[1], wp[2]]
     wp_circle2 = [wp[2], wp[3]]
 
-    wp_list = wp_straight_course(wp_line1, 3)
-    wp_list.extend(wp_circle_course(wp_circle1, 3, 180, 1))
+    wp_list = (wp_circle_course(wp_circle1, 3, 180, 1))
+    wp_list.pop(-1)
     wp_list.extend(wp_straight_course(wp_line2, 3))
+    wp_list.pop(-1)
     wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
+    wp_list.pop(-1)
+    wp_list.extend(wp_straight_course(wp_line1, 3))
+    wp_list.pop(-1)
+    wp_list.append(home_position)
 
     Thread(target=runGui).start()
     setMapLocation((home_position.lat, home_position.lon))
     waypoint_print_list = []
-    for count in range(len(wp)):
-        waypoint_print_list.append((wp[count].lat, wp[count].lon))
-        # print(waypoint_print_list)
+    for count in range(len(wp_list)):
+        waypoint_print_list.append((wp_list[count].lat, wp_list[count].lon))
     setTargetPoints(waypoint_print_list)
 
-    upload_mission_till_completed(the_connection, wp_list, home_position, track_list)
+    mission_upload(the_connection, wp_list, home_position)
+
+    while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list):
+        gain_track_of_time(the_connection, track_list)
+        continue
+    print("mission completed")

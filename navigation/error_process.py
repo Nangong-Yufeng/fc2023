@@ -31,3 +31,12 @@ def rec_match_received(the_connection, type, times=5):
             continue
         else:
             error_process(the_connection)
+
+def retry_fuc_para1(the_connection, function, para):
+    msg = function(the_connection, para)
+    if msg > -1:
+        pass
+    elif msg == -2:
+        function(the_connection, para)
+    else:
+        error_process(the_connection)
