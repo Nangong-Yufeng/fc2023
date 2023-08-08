@@ -4,10 +4,7 @@
 from utils import title
 import time
 from vision.detect import Vision
-import navigation.error_process
-from navigation.preflight import arm, mode_set, set_home
-from navigation.class_list import Waypoint
-from navigation.mission import yard_fly
+from navigation import Waypoint, set_home, mode_set, arm, yard_fly
 from pymavlink import mavutil
 
 '''
