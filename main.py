@@ -10,7 +10,6 @@ from pymavlink import mavutil
 '''
 帅
 '''
-# 0. ~
 title.printTitle()
 
 '''
