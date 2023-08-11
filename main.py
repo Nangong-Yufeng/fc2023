@@ -1,5 +1,5 @@
 """
-这是将在比赛时被运行的文件,目前对navigation包的引用尚存在问题
+这是将在比赛时被运行的文件
 """
 from utils import title
 import time
