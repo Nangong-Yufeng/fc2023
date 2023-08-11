@@ -1,13 +1,9 @@
-import sys
-sys.path.append('../gui')
 from pymavlink import mavutil
 import math
 from class_list import Waypoint, track_point
 from get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
 from preflight import mode_set
 from error_process import error_process, rec_match_received
-from gui import putPathPoint, setTargetPoints, runGui, setMapLocation
-from threading import Thread
 from trajectory import trajectory_cal
 
 
@@ -36,7 +32,7 @@ def mission_accomplished(the_connection, wp_list_len):
     if msg.seq == wp_list_len and msg.mission_state == 5:
         return 1
     else:
-        print("seq: ", msg.seq, "state: ", msg.mission_state)
+        #print("seq: ", msg.seq, "state: ", msg.mission_state)
         return -10
 
 
@@ -95,10 +91,6 @@ def upload_mission_till_completed(the_connection, wp, home_position, track_list)
     while mission_accomplished(the_connection, wp_list_len) < 0:
 
         gain_track_of_time(the_connection, track_list)
-        po_now = position_now(the_connection)
-        point = (po_now.lat, po_now.lon)
-        putPathPoint(point)
-
 
     print("reaching last waypoint of NO.", wp_list_len, ", mission accomplished!")
 
@@ -282,15 +274,6 @@ def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_ta
     wp_bomb_drop.extend(wp_line2_list)
     wp_bomb_drop.extend(wp_line3_list)
     '''
-    # 开启地图脚本并在地图中显示静态航点
-    Thread(target=runGui).start()
-    setMapLocation((home_position.lat, home_position.lon))
-    waypoint_print_list = []
-    for count in range(len(wp_bomb_drop)):
-        waypoint_print_list.append((wp_bomb_drop[count].lat, wp_bomb_drop[count].lon))
-        # print(waypoint_print_list)
-    setTargetPoints(waypoint_print_list)
-
 
 # 上传并等待任务执行
 
@@ -323,7 +306,7 @@ def bomb_drop(the_connection):
 
 def loiter_at_present(the_connection, alt):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
-                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, 30, 0, 0, 0, alt)
+                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, -30, 0, 0, 0, alt)
     msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
     result = msg.result
     if result == 0:
@@ -333,6 +316,14 @@ def loiter_at_present(the_connection, alt):
     else:
        print("loiter failed")
        error_process(the_connection)
+
+
+def loiter(the_connection, position):
+    print(position.lat, position.lon)
+    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, -30, 0, position.lat, position.lon, position.alt)
+    msg = rec_match_received(the_connection, "COMMAND_ACK")
+    print(msg)
 
 
 # 环形飞行航线（仅测试用）
@@ -349,19 +340,21 @@ def yard_fly(the_connection, wp, home_position, track_list):
     wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
     wp_list.pop(-1)
     wp_list.extend(wp_straight_course(wp_line1, 3))
-    wp_list.pop(-1)
-    wp_list.append(home_position)
+    #wp_list.append(home_position)
 
-    Thread(target=runGui).start()
-    setMapLocation((home_position.lat, home_position.lon))
-    waypoint_print_list = []
-    for count in range(len(wp_list)):
-        waypoint_print_list.append((wp_list[count].lat, wp_list[count].lon))
-    setTargetPoints(waypoint_print_list)
-
+    print(len(wp_list))
+    if input("输入0进行环操场航线： ") == '0':
+        pass
     mission_upload(the_connection, wp_list, home_position)
 
-    while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list):
-        gain_track_of_time(the_connection, track_list)
-        continue
-    print("mission completed")
+    count = 0
+    while True:#input("输入0进行环操场航线： ") == '0':
+
+      mode_set(the_connection, 10)
+
+      while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list)-1:
+         gain_track_of_time(the_connection, track_list)
+         continue
+      count += 1
+      print("circle NO.", count, " completed")
+

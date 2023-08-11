@@ -1,9 +1,6 @@
-import time
-
 from pymavlink import mavutil
 from class_list import Position_relative, posture_inform, track_point
 from error_process import rec_match_received
-import random
 
 
 def gain_posture_para(the_connection):

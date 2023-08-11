@@ -1,6 +1,3 @@
-import time
-import sys
-sys.path.append('../gui')
 from pymavlink import mavutil
 from preflight import arm, mode_set, set_home
 from mission import clear_waypoint,upload_mission_till_completed, execute_bomb_course, loiter_at_present
@@ -43,7 +40,6 @@ loiter_at_present(the_connection, 50)
 
 while input("假设视觉已返回坐标信息，输入零以继续： ") != '0':
     print("loitering")
-
 
 # 执行投弹航线
 execute_bomb_course(the_connection, home_position, track_list, position_now(the_connection), wp_target, precision=3, course_len=200, direction=1, radius=200)
