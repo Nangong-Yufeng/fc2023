@@ -1,10 +1,10 @@
 from pymavlink import mavutil
 import math
-from class_list import Waypoint, track_point
-from get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
-from preflight import mode_set
-from error_process import error_process, rec_match_received
-from trajectory import trajectory_cal
+from .class_list import Waypoint, track_point
+from .get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
+from .preflight import mode_set
+from .error_process import error_process, rec_match_received
+from .trajectory import trajectory_cal
 
 
 # 通用任务函数
@@ -280,7 +280,7 @@ def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_ta
     # 上传任务
     upload_mission_till_completed(the_connection, wp_bomb_drop, home_position, track_list)
     print("bombs away!")
-    print(len(track_list))
+    print("len of track_list: ", len(track_list))
 
 
 def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):

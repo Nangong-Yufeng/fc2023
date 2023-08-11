@@ -1,8 +1,8 @@
 from pymavlink import mavutil
-from preflight import arm, mode_set, set_home
-from mission import clear_waypoint,upload_mission_till_completed, execute_bomb_course, loiter_at_present
-from class_list import Position_relative, Waypoint
-from get_para import position_now
+from .preflight import arm, mode_set, set_home
+from .mission import clear_waypoint,upload_mission_till_completed, execute_bomb_course, loiter_at_present
+from .class_list import Position_relative, Waypoint
+from .get_para import position_now
 
 # 连接飞行器
 the_connection = mavutil.mavlink_connection('udpin:localhost:14550')
