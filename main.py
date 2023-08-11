@@ -1,6 +1,7 @@
 """
 这是将在比赛时被运行的文件
 """
+
 from utils import title
 import time
 from vision.detect import Vision
