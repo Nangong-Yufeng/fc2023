@@ -1,4 +1,3 @@
-import time
 from pymavlink import mavutil
 from preflight import arm, mode_set, set_home
 from mission import clear_waypoint,upload_mission_till_completed, execute_bomb_course, loiter_at_present
