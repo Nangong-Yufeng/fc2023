@@ -1,5 +1,3 @@
-import sys
-sys.path.append('../gui')
 from pymavlink import mavutil
 from preflight import arm, mode_set, set_home
 from mission import wp_straight_course, wp_circle_course, yard_fly, clear_waypoint
@@ -17,7 +15,7 @@ retry_fuc_para1(the_connection, mode_set, 0)
 # 设置飞行器home点
 home_position = Position_relative(22.5903516, 113.9755156, 0)
 
-#set_home(the_connection, home_position)
+set_home(the_connection, home_position)
 
 arm(the_connection)
 
@@ -28,7 +26,5 @@ wp3 = Waypoint(22.5909185, 113.9755938, 120)
 wp4 = Waypoint(22.5909266, 113.9752198, 120)
 
 wp = [wp1, wp2, wp3, wp4]
-
-clear_waypoint(the_connection)
 
 yard_fly(the_connection, wp, home_position, track_list)
