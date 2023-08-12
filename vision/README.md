@@ -32,6 +32,8 @@ datasets/0515内为数据集
 
 train.py中需要修改--data, --epochs, --batch-size, --device，具体含义见参考资料
 
+./weights下含s_low,s_med,m_low三个文件夹，分别为用不同权重或网络结构的训练结果
+
 ## 参考资料
 
 train.py注解 https://blog.csdn.net/CharmsLUO/article/details/123542598
