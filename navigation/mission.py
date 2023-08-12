@@ -1,10 +1,10 @@
 from pymavlink import mavutil
 import math
-from class_list import Waypoint, track_point
-from get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
-from preflight import mode_set
-from error_process import error_process, rec_match_received
-from trajectory import trajectory_cal
+from navigation.class_list import Waypoint, track_point
+from navigation.get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
+from navigation.preflight import mode_set
+from navigation.error_process import error_process, rec_match_received
+from navigation.trajectory import trajectory_cal
 
 
 # 通用任务函数

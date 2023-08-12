@@ -1,6 +1,6 @@
 from pymavlink import mavutil
-from class_list import Position_relative, posture_inform, track_point
-from error_process import rec_match_received
+from navigation.class_list import Position_relative, posture_inform, track_point
+from navigation.error_process import rec_match_received
 
 
 def gain_posture_para(the_connection):

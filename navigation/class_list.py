@@ -1,5 +1,5 @@
 import geopy.distance
-from error_process import rec_match_received
+from navigation.error_process import rec_match_received
 
 class Position_relative:
     def __init__(self, lat=0, lon=0, alt=0):

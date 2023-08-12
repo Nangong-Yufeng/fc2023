@@ -1,8 +1,8 @@
 import sys
-sys.path.append('../gui')
-from class_list import Waypoint
-from preflight import arm, mode_set, set_home
-from mission import yard_fly
+# sys.path.append('../gui')
+from navigation.class_list import Waypoint
+from navigation.preflight import arm, mode_set, set_home
+from navigation.mission import yard_fly
 
 arm = arm
 mode_set = mode_set
