@@ -1,6 +1,7 @@
 """
-这是将在比赛时被运行的文件,目前对navigation包的引用尚存在问题
+这是将在比赛时被运行的文件
 """
+
 from utils import title
 import time
 from vision.detect import Vision
@@ -10,7 +11,6 @@ from pymavlink import mavutil
 '''
 帅
 '''
-# 0. ~
 title.printTitle()
 
 '''

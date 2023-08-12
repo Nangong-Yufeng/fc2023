@@ -1,10 +1,10 @@
 from pymavlink import mavutil
 import math
-from class_list import Waypoint, track_point
-from get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
-from preflight import mode_set
-from error_process import error_process, rec_match_received
-from trajectory import trajectory_cal
+from .class_list import Waypoint, track_point
+from .get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
+from .preflight import mode_set
+from .error_process import error_process, rec_match_received
+from .trajectory import trajectory_cal
 
 
 # 通用任务函数
@@ -95,10 +95,32 @@ def upload_mission_till_completed(the_connection, wp, home_position, track_list)
     print("reaching last waypoint of NO.", wp_list_len, ", mission accomplished!")
 
 
-def clear_waypoint(the_connection):
-    msg = mavutil.mavlink.MAVLink_mission_clear_all_message(the_connection.target_system,the_connection.target_component,
-                                                            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
-    the_connection.mav.send(msg)
+def clear_waypoint(vehicle):
+    message = mavutil.mavlink.MAVLink_mission_clear_all_message(target_system=vehicle.target_system,
+                                                        target_component=vehicle.target_component,
+                                                        mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+
+    # send mission clear all command to the vehicle
+    vehicle.mav.send(message)
+
+    # create mission request list message
+    message = mavutil.mavlink.MAVLink_mission_request_list_message(target_system=vehicle.target_system,
+                                                           target_component=vehicle.target_component,
+                                                           mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+
+    # send the message to the vehicle
+    vehicle.mav.send(message)
+
+    # wait mission count message
+    message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_count_message.msgname,
+                                 blocking=True)
+
+    # convert this message to dictionary
+    message = message.to_dict()
+
+    # get the mission item count
+    count = message["count"]
+    print("Total mission item count:", count)
 
 
 # 指定形状航线生成函数
@@ -280,7 +302,7 @@ def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_ta
     # 上传任务
     upload_mission_till_completed(the_connection, wp_bomb_drop, home_position, track_list)
     print("bombs away!")
-    print(len(track_list))
+    print("len of track_list: ", len(track_list))
 
 
 def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
