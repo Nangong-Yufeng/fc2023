@@ -1,8 +1,8 @@
 from pymavlink import mavutil
-from preflight import arm, mode_set, set_home
-from mission import wp_straight_course, wp_circle_course, yard_fly, clear_waypoint
-from class_list import Position_relative, Waypoint
-from error_process import rec_match_received, retry_fuc_para1
+from .preflight import arm, mode_set, set_home
+from .mission import wp_straight_course, wp_circle_course, yard_fly, clear_waypoint
+from .class_list import Position_relative, Waypoint
+from .error_process import rec_match_received, retry_fuc_para1
 
 
 track_list = []

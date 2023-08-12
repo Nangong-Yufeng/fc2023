@@ -1,6 +1,6 @@
 import time
 from pymavlink import mavutil
-from navigation.error_process import error_process, is_none_return, rec_match_received
+from .error_process import error_process, is_none_return, rec_match_received
 
 def arm(the_connection, times=5):
     the_connection.wait_heartbeat()

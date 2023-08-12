@@ -1,5 +1,5 @@
 from pymavlink import mavutil
-from navigation.get_para import position_now, gain_posture_para
+from .get_para import position_now, gain_posture_para
 
 
 # 为投弹位置估计准备的函数
