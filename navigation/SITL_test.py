@@ -1,6 +1,6 @@
 from pymavlink import mavutil
 from .preflight import arm, mode_set, set_home
-from .mission import clear_waypoint,upload_mission_till_completed, execute_bomb_course, loiter_at_present
+from .mission import clear_waypoint, upload_mission_till_completed, execute_bomb_course, loiter_at_present, mission_upload
 from .class_list import Position_relative, Waypoint
 from .get_para import position_now
 
@@ -33,10 +33,21 @@ wp_target = Waypoint(-35.3598136, 149.1647655, 10)
 wp = [wp4, wp2]
 
 # 飞往侦察点
-mission1 = [wp1]
-upload_mission_till_completed(the_connection, mission1, home_position, track_list)
+mission1 = [wp1, wp2]
+#upload_mission_till_completed(the_connection, mission1, home_position, track_list)
+mission_upload(the_connection, mission1, home_position)
 
-loiter_at_present(the_connection, 50)
+mode_set(the_connection, 10)
+
+if input("hello there") == '0':
+    clear_waypoint(the_connection)
+    print("interrupt")
+
+mission_upload(the_connection, wp, home_position)
+
+mode_set(the_connection, 10)
+
+#loiter_at_present(the_connection, 50)
 
 while input("假设视觉已返回坐标信息，输入零以继续： ") != '0':
     print("loitering")

@@ -95,10 +95,32 @@ def upload_mission_till_completed(the_connection, wp, home_position, track_list)
     print("reaching last waypoint of NO.", wp_list_len, ", mission accomplished!")
 
 
-def clear_waypoint(the_connection):
-    msg = mavutil.mavlink.MAVLink_mission_clear_all_message(the_connection.target_system,the_connection.target_component,
-                                                            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
-    the_connection.mav.send(msg)
+def clear_waypoint(vehicle):
+    message = mavutil.mavlink.MAVLink_mission_clear_all_message(target_system=vehicle.target_system,
+                                                        target_component=vehicle.target_component,
+                                                        mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+
+    # send mission clear all command to the vehicle
+    vehicle.mav.send(message)
+
+    # create mission request list message
+    message = mavutil.mavlink.MAVLink_mission_request_list_message(target_system=vehicle.target_system,
+                                                           target_component=vehicle.target_component,
+                                                           mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+
+    # send the message to the vehicle
+    vehicle.mav.send(message)
+
+    # wait mission count message
+    message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_count_message.msgname,
+                                 blocking=True)
+
+    # convert this message to dictionary
+    message = message.to_dict()
+
+    # get the mission item count
+    count = message["count"]
+    print("Total mission item count:", count)
 
 
 # 指定形状航线生成函数
