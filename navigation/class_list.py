@@ -21,7 +21,7 @@ class Waypoint(Position_relative):
         target_distance = geopy.distance.GeodesicDistance(target, local).meters
         return target_distance
 
-#记录飞机航点（含时间信息）
+# 记录飞机航点（含时间信息）
 class track_point(Position_relative):
     def __init__(self, lat, lon, alt, time):
         super(track_point, self).__init__(lat, lon, alt)
@@ -37,7 +37,8 @@ class posture_inform:
         self.pitch_speed = pitch_speed
         self.yaw_speed = yaw_speed
 
-#视觉识别到靶标后返回的信息类
+
+# 视觉识别到靶标后返回的信息类
 class vision_position:
     def __init__(self, x, y, the_connection, target_number):
         self.x = x
