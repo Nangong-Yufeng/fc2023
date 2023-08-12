@@ -9,7 +9,7 @@ from navigation import Waypoint, set_home, mode_set, arm, yard_fly
 from pymavlink import mavutil
 
 '''
-帅
+帅(😅)
 '''
 title.printTitle()
 
