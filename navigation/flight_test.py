@@ -8,7 +8,21 @@ from .error_process import rec_match_received, retry_fuc_para1
 track_list = []
 
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+#the_connection = mavutil.mavlink_connection('/dev/serial/by-id/usb-ArduPilot_CUAVv5_2F001F000850304E35313320-if00', baud=9600)
 #the_connection = mavutil.mavlink_connection('udpin:localhost:14550')
+'''
+time_list = []
+
+while True:
+  msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
+  if len(time_list) <= 50:
+      time_list.append(msg.time_boot_ms)
+  else:
+      frequency = 50 / (time_list[50] - time_list[0]) * 1000
+      print("frequency: ", frequency)
+      time_list = []
+  print(msg.time_boot_ms, msg.relative_alt)
+'''
 
 retry_fuc_para1(the_connection, mode_set, 0)
 
