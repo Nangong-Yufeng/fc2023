@@ -357,6 +357,7 @@ def yard_fly(the_connection, wp, home_position, track_list):
 
     wp_list = (wp_circle_course(wp_circle1, 3, 180, 1))
     wp_list.pop(-1)
+    wp_list.pop(-1)
     wp_list.extend(wp_straight_course(wp_line2, 3))
     wp_list.pop(-1)
     wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
@@ -365,9 +366,9 @@ def yard_fly(the_connection, wp, home_position, track_list):
     #wp_list.append(home_position)
 
     print(len(wp_list))
+    mission_upload(the_connection, wp_list, home_position)
     if input("输入0进行环操场航线： ") == '0':
         pass
-    mission_upload(the_connection, wp_list, home_position)
 
     count = 0
     while True:#input("输入0进行环操场航线： ") == '0':
@@ -379,4 +380,6 @@ def yard_fly(the_connection, wp, home_position, track_list):
          continue
       count += 1
       print("circle NO.", count, " completed")
-
+      loiter(the_connection, home_position)
+      if input("输入0进行下一圈： ") == '0':
+          pass
