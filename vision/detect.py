@@ -26,7 +26,7 @@ class Vision:
     def __init__(self, source=0, device='0', conf_thres=0.7):
         """构造函数
 
-        :param source: 视频源 0: 电脑自带摄像头； 1： 外部摄像头
+        :param source: 视频源 0: 外部摄像头，使用前请禁用电脑摄像头
         :param device: 硬件 '0'：GPU； 'CPU'：CPU
         :param conf_thres: 置信度阈值
         """
@@ -162,6 +162,6 @@ class Vision:
         Return:
              未完成
         """
-        ret, im0 = self.cap.read()  # 截图
+
         im = MyLoadIamge(im0=im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
         self.detect(im0=im0, im=im, model=self.model, conf_thres=self.conf_thres)
