@@ -7,7 +7,7 @@ class Model(nn.Module):
         self.flatten = nn.Flatten()
         self.conv1 = nn.Sequential(
             nn.Conv2d(
-                in_channels=1,  # gray image(1,28,28),the size which can not be changed depends on MNIST
+                in_channels=1,  # gray image(1,28,28)
                 out_channels=16,
                 kernel_size=5,
                 stride=1,
