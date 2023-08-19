@@ -37,8 +37,8 @@ class Vision:
         ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
         # 参数
-        weights = ROOT / 'best.pt'  # 权重文件
-        data = ROOT / '0515.yaml'  # 类别等信息
+        weights = ROOT / 'weights/s_low/best.pt'  # 权重文件
+        data = ROOT / 'ngyf.yaml'  # 类别等信息
         imgsz = (640, 640)  # 新图大小
         half = False  # use FP16 half-precision inference
         dnn = False  # use OpenCV DNN for ONNX inference
@@ -138,6 +138,7 @@ class Vision:
                     wid = img.shape[1]
                     img = img[max(0, int(tlbr[1]) - 5):min(int(tlbr[3]) + 5, hei),
                           max(0, int(tlbr[0]) - 5):min(int(tlbr[2]) + 5, wid)]  # 对原图切片，截取标靶
+                    img = cv2.copyMakeBorder(img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, 0)
                     img_rotated = rotate(img)
                     img_crop = crop(img_rotated)
                     if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形

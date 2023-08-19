@@ -17,11 +17,12 @@ def crop(img):
 # img = rotate(img)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    _, imgb = cv2.threshold(img_gray, 180, 255, cv2.THRESH_BINARY)
+    _, imgb = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
 
-    # 膨胀操作，消除中间数字的黑色，将数字所以区域染为全白
+    # 闭运算，消除中间数字的黑色，将数字所以区域染为全白
     kernel = np.ones((3, 3), dtype=np.uint8)
-    imgb = cv2.dilate(imgb, kernel, 1) # 1:迭代次数，也就是执行几次膨胀操作
+    imgb = cv2.morphologyEx(imgb, cv2.MORPH_CLOSE, kernel)
+    # imgb = cv2.morphologyEx(imgb, cv2.MORPH_OPEN, kernel)
 
     # cv2.imshow('img', imgb)
     # cv2.waitKey(0)
@@ -37,7 +38,7 @@ def crop(img):
     center_x = 0
     center_y = 0
     for rect in rects:
-        if rect[1][0] / rect[1][1] < 1.2 and rect[1][0] / rect[1][1] > 0.8 and rect[1][0] * rect[1][1] > 63:
+        if rect[1][1] != 0 and rect[1][0] / rect[1][1] < 1.25 and rect[1][0] / rect[1][1] > 0.8 and rect[1][0] * rect[1][1] > 400:
             # 获取中心点坐标
             center_x = rect[0][0]
             center_y = rect[0][1]
@@ -50,8 +51,8 @@ def crop(img):
     if not center_x and not center_y:
         return img[0:0, 0:0]
     # 获取左上点坐标
-    x = int(center_x - wid // 2)
-    y = int(center_y - hei // 2)
-    return img[y:y+hei, x:x+wid]
+    x = max(0, int(center_x - wid // 2))
+    y = max(0, int(center_y - hei // 2))
+    return img[y:min(img.shape[0], y+hei), x:min(img.shape[1], x+wid)]
     # cv2.imshow("crop", img_crop)
     # cv2.waitKey(0)

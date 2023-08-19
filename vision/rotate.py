@@ -28,7 +28,10 @@ def rotate(image:np.array, debug:bool=False)->np.array:
         debug_ret['gray'] = image_gray.copy()
         time_start = time.time()
     # 转化为二值图
-    _, image_binary = cv2.threshold(image_gray, 140, 255, cv2.THRESH_BINARY)
+    _, image_binary = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
+    # cv2.imshow('tmp', image_binary)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     if debug:
         time_end = time.time()
         print(f"转化为二值图：{1000*(time_end-time_start)}ms")
@@ -47,6 +50,10 @@ def rotate(image:np.array, debug:bool=False)->np.array:
             for i in range(len(contour)):
                 cv2.line(image_with_contour, contour[i][0], contour[(i+1)%len(contour)][0], thickness=2, color=(0, 255, 255))
                 debug_ret['with_contour'] = image_with_contour
+
+            # cv2.imshow('tmp', image_with_contour)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
         time_start = time.time()
 
     # 利用检测出来的边缘检测角度
@@ -65,10 +72,10 @@ def rotate(image:np.array, debug:bool=False)->np.array:
             used_rect_size = width * height
             if (height < width):
                 angle -= 90
-    
-    if rect is None:  # 如果一个轮廓都没检测出来就别旋转了直接返回得了
+
+    if rect is None or used_contour is None:  # 如果一个轮廓都没检测出来就别旋转了直接返回得了
         return image.copy()
-                
+
     if debug:
         time_end = time.time()
         print(f"利用轮廓获取角度：{1000*(time_end-time_start)}ms")
@@ -83,11 +90,11 @@ def rotate(image:np.array, debug:bool=False)->np.array:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         time_start = time.time()
-    
+
     # 检测图片正反
     # 得到仿射变换
     M = cv2.getRotationMatrix2D((0, 0), angle, 1.0)
-    
+
     # 根据轮廓得到一个近似三角形
     _, tri = cv2.minEnclosingTriangle(used_contour.squeeze())
     tri = tri.squeeze().astype(int)
@@ -97,7 +104,7 @@ def rotate(image:np.array, debug:bool=False)->np.array:
     ys = rotated_tri[:, 1].reshape(-1)
     if np.prod(np.mean(ys)-ys) < 0:
         angle += 180
-    
+
     # 更新旋转矩阵并执行旋转
     h, w = image.shape[:2]
     a = max(h, w) * 1.5
@@ -116,6 +123,6 @@ def rotate(image:np.array, debug:bool=False)->np.array:
             cv2.circle(image_rotated, center=tuple(box[i]), radius=3, color=(0, 0, 0), thickness=1)
             cv2.line(image_rotated, tuple(box[i]), tuple(box[(i+1)%4]), color=(0, 0, 255), thickness=1)
         debug_ret['rotated'] = image_rotated
-        return debug_ret
+        return debug_ret['rotated']
     
     return image_rotated
