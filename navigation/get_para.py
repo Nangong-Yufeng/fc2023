@@ -69,7 +69,7 @@ def mission_current(the_connection):
 
 # track_list是由track_point对象组成的list
 def gain_track_of_time(the_connection, track_list, time_last=500):
-    track = position_now(the_connection)
+    track = gain_position_now(the_connection)
     track_list.append(track)
 
     # 默认保存过去500个位置信息，往前的消息删除

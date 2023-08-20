@@ -99,7 +99,7 @@ while True:
         mode_set(the_connection, 10)
 
     while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list) - 1:
-    if int(time.time() * 1000) > pre + itv:
-       vis.run()
-       pre = int(time.time() * 1000)
+        if int(time.time() * 1000) > pre + itv:
+           vis.run()
+           pre = int(time.time() * 1000)
     print("circle completed, stand by at home")
