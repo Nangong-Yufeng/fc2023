@@ -74,7 +74,7 @@ def rotate(image:np.array, debug:bool=False)->np.array:
                 angle -= 90
 
     if rect is None or used_contour is None:  # 如果一个轮廓都没检测出来就别旋转了直接返回得了
-        return image.copy()
+        return image[0:0, 0:0]
 
     if debug:
         time_end = time.time()

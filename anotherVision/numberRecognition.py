@@ -1,7 +1,7 @@
 import cv2
 import torch
 # from utils import getWeightPath
-import models.mnist_model
+import anotherVision.models.mnist_model
 import numpy as np
 from PIL import Image
 from torchvision import transforms
@@ -17,7 +17,7 @@ class NumberRecognizer:
             path (str): 要载入的模型的路径
         """
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = models.mnist_model.CNN().to(self.device)
+        self.model = anotherVision.models.mnist_model.CNN().to(self.device)
         self.model.load_state_dict(torch.load(weight_path))
         self.model.eval()
         self.image_transforms = transforms.ToTensor()
