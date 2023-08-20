@@ -21,3 +21,7 @@ if input("输入0测试投弹，输入其他跳过： ") == '0':
 
 if input("输入任意内容投弹： "):
     bomb_drop(the_connection)
+
+if input("落地后，输入任意内容测量落点位置： "):
+    wp = gain_position_now(the_connection)
+    print("落点坐标 lat ", wp.lat, " lon ", wp.lon)

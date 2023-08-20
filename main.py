@@ -8,7 +8,7 @@ from vision.detect import Vision
 from navigation import Waypoint, set_home, mode_set, arm, wp_circle_course, wp_straight_course, mission_upload, rec_match_received
 from pymavlink import mavutil
 
-"""
+
 def vision_test_court(the_connection):
     # 已知航点(操场的四个角)
     a = input("输入需要的环线高度（输入为空则默认为120米）： ")
@@ -80,7 +80,7 @@ arm(the_connection)
 
 # 定义轨迹集
 track_list = []
-"""
+
 """
 标靶识别
 """
@@ -93,13 +93,13 @@ pre = int(time.time() * 1000)  # 上次检测完的时间
 
 # 循环侦察任务
 while True:
-    # wp_list = vision_test_court(the_connection)
-    #
-    # if input("输入0切换自动模式开始任务（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
-    #     mode_set(the_connection, 10)
-    #
-    # while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list) - 1:
+    wp_list = vision_test_court(the_connection)
+
+    if input("输入0切换自动模式开始任务（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
+        mode_set(the_connection, 10)
+
+    while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list) - 1:
     if int(time.time() * 1000) > pre + itv:
        vis.run()
        pre = int(time.time() * 1000)
-    # print("circle completed, stand by at home")
+    print("circle completed, stand by at home")
