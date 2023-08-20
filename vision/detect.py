@@ -19,6 +19,8 @@ from vision.MyLoadImage import MyLoadIamge
 from vision.rotate import rotate
 from vision.crop import crop
 
+from anotherVision import NumberRecognizer
+from navigation.class_list import vision_position
 
 class Vision:
     """完成视觉工作的所有任务
@@ -54,6 +56,9 @@ class Vision:
         # 加载摄像头
         self.cap = cv2.VideoCapture(source)
 
+        self.numrec = NumberRecognizer('./anotherVision/weights/cnn2.pkl')
+
+        self.res = []
 
     @smart_inference_mode()
     def detect(
@@ -139,10 +144,19 @@ class Vision:
                     img = img[max(0, int(tlbr[1]) - 5):min(int(tlbr[3]) + 5, hei),
                           max(0, int(tlbr[0]) - 5):min(int(tlbr[2]) + 5, wid)]  # 对原图切片，截取标靶
                     img = cv2.copyMakeBorder(img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, 0)
+
                     img_rotated = rotate(img)
+                    if img_rotated.shape[:2] == (0, 0):  # 未检测到数字正方形
+                        continue
+
                     img_crop = crop(img_rotated)
                     if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形
                         continue
+
+                    ret = self.numrec.recognize(img_crop)
+                    if ret not in self.res:
+                        print(f'检测到新数字: {ret}')
+                        self.res.append(ret)
 
                     # 在原图上画框
                     if view_img:  # Add bbox to image
@@ -162,6 +176,6 @@ class Vision:
         Return:
              未完成
         """
-
+        ret, im0 = self.cap.read()  # 截图
         im = MyLoadIamge(im0=im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
         self.detect(im0=im0, im=im, model=self.model, conf_thres=self.conf_thres)

@@ -1,2 +1,1 @@
-from targetDetection import detect
-from numberRecognition import NumberRecognizer
+from anotherVision.numberRecognition import NumberRecognizer
