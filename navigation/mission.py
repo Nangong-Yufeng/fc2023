@@ -1,7 +1,7 @@
 from pymavlink import mavutil
 import math
 from .class_list import Waypoint, track_point
-from .get_para import gain_mission, waypoint_reached, position_now, mission_current, gain_track_of_time
+from .get_para import gain_mission, waypoint_reached, gain_position_now, mission_current, gain_track_of_time, gain_ground_speed, gain_posture_para
 from .preflight import mode_set
 from .error_process import error_process, rec_match_received
 from .trajectory import trajectory_cal
@@ -192,13 +192,18 @@ def wp_circle_course(wp, precision, angle, direction=1):
         lon_new = center.lon + radius * math.cos(theta)
         alt_new = wp[0].alt + alt_len / precision * (i+1)
         wp_new = Waypoint(lat_new, lon_new, alt_new)
-        #wp_new.show()
+        # wp_new.show()
         wp_list.append(wp_new)
         i += 1
 
     wp_list.append(wp[1])
     return wp_list
 
+
+# 根据两个航点，在其中生成平行四边形的侦察航线
+def wp_detect_course(the_connection, wp, len, precision):
+    len = len * 1e-5
+    pass
 
 # 投弹相关函数
 
@@ -317,7 +322,16 @@ def bomb_drop(the_connection):
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 1000, 0, 0, 0, 0, 0)
     msg = the_connection.recv_match(type='COMMAND_ACK', blocking=True)
     if msg.result == 0:
+        position = gain_position_now(the_connection)
+        posture = gain_posture_para(the_connection)
+        speed = gain_ground_speed(the_connection)
         print("bomb away!")
+        print("原始数据： ")
+        print("位置： lat ", position.lat, " lon ", position.lat, " alt ", position.alt)
+        print("速度:  north ", speed.vx, " east ", speed.vy, " down ", speed.vz)
+        print("姿态： roll ", posture.roll, " pitch ", posture.pitch, " yaw ", posture.yaw)
+        print("方向角: direction ", speed.direction)
+
         return 0
     else:
         print("failed to drop the bomb!")
@@ -332,8 +346,8 @@ def loiter_at_present(the_connection, alt):
     msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
     result = msg.result
     if result == 0:
-        lat = position_now(the_connection).lat
-        lon = position_now(the_connection).lon
+        lat = gain_position_now(the_connection).lat
+        lon = gain_position_now(the_connection).lon
         print("loiter at present of lat: ",lat, "lon: ", lon, "alt: ", alt)
     else:
        print("loiter failed")

@@ -1,6 +1,7 @@
 from .class_list import *
 from .preflight import *
 from .mission import *
+from .get_para import *
 
 arm = arm
 mode_set = mode_set

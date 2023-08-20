@@ -1,8 +1,10 @@
+import time
+
 from pymavlink import mavutil
 from .preflight import arm, mode_set, set_home
 from .mission import clear_waypoint, upload_mission_till_completed, execute_bomb_course, loiter_at_present, mission_upload
 from .class_list import Position_relative, Waypoint
-from .get_para import position_now
+from .get_para import position_now, gain_ground_speed
 
 # 连接飞行器
 the_connection = mavutil.mavlink_connection('udpin:localhost:14550')
@@ -37,20 +39,19 @@ mission1 = [wp1, wp2]
 #upload_mission_till_completed(the_connection, mission1, home_position, track_list)
 mission_upload(the_connection, mission1, home_position)
 
-mode_set(the_connection, 10)
+mode_set(the_connection, 13)
 
-if input("hello there") == '0':
-    clear_waypoint(the_connection)
-    print("interrupt")
+time.sleep(5)
 
 mission_upload(the_connection, wp, home_position)
 
 mode_set(the_connection, 10)
 
-#loiter_at_present(the_connection, 50)
+loiter_at_present(the_connection, 50)
 
 while input("假设视觉已返回坐标信息，输入零以继续： ") != '0':
     print("loitering")
+    gain_ground_speed(the_connection)
 
 # 执行投弹航线
 execute_bomb_course(the_connection, home_position, track_list, position_now(the_connection), wp_target, precision=3, course_len=200, direction=1, radius=200)
