@@ -1,5 +1,5 @@
 from pymavlink import mavutil
-from .class_list import Position_relative, posture_inform, track_point
+from .class_list import Position_relative, posture_inform, track_point, speed_inform
 from .error_process import rec_match_received
 
 
@@ -9,8 +9,13 @@ def gain_posture_para(the_connection):
                           msg.rollspeed, msg.pitchspeed, msg.yawspeed)
     return pose
 
+def gain_ground_speed(the_connection):
+    msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
+    speed = speed_inform(msg.vx, msg.vy, msg.vz, msg.hdg)
+    return speed
 
-def position_now(the_connection):
+
+def gain_position_now(the_connection):
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
     wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms)
     return wp_now
@@ -67,12 +72,9 @@ def gain_track_of_time(the_connection, track_list, time_last=500):
     track = position_now(the_connection)
     track_list.append(track)
 
-    # 默认保存过去500个位置信息，往前的消息删除（实际上程序的刷新频率达不到ms级，大概是每秒一次）
+    # 默认保存过去500个位置信息，往前的消息删除
     if len(track_list) > time_last:
         track_list.pop(0)
     else:
         pass
-    '''
-    num = random.choice(range(len(track_list)))
-    print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
-    '''
+    #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)

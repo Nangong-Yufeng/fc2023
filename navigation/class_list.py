@@ -38,6 +38,14 @@ class posture_inform:
         self.pitch_speed = pitch_speed
         self.yaw_speed = yaw_speed
 
+class speed_inform:
+    def __init__(self, vx, vy, vz, direction):
+        # 分别指向北、东和下的速度分量（转为m/s）
+        self.vx = vx * 1e-2
+        self.vy = vy * 1e-2
+        self.vz = vz * 1e-2
+        # 方向角，正北为360
+        self.direction = direction
 
 # 视觉识别到靶标后返回的信息类
 class vision_position:

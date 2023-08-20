@@ -55,6 +55,15 @@ title.printTitle()
 # the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
+# 测试投弹装置
+if input("输入0测试投弹，输入其他跳过： ") == '0':
+    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 1000, 0, 0, 0, 0, 0)
+    time.sleep(1)
+    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 2000, 0, 0, 0, 0, 0)
+    print("投弹测试完成")
+
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
 # set_home(the_connection, home_position)
