@@ -1,11 +1,8 @@
-from navigation import Waypoint, set_home, mode_set, arm, wp_circle_course, wp_straight_course, mission_upload, rec_match_received, bomb_drop, gain_track_of_time, gain_ground_speed
+from navigation import gain_position_now, bomb_drop
 from pymavlink import mavutil
+from navigation.get_para import gain_position_now
 import time
 
-
-'''
-飞行前准备
-'''
 # 连接飞行器  device部分，可以在mission planner中成功连接后直接复制过来
 # the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
@@ -19,5 +16,11 @@ if input("输入0测试投弹，输入其他跳过： ") == '0':
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 2000, 0, 0, 0, 0, 0)
     print("投弹装置测试完成")
 
+# 投弹
 if input("输入任意内容投弹： "):
     bomb_drop(the_connection)
+
+# 落点测量
+if input("落地后，输入任意内容测量落点位置： "):
+    wp = gain_position_now(the_connection)
+    print("落点坐标 lat ", wp.lat, " lon ", wp.lon)
