@@ -1,11 +1,14 @@
-from navigation import gain_position_now, bomb_drop
+from navigation import gain_position_now, bomb_drop, Waypoint, set_home
 from pymavlink import mavutil
-from navigation.get_para import gain_position_now
 import time
 
 # 连接飞行器  device部分，可以在mission planner中成功连接后直接复制过来
-# the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
-the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+# the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+
+# 设置home点
+home_position = Waypoint(22.5903516, 113.9755156, 0)
+set_home(the_connection, home_position)
 
 # 测试投弹装置
 if input("输入0测试投弹，输入其他跳过： ") == '0':
@@ -24,3 +27,9 @@ if input("输入任意内容投弹： "):
 if input("落地后，输入任意内容测量落点位置： "):
     wp = gain_position_now(the_connection)
     print("落点坐标 lat ", wp.lat, " lon ", wp.lon)
+    with open(file='/home/bobo/fc2023/data.txt', mode='a') as f:
+        f.write("落点坐标 lat ")
+        f.write(str(wp.lat))
+        f.write(" lon ")
+        f.write(str(wp.lon))
+        f.write('\n\n')
