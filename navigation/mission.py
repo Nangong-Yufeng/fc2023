@@ -5,6 +5,7 @@ from .get_para import gain_mission, waypoint_reached, gain_position_now, mission
 from .preflight import mode_set
 from .error_process import error_process, rec_match_received
 from .trajectory import trajectory_cal
+import time
 
 
 # 通用任务函数
@@ -328,9 +329,39 @@ def bomb_drop(the_connection):
         print("bomb away!")
         print("原始数据： ")
         print("位置： lat ", position.lat, " lon ", position.lat, " alt ", position.alt)
-        print("速度:  north ", speed.vx, " east ", speed.vy, " down ", speed.vz)
+        print("速度:  north ", speed.vx, 'east', speed.vy, " down ", speed.vz)
         print("姿态： roll ", posture.roll, " pitch ", posture.pitch, " yaw ", posture.yaw)
         print("方向角: direction ", speed.direction)
+
+        # 将时间和投弹位资信息记录到文件中
+        localtime = time.localtime(time.time())
+        with open(file='/home/bobo/fc2023/data.txt', mode='a') as f:
+            f.write(str(localtime))
+            f.write('\n')
+            f.write("位置： lat ")
+            f.write(str(position.lat))
+            f.write(" lon ")
+            f.write(str(position.lat))
+            f.write(" alt ")
+            f.write(str(position.alt))
+            f.write('\n')
+            f.write("速度:  north ")
+            f.write(str(speed.vx))
+            f.write(" east ")
+            f.write(str(speed.vy))
+            f.write(" down ")
+            f.write(str(speed.vz))
+            f.write('\n')
+            f.write("姿态： roll ")
+            f.write(str(posture.roll))
+            f.write(" pitch ")
+            f.write(str(posture.pitch))
+            f.write(" yaw ")
+            f.write(str(posture.yaw))
+            f.write('\n')
+            f.write("方向（可用性未知） direction ")
+            f.write(str(speed.direction))
+            f.write("\n\n")
 
         return 0
     else:
