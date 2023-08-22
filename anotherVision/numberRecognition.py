@@ -28,6 +28,7 @@ class NumberRecognizer:
         返回值:
             int: 检测得到的图片中数字的结果
         """
+        # 使用前请查看anotherVision下的README.md
         text = pytesseract.image_to_string(image, lang='digits', config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
         # 去除识别结果中的空格和换行符等不可见字符
         text = ''.join(text.split())
