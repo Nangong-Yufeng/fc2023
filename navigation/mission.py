@@ -335,8 +335,9 @@ def bomb_drop(the_connection):
 
         # 将时间和投弹位资信息记录到文件中
         localtime = time.localtime(time.time())
+        time_data = str(localtime.tm_year) + '.' + str(localtime.tm_mon) + '.' + str(localtime.tm_day) + ' ' + str(localtime.tm_hour) + ':' + str(localtime.tm_min) + ':' + str(localtime.tm_sec)
         with open(file='/home/bobo/fc2023/data.txt', mode='a') as f:
-            f.write(str(localtime))
+            f.write(time_data)
             f.write('\n')
             f.write("位置： lat ")
             f.write(str(position.lat))
@@ -361,7 +362,7 @@ def bomb_drop(the_connection):
             f.write('\n')
             f.write("方向（可用性未知） direction ")
             f.write(str(speed.direction))
-            f.write("\n\n")
+            f.write("\n")
 
         return 0
     else:
