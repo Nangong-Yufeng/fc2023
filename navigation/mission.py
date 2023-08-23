@@ -201,10 +201,15 @@ def wp_circle_course(wp, precision, angle, direction=1):
     return wp_list
 
 
-# 根据两个航点，在其中生成平行四边形的侦察航线
-def wp_detect_course(the_connection, wp, len, precision):
-    len = len * 1e-5
-    pass
+# 根据两个航点，在其中生成圆形侦察航线（视解算正确率进行航线形状修改），主要功能是可以改变高度
+def wp_detect_course(wp, precision, alt):
+    wp1 = Waypoint(wp[0].lat, wp[0].lon, alt)
+    wp2 = Waypoint(wp[1].lat, wp[1].lon, alt)
+    detect_course = wp_circle_course([wp1,wp2], precision, 180, 1)
+    detect_course.pop(-1)
+    detect_course.extend(wp_circle_course([wp2,wp1], precision, 180, 1))
+    detect_course.pop(-1)
+    return detect_course
 
 # 投弹相关函数
 
@@ -321,53 +326,31 @@ def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
 def bomb_drop(the_connection):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 1000, 0, 0, 0, 0, 0)
-    msg = the_connection.recv_match(type='COMMAND_ACK', blocking=True)
-    if msg.result == 0:
-        position = gain_position_now(the_connection)
-        posture = gain_posture_para(the_connection)
-        speed = gain_ground_speed(the_connection)
-        print("bomb away!")
-        print("原始数据： ")
-        print("位置： lat ", position.lat, " lon ", position.lat, " alt ", position.alt)
-        print("速度:  north ", speed.vx, 'east', speed.vy, " down ", speed.vz)
-        print("姿态： roll ", posture.roll, " pitch ", posture.pitch, " yaw ", posture.yaw)
-        print("方向角: direction ", speed.direction)
+    position = gain_position_now(the_connection)
+    posture = gain_posture_para(the_connection)
+    speed = gain_ground_speed(the_connection)
+    print("bomb away!")
+    print("原始数据： ")
+    print("位置： lat ", position.lat, " lon ", position.lat, " alt ", position.alt)
+    print("速度:  north ", speed.vx, 'east', speed.vy, " down ", speed.vz)
+    print("姿态： roll ", posture.roll, " pitch ", posture.pitch, " yaw ", posture.yaw)
+    print("方向角: direction ", speed.direction)
 
-        # 将时间和投弹位资信息记录到文件中
-        localtime = time.localtime(time.time())
-        time_data = str(localtime.tm_year) + '.' + str(localtime.tm_mon) + '.' + str(localtime.tm_day) + ' ' + str(localtime.tm_hour) + ':' + str(localtime.tm_min) + ':' + str(localtime.tm_sec)
-        with open(file='/home/bobo/fc2023/data.txt', mode='a') as f:
-            f.write(time_data)
-            f.write('\n')
-            f.write("位置： lat ")
-            f.write(str(position.lat))
-            f.write(" lon ")
-            f.write(str(position.lat))
-            f.write(" alt ")
-            f.write(str(position.alt))
-            f.write('\n')
-            f.write("速度:  north ")
-            f.write(str(speed.vx))
-            f.write(" east ")
-            f.write(str(speed.vy))
-            f.write(" down ")
-            f.write(str(speed.vz))
-            f.write('\n')
-            f.write("姿态： roll ")
-            f.write(str(posture.roll))
-            f.write(" pitch ")
-            f.write(str(posture.pitch))
-            f.write(" yaw ")
-            f.write(str(posture.yaw))
-            f.write('\n')
-            f.write("方向（可用性未知） direction ")
-            f.write(str(speed.direction))
-            f.write("\n")
+    # 将时间和投弹位资信息记录到文件中
+    localtime = time.localtime(time.time())
+    time_data = str(localtime.tm_year) + '.' + str(localtime.tm_mon) + '.' + str(localtime.tm_mday) + ' ' + str(localtime.tm_hour) + ':' + str(localtime.tm_min) + ':' + str(localtime.tm_sec)
+    with open(file='/home/bobo/fc2023/data.txt', mode='a') as f:
+        f.write(time_data)
+        f.write('\n')
+        f.write("位置： lat "+str(position.lat)+" lon "+str(position.lat)+" alt "+str(position.alt))
+        f.write('\n')
+        f.write("速度:  north "+str(speed.vx)+" east "+str(speed.vy)+" down "+str(speed.vz))
+        f.write('\n')
+        f.write("姿态： roll "+str(posture.roll)+" pitch "+str(posture.pitch)+" yaw "+str(posture.yaw))
+        f.write('\n')
+        f.write("方向（可用性未知） direction "+str(speed.direction))
+        f.write("\n")
 
-        return 0
-    else:
-        print("failed to drop the bomb!")
-        return -10
 
 
 # 飞机动作控制函数
