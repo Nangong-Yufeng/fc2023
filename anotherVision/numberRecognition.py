@@ -39,6 +39,8 @@ class NumberRecognizer:
             text = text[-2:]
         if len(text) == 4:
             text = text[-3:-2]
+        if len(text) > 4:
+            return -1
         return int(text)
 
 
