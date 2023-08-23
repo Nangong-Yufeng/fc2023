@@ -32,11 +32,8 @@ class NumberRecognizer:
         text = pytesseract.image_to_string(image, lang='digits', config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
         # 去除识别结果中的空格和换行符等不可见字符
         text = ''.join(text.split())
-        if len(text) == 0:
+        if len(text) == 0 or len(text) == 1:
             return -1
-        # 个位数，保证是十位数（如果检测到十位）
-        if len(text) == 1:
-            text = text + "0"
         # 三四位是误把边缘识别为1
         if len(text) == 3:
             text = text[-2:]
