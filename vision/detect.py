@@ -141,8 +141,14 @@ class Vision:
                     img = im0_copy.copy()
                     hei = img.shape[0]
                     wid = img.shape[1]
-                    img = img[max(0, int(tlbr[1]) - 5):min(int(tlbr[3]) + 5, hei),
-                          max(0, int(tlbr[0]) - 5):min(int(tlbr[2]) + 5, wid)]  # 对原图切片，截取标靶
+
+                    top = int(tlbr[1]) - 5
+                    down = int(tlbr[3]) + 5
+                    left = int(tlbr[0]) - 5
+                    right = int(tlbr[2]) + 5
+                    if top < 0 or left < 0 or down > hei or right > wid:  # 舍弃边界图片，确保标靶完整
+                        continue
+                    img = img[top:down, left:right]  # 对原图切片，截取标靶
                     img = cv2.copyMakeBorder(img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, 0)
 
                     img_rotated = rotate(img)
@@ -154,9 +160,9 @@ class Vision:
                         continue
 
                     ret = self.numrec.recognize(img_crop)
-                    if ret not in self.res:
-                        print(f'检测到新数字: {ret}')
-                        self.res.append(ret)
+                    # if ret not in self.res:
+                    print(f'检测到新数字: {ret}')
+                        # self.res.append(ret)
 
                     # 在原图上画框
                     if view_img:  # Add bbox to image

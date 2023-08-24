@@ -1,10 +1,10 @@
 import cv2
-import torch
+# import torch
 # from utils import getWeightPath
-import models.mnist_model
-import numpy as np
-from PIL import Image
-from torchvision import transforms
+# import models.mnist_model
+# import numpy as np
+# from PIL import Image
+# from torchvision import transforms
 import pytesseract
 
 class NumberRecognizer:
@@ -32,7 +32,9 @@ class NumberRecognizer:
         text = pytesseract.image_to_string(image, lang='digits', config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789')
         # 去除识别结果中的空格和换行符等不可见字符
         text = ''.join(text.split())
-        if len(text) == 0 or len(text) == 1:
+        if len(text) == 0:
+            return -1
+        if len(text) == 1:
             return -1
         # 三四位是误把边缘识别为1
         if len(text) == 3:
