@@ -3,7 +3,7 @@ from .preflight import arm, mode_set, set_home
 from .mission import wp_straight_course, wp_circle_course, yard_fly, clear_waypoint
 from .class_list import Position_relative, Waypoint
 from .error_process import rec_match_received, retry_fuc_para1
-from .get_para import gain_ground_speed, gain_tranform_frequency
+from .get_para import gain_ground_speed, gain_transform_frequency
 
 
 track_list = []
@@ -26,7 +26,7 @@ the_connection.mav.command_long_send(the_connection.target_system, the_connectio
 msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
 '''
 if input("输入0测试数传传输频率（大概需要10秒），输入其他跳过： ") == '0':
-    frequency = gain_tranform_frequency(the_connection)
+    frequency = gain_transform_frequency(the_connection)
     print("数传传输频率：", frequency, "Hz")
 
 retry_fuc_para1(the_connection, mode_set, 0)

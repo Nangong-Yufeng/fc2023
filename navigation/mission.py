@@ -28,6 +28,7 @@ def send_mission(the_connection, wp, seq):
     the_connection.mav.send(mission_message)
 
 
+# 在模拟器中可行，但实际飞控不支持
 def mission_accomplished(the_connection, wp_list_len):
     msg = rec_match_received(the_connection, 'MISSION_CURRENT')
     if msg.seq == wp_list_len and msg.mission_state == 5:
@@ -48,9 +49,14 @@ def mission_upload(the_connection, wp, home_position):
     waypoint_print_list = []
     for count in range(len(wp)):
         waypoint_print_list.append((wp[count].lat, wp[count].lon))
-        #print(waypoint_print_list)
-    #setTargetPoints(waypoint_print_list)
-
+    '''
+    msg = rec_match_received(the_connection, 'COMMAND_ACK')
+    if msg.result == 0:
+        print("Mission uploaded successfully")
+        return 1
+    else:
+        return -10
+    '''
     while True:
         message = the_connection.recv_match(blocking=True)
         message = message.to_dict()
@@ -328,13 +334,27 @@ def bomb_drop(the_connection):
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 1000, 0, 0, 0, 0, 0)
     position = gain_position_now(the_connection)
     posture = gain_posture_para(the_connection)
-    speed = gain_ground_speed(the_connection)
+    speed_list = []
+    vx = vy = vz = direction = 0
+    for count in range(0, 5):
+        speed = gain_ground_speed(the_connection)
+        speed_list.append(speed)
+        vx += speed_list[count].vx
+        vy += speed_list[count].vy
+        vz += speed_list[count].vz
+        direction += speed_list[count].direction
+    length = len(speed_list)
+    vx /= length
+    vy /= length
+    vz /= length
+    direction /= length
+
     print("bomb away!")
     print("原始数据： ")
     print("位置： lat ", position.lat, " lon ", position.lat, " alt ", position.alt)
-    print("速度:  north ", speed.vx, 'east', speed.vy, " down ", speed.vz)
+    print("速度:  north ",vx, 'east', vy, " down ", vz)
     print("姿态： roll ", posture.roll, " pitch ", posture.pitch, " yaw ", posture.yaw)
-    print("方向角: direction ", speed.direction)
+    print("方向角: direction ", direction)
 
     # 将时间和投弹位资信息记录到文件中
     localtime = time.localtime(time.time())
@@ -344,11 +364,11 @@ def bomb_drop(the_connection):
         f.write('\n')
         f.write("位置： lat "+str(position.lat)+" lon "+str(position.lat)+" alt "+str(position.alt))
         f.write('\n')
-        f.write("速度:  north "+str(speed.vx)+" east "+str(speed.vy)+" down "+str(speed.vz))
+        f.write("速度:  north "+str(vx)+" east "+str(vy)+" down "+str(vz))
         f.write('\n')
         f.write("姿态： roll "+str(posture.roll)+" pitch "+str(posture.pitch)+" yaw "+str(posture.yaw))
         f.write('\n')
-        f.write("方向（可用性未知） direction "+str(speed.direction))
+        f.write("方向（可用性未知） direction "+str(direction))
         f.write("\n")
 
 

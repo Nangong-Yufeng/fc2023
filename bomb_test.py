@@ -8,11 +8,6 @@ the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
 mode_set(the_connection, 0)
 
-
-while True:
-    speed = gain_ground_speed(the_connection)
-    print('north: ', speed.vx, 'east: ', speed.vy, 'down: ', speed.vz)
-
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
 set_home(the_connection, home_position)

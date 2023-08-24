@@ -9,6 +9,7 @@ def gain_posture_para(the_connection):
                           msg.rollspeed, msg.pitchspeed, msg.yawspeed)
     return pose
 
+
 def gain_ground_speed(the_connection):
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
     speed = speed_inform(msg.vx, msg.vy, msg.vz, msg.hdg)
@@ -62,6 +63,7 @@ def gain_mission(vehicle):
     '''
     return count-1
 
+
 def mission_current(the_connection):
     mission_msg = rec_match_received(the_connection, "MISSION_CURRENT")
     return mission_msg.seq
@@ -79,7 +81,8 @@ def gain_track_of_time(the_connection, track_list, time_last=500):
         pass
     #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
 
-def gain_tranform_frequency(the_connection):
+
+def gain_transform_frequency(the_connection):
     # 数传频率测试
     time_list = []
     count = 0
