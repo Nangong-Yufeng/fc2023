@@ -146,7 +146,7 @@ class Vision:
                     down = int(tlbr[3]) + 5
                     left = int(tlbr[0]) - 5
                     right = int(tlbr[2]) + 5
-                    if top < 0 or left < 0 or down > hei or right > wid:
+                    if top < 0 or left < 0 or down > hei or right > wid:  # 舍弃边界图片，确保标靶完整
                         continue
                     img = img[top:down, left:right]  # 对原图切片，截取标靶
                     img = cv2.copyMakeBorder(img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, 0)
