@@ -81,15 +81,12 @@ arm(the_connection)
 # 定义轨迹集
 track_list = []
 
+
 """
 标靶识别
 """
-
 # 参数和初始化
 vis = Vision(source=0, device='0', conf_thres=0.7)
-
-itv = 50  # 每次检测的间隔时间，单位ms
-pre = int(time.time() * 1000)  # 上次检测完的时间
 
 # 循环侦察任务
 while True:
@@ -99,7 +96,8 @@ while True:
         mode_set(the_connection, 10)
 
     while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list) - 1:
-        if int(time.time() * 1000) > pre + itv:
-           vis.run()
-           pre = int(time.time() * 1000)
+        cur = int(time.time() * 1000)
+        vis.run()
+        pre = int(time.time() * 1000)
+        # print(pre - cur, 'ms')
     print("circle completed, stand by at home")
