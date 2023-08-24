@@ -78,3 +78,23 @@ def gain_track_of_time(the_connection, track_list, time_last=500):
     else:
         pass
     #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
+
+def gain_tranform_frequency(the_connection):
+    # 数传频率测试
+    time_list = []
+    count = 0
+    fre = 0
+    while count < 3:
+        msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
+        rec_match_received(the_connection, 'ATTITUDE')
+        if len(time_list) <= 50:
+            time_list.append(msg.time_boot_ms)
+        else:
+            frequency = 50 / (time_list[50] - time_list[0]) * 1000
+            print("frequency: ", frequency, "\n")
+            time_list = []
+            fre = (frequency + fre * count) / (count+1)
+            count += 1
+    return fre
+
+
