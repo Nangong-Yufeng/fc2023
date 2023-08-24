@@ -1,10 +1,10 @@
 import cv2
-import torch
+# import torch
 # from utils import getWeightPath
-import models.mnist_model
-import numpy as np
-from PIL import Image
-from torchvision import transforms
+# import models.mnist_model
+# import numpy as np
+# from PIL import Image
+# from torchvision import transforms
 import pytesseract
 
 class NumberRecognizer:
