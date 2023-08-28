@@ -85,7 +85,6 @@ arm(the_connection)
 # 定义轨迹集
 track_list = []
 
-
 """
 标靶识别
 """
@@ -101,6 +100,7 @@ while True:
 
     while rec_match_received(the_connection, 'MISSION_CURREN T').seq < len(wp_list) - 1:
         cur = int(time.time() * 1000)
+        vis.shot()
         vis.run()
         pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')

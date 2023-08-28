@@ -54,6 +54,7 @@ class Vision:
         self.model.warmup(imgsz=(1 if self.pt or self.model.triton else bs, 3, *imgsz))  # warmup
 
         # 加载摄像头
+        self.im0 = None
         self.cap = cv2.VideoCapture(source)
 
         self.numrec = NumberRecognizer('./anotherVision/weights/cnn2.pkl')
@@ -176,12 +177,16 @@ class Vision:
                 cv2.imshow('0', im0)
                 cv2.waitKey(1)
 
+    def shot(self):
+        """截图
+        """
+        ret, self.im0 = self.cap.read()
+
     def run(self):
-        """ 对视频截图（抽帧），检测标靶，返回数值与坐标
+        """ 检测图像中的标靶，返回数值与坐标
 
         Return:
              未完成
         """
-        ret, im0 = self.cap.read()  # 截图
-        im = MyLoadIamge(im0=im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
-        self.detect(im0=im0, im=im, model=self.model, conf_thres=self.conf_thres)
+        im = MyLoadIamge(im0=self.im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
+        self.detect(im0=self.im0, im=im, model=self.model, conf_thres=self.conf_thres)
