@@ -5,7 +5,7 @@
 from utils import title
 import time
 from vision.detect import Vision
-from navigation import Waypoint, set_home, mode_set, arm, wp_circle_course, wp_straight_course, mission_upload, rec_match_received
+from navigation import Waypoint, set_home, mode_set, arm, wp_circle_course, wp_straight_course, mission_upload, rec_match_received, gain_transform_frequency
 from pymavlink import mavutil
 
 
@@ -64,6 +64,10 @@ if input("输入0测试投弹，输入其他跳过： ") == '0':
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 2000, 0, 0, 0, 0, 0)
     print("投弹测试完成")
 
+if input("输入0测试数传传输频率（大概需要10秒），输入其他跳过： ") == '0':
+    frequency = gain_transform_frequency(the_connection)
+    print("数传传输频率：", frequency, "Hz")
+
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
 set_home(the_connection, home_position)
@@ -100,4 +104,5 @@ while True:
         vis.run()
         pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
+    mode_set(the_connection, 11)
     print("circle completed, stand by at home")
