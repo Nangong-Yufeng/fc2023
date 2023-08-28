@@ -70,7 +70,7 @@ if input("输入0测试数传传输频率（大概需要10秒），输入其他�
 
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
-# set_home(the_connection, home_position)
+set_home(the_connection, home_position)
 
 # 设置模式为纯手动
 mode_set(the_connection, 0)
@@ -85,7 +85,6 @@ arm(the_connection)
 # 定义轨迹集
 track_list = []
 
-
 """
 标靶识别
 """
@@ -99,8 +98,9 @@ while True:
     if input("输入0切换自动模式开始任务（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
         mode_set(the_connection, 10)
 
-    while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list) - 1:
+    while rec_match_received(the_connection, 'MISSION_CURREN T').seq < len(wp_list) - 1:
         cur = int(time.time() * 1000)
+        vis.shot()
         vis.run()
         pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
