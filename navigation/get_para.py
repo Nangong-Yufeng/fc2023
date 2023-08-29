@@ -18,7 +18,7 @@ def gain_ground_speed(the_connection):
 
 def gain_position_now(the_connection):
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
-    wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms)
+    wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms, 0, 0, 0)
     return wp_now
 
 
@@ -71,7 +71,10 @@ def mission_current(the_connection):
 
 # track_list是由track_point对象组成的list
 def gain_track_of_time(the_connection, track_list, time_last=500):
-    track = gain_position_now(the_connection)
+    position = gain_position_now(the_connection)
+    posture = gain_posture_para(the_connection)
+
+    track = track_point(position.lat, position.lon, position.alt, position.time, posture.roll, posture.pitch, posture.yaw)
     track_list.append(track)
 
     # 默认保存过去500个位置信息，往前的消息删除

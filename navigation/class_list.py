@@ -24,9 +24,13 @@ class Waypoint(Position_relative):
 
 # 记录飞机航点（含时间信息）
 class track_point(Position_relative):
-    def __init__(self, lat, lon, alt, time):
+    def __init__(self, lat, lon, alt, time, roll, pitch, yaw):
         super(track_point, self).__init__(lat, lon, alt)
         self.time = time
+        self.roll = roll
+        self.pitch = pitch
+        self.yaw = yaw
+
 
 class posture_inform:
     def __init__(self, time, roll, pitch, yaw, roll_speed, pitch_speed, yaw_speed):
