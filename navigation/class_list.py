@@ -53,8 +53,8 @@ class speed_inform:
 
 # 视觉识别到靶标后返回的信息类
 class vision_position:
-    def __init__(self, x, y, the_connection, target_number):
+    def __init__(self, x, y, target_number):
         self.x = x
         self.y = y
-        self.time = rec_match_received(the_connection, 'SYSTEM_TIME').time_boot_ms
+        # self.time = rec_match_received(the_connection, 'SYSTEM_TIME').time_boot_ms
         self.num = target_number
