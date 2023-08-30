@@ -69,7 +69,7 @@ def mission_current(the_connection):
     return mission_msg.seq
 
 
-# track_list是由track_point对象组成的list
+# 记录一段时间内的航点信息（弃用） track_list是由track_point对象组成的list
 def gain_track_of_time(the_connection, track_list, time_last=500):
     position = gain_position_now(the_connection)
     posture = gain_posture_para(the_connection)
@@ -85,6 +85,16 @@ def gain_track_of_time(the_connection, track_list, time_last=500):
     #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
 
 
+# 获取坐标和姿态信息，用于目标位置解算
+def gain_track_point(the_connection):
+    position = gain_position_now(the_connection)
+    posture = gain_posture_para(the_connection)
+
+    track = track_point(position.lat, position.lon, position.alt, position.time, posture.roll, posture.pitch,
+                        posture.yaw)
+    return track
+
+
 def gain_transform_frequency(the_connection):
     # 数传频率测试
     time_list = []
@@ -92,7 +102,7 @@ def gain_transform_frequency(the_connection):
     fre = 0
     while count < 3:
         msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
-        rec_match_received(the_connection, 'ATTITUDE')
+        #rec_match_received(the_connection, 'ATTITUDE')
         if len(time_list) <= 50:
             time_list.append(msg.time_boot_ms)
         else:
