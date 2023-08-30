@@ -134,7 +134,6 @@ while result == 0:
 
         # 坐标解算
 
-
         pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
 
