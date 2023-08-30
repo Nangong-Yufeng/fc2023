@@ -8,7 +8,7 @@ from .get_para import gain_ground_speed, gain_transform_frequency
 
 track_list = []
 
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB1', baud=57600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 #the_connection = mavutil.mavlink_connection('udpin:localhost:14550')
 '''
 SYSID_THISMAV = "SYSID_THISMAV"

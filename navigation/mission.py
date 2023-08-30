@@ -336,6 +336,9 @@ def bomb_drop(the_connection):
     posture = gain_posture_para(the_connection)
     speed_list = []
     vx = vy = vz = direction = 0
+    alt = 0
+
+    # 由于瞬时读取的速度和高度值非常奇怪，使用连续读取几次的方式考察情况是否有改善
     for count in range(0, 5):
         speed = gain_ground_speed(the_connection)
         speed_list.append(speed)
@@ -343,11 +346,13 @@ def bomb_drop(the_connection):
         vy += speed_list[count].vy
         vz += speed_list[count].vz
         direction += speed_list[count].direction
+        alt += gain_position_now(the_connection).alt
     length = len(speed_list)
     vx /= length
     vy /= length
     vz /= length
     direction /= length
+    alt /= length
 
     print("bomb away!")
     print("原始数据： ")

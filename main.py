@@ -5,7 +5,7 @@
 from utils import title
 import time
 from vision.detect import Vision
-from navigation import Waypoint, set_home, mode_set, arm, wp_circle_course, wp_straight_course, mission_upload, rec_match_received, gain_transform_frequency
+from navigation import Waypoint, set_home, mode_set, arm, wp_circle_course, wp_straight_course, mission_upload, rec_match_received, gain_transform_frequency, gain_track_point, wp_detect_course
 from pymavlink import mavutil
 
 
@@ -82,27 +82,67 @@ arm(the_connection)
 开始自动飞行
 '''
 
-# 定义轨迹集
-track_list = []
-
 """
 标靶识别
 """
 # 参数和初始化
 vis = Vision(source=0, device='0', conf_thres=0.7)
 
-# 循环侦察任务
+# 循环侦察任务（用于操场测试）
+'''
 while True:
     wp_list = vision_test_court(the_connection)
 
     if input("输入0切换自动模式开始任务（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
         mode_set(the_connection, 10)
 
-    while rec_match_received(the_connection, 'MISSION_CURREN T').seq < len(wp_list) - 1:
+    while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list) - 1:
         cur = int(time.time() * 1000)
         vis.shot()
+        track = gain_track_point(the_connection)
         vis.run()
         pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
     mode_set(the_connection, 11)
     print("circle completed, stand by at home")
+'''
+
+# 循环侦察任务（用于完整任务）
+result = 0
+
+# 侦察区坐标，使用环绕航线
+wp1 = Waypoint(22.5899275, 113.9751526, 120)
+wp2 = Waypoint(22.5899248, 113.9755938, 120)
+wp_detect = [wp1, wp2]
+alt = 120
+
+# 开始侦察
+while result == 0:
+    wp_detect_list = wp_detect_course(wp_detect, 3, alt=alt)
+
+    while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_detect_list) - 1:
+        cur = int(time.time() * 1000)
+
+        # 截图
+        vis.shot()
+
+        # 读取当前姿态和位置
+        track = gain_track_point(the_connection)
+
+        # 视觉处理
+        vis.run()
+
+        # 坐标解算
+
+        pre = int(time.time() * 1000)
+        # print(pre - cur, 'ms')
+
+        # 根据数字识别判断是否继续
+        result = 0
+
+    # 若没有识别到数字，降低高度继续进行
+    alt -= 10
+
+'''
+执行投弹
+'''
