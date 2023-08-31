@@ -59,8 +59,6 @@ class Vision:
 
         self.numrec = NumberRecognizer('./anotherVision/weights/cnn2.pkl')
 
-        self.res = []
-
     @smart_inference_mode()
     def detect(
         self,
@@ -87,7 +85,7 @@ class Vision:
             conf_thres: 置信度阈值
 
         Returns:
-            未完成
+            list (vision_position): 标靶中心坐标、数值列表
         """
         names = model.names
         dt = (Profile(), Profile(), Profile())
@@ -122,6 +120,7 @@ class Vision:
         对每一张图做处理
         循环次数等于batch_size
         """
+        res = []
         for i, det in enumerate(pred):  # per image
             im0_copy = im0.copy()
             annotator = Annotator(im0, line_width=line_thickness, example=str(names))
@@ -161,10 +160,8 @@ class Vision:
                         continue
 
                     ret = self.numrec.recognize(img_crop)
-                    # if ret not in self.res:
-                    print(f'检测到新数字: {ret}')
-                        # self.res.append(ret)
-
+                    print(f'检测到数字: {ret}')
+                    res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=ret))
                     # 在原图上画框
                     if view_img:  # Add bbox to image
                         c = int(cls)  # integer class
@@ -176,6 +173,7 @@ class Vision:
             if view_img:
                 cv2.imshow('0', im0)
                 cv2.waitKey(1)
+        return res
 
     def shot(self):
         """截图
@@ -186,7 +184,7 @@ class Vision:
         """ 检测图像中的标靶，返回数值与坐标
 
         Return:
-             未完成
+             list (vision_position): 标靶中心坐标、数值列表
         """
         im = MyLoadIamge(im0=self.im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
-        self.detect(im0=self.im0, im=im, model=self.model, conf_thres=self.conf_thres)
+        return self.detect(im0=self.im0, im=im, model=self.model, conf_thres=self.conf_thres)

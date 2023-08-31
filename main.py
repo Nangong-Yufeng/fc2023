@@ -130,7 +130,7 @@ while result == 0:
         track = gain_track_point(the_connection)
 
         # 视觉处理
-        vis.run()
+        tmp = vis.run()
 
         # 坐标解算
 
