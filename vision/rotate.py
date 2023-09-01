@@ -28,23 +28,24 @@ def rotate(image:np.array, debug:bool=False)->np.array:
         debug_ret['gray'] = image_gray.copy()
         time_start = time.time()
     # 转化为二值图
-    _, image_binary = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
-    # cv2.imshow('tmp', image_binary)
+    # _, image_edge = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
+    image_edge = cv2.Canny(image, 60, 180, L2gradient=True)
+    # cv2.imshow('tmp', image_edge)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
     if debug:
         time_end = time.time()
-        print(f"转化为二值图：{1000*(time_end-time_start)}ms")
-        debug_ret['binary'] = image_binary
+        print(f"Canny转化为二值图：{1000*(time_end-time_start)}ms")
+        debug_ret['binary'] = image_edge
         time_start = time.time()
 
     # 对二值图进行轮廓检测
     # 轮廓的检索模式：cv2.RETR_CCOMP 只检测最外部轮廓
     # 轮廓的近似方法：cv2.CHAIN_APPROX_SIMPLE，只保留端点
-    contours, _ = cv2.findContours(image_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(image_edge, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if debug:
         time_end = time.time()
-        print(f"对二值图轮廓检测：{1000*(time_end-time_start)}ms")
+        print(f"对Canny二值图轮廓检测：{1000*(time_end-time_start)}ms")
         for contour in contours:
             image_with_contour = image.copy()
             for i in range(len(contour)):
