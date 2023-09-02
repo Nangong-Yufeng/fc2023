@@ -69,8 +69,8 @@ def mission_current(the_connection):
     return mission_msg.seq
 
 
-# 记录一段时间内的航点信息（弃用） track_list是由track_point对象组成的list
-def gain_track_of_time(the_connection, track_list, time_last=500):
+# 记录一段时间内的航点信息 track_list是由track_point对象组成的list
+def gain_track_of_time(the_connection, track_list, time_last=50):
     position = gain_position_now(the_connection)
     posture = gain_posture_para(the_connection)
 
@@ -82,6 +82,7 @@ def gain_track_of_time(the_connection, track_list, time_last=500):
         track_list.pop(0)
     else:
         pass
+    return position.time
     #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
 
 

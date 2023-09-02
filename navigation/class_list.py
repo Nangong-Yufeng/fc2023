@@ -58,3 +58,10 @@ class vision_position:
         self.y = y
         # self.time = rec_match_received(the_connection, 'SYSTEM_TIME').time_boot_ms
         self.num = target_number
+
+# 靶标信息
+class target_point:
+    def __init__(self, lat, lon, number):
+        self.lat = lat
+        self.lon = lon
+        self.number = number
