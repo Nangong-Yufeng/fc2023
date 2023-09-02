@@ -30,9 +30,9 @@ def rotate(image:np.array, debug:bool=False)->np.array:
     # 转化为二值图
     # _, image_edge = cv2.threshold(image_gray, 180, 255, cv2.THRESH_BINARY)
     image_edge = cv2.Canny(image, 60, 180, L2gradient=True)
-    # cv2.imshow('tmp', image_edge)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow('tmp', image_edge)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     if debug:
         time_end = time.time()
         print(f"Canny转化为二值图：{1000*(time_end-time_start)}ms")
