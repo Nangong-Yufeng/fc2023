@@ -127,8 +127,7 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y):
 
     target = XYtoGPS(matrix[1], matrix[0], lat, lon)
     return target
-    # 输出结果
-    # 输出类型为类target_point，数字为-1
+    # 输出结果，输出类型为类target_point，数字为-1
 
 
 # 相对坐标转为gps坐标（网上抄的） X向北，Y向东
