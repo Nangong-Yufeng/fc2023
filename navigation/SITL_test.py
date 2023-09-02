@@ -2,7 +2,7 @@ import time
 import random
 from pymavlink import mavutil
 from .preflight import arm, mode_set, set_home
-from .mission import clear_waypoint, rec_match_received, execute_bomb_course, loiter_at_present, mission_upload, wp_detect_course
+from .mission import clear_waypoint, rec_match_received, loiter_at_present, mission_upload, wp_detect_course
 from .class_list import Position_relative, Waypoint
 from .get_para import gain_position_now, gain_ground_speed
 
@@ -63,6 +63,6 @@ loiter_at_present(the_connection, 100)
 #clear_waypoint(the_connection)
 
 # 执行投弹航线
-execute_bomb_course(the_connection, home_position, track_list, gain_position_now(the_connection), wp_target, precision=3, course_len=200, direction=1, radius=200)
+#execute_bomb_course(the_connection, home_position, track_list, gain_position_now(the_connection), wp_target, precision=3, course_len=200, direction=1, radius=200)
 
 mode_set(the_connection, 11)

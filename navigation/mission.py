@@ -102,6 +102,7 @@ def upload_mission_till_completed(the_connection, wp, home_position, track_list)
     print("reaching last waypoint of NO.", wp_list_len, ", mission accomplished!")
 
 
+# 似乎没用
 def clear_waypoint(vehicle):
     message = mavutil.mavlink.MAVLink_mission_clear_all_message(target_system=vehicle.target_system,
                                                         target_component=vehicle.target_component,
@@ -128,6 +129,31 @@ def clear_waypoint(vehicle):
     # get the mission item count
     count = message["count"]
     print("Total mission item count:", count)
+
+
+# 对摄像头延时等影响造成延迟的消除，delay具体值需要使用实验测定
+def delay_eliminate(track_list, time, delay=100):
+    # 使用二分法查找离要求最近的时刻
+    head = 0
+    tail = len(track_list)-1
+    while (tail - head) > 3 :
+        mid = int((head+tail)*0.5)
+        if track_list[mid].time - (time-delay) > 0:
+            tail = mid
+        elif track_list[mid].time - (time-delay) < 0:
+            head = mid
+        # 若表中恰好有所需时刻
+        elif track_list[mid].time == (time-delay):
+            return track_list[mid]
+
+    # 对二分后结果进行处理，分奇数或偶数
+    if tail-head == 3:
+        if (track_list[head+1].time - (time-delay)) < (track_list[head+2].time - (time-delay)):
+            return track_list[head+1]
+        else:
+            return track_list[head+2]
+    elif tail-head == 2:
+        return track_list[head+1]
 
 
 # 指定形状航线生成函数
@@ -221,7 +247,7 @@ def wp_detect_course(wp, precision, alt):
 
 # 自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（顺或逆）
 # 修正，采用半圆航线飞至一定距离后，弧形航线进场投弹；后半段航线不变，前半段改变。此方法适用于盘旋侦察，如使用其他侦察航线则需要
-def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_target, precision, course_len, direction, radius):
+def bombing_course(wp_now, wp_target, precision, course_len, direction, radius):
 
 # 自动生成航路点集
     lat_len = wp_now.lat - wp_target.lat
@@ -313,13 +339,7 @@ def execute_bomb_course(the_connection, home_position, track_list, wp_now, wp_ta
     wp_bomb_drop.extend(wp_line2_list)
     wp_bomb_drop.extend(wp_line3_list)
     '''
-
-# 上传并等待任务执行
-
-    # 上传任务
-    upload_mission_till_completed(the_connection, wp_bomb_drop, home_position, track_list)
-    print("bombs away!")
-    print("len of track_list: ", len(track_list))
+    return wp_bomb_drop
 
 
 def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
@@ -332,51 +352,7 @@ def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
 def bomb_drop(the_connection):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 1000, 0, 0, 0, 0, 0)
-    position = gain_position_now(the_connection)
-    posture = gain_posture_para(the_connection)
-    speed_list = []
-    vx = vy = vz = direction = 0
-    alt = 0
-
-    # 由于瞬时读取的速度和高度值非常奇怪，使用连续读取几次的方式考察情况是否有改善
-    for count in range(0, 5):
-        speed = gain_ground_speed(the_connection)
-        speed_list.append(speed)
-        vx += speed_list[count].vx
-        vy += speed_list[count].vy
-        vz += speed_list[count].vz
-        direction += speed_list[count].direction
-        alt += gain_position_now(the_connection).alt
-    length = len(speed_list)
-    vx /= length
-    vy /= length
-    vz /= length
-    direction /= length
-    alt /= length
-
     print("bomb away!")
-    print("原始数据： ")
-    print("位置： lat ", position.lat, " lon ", position.lat, " alt ", position.alt)
-    print("速度:  north ",vx, 'east', vy, " down ", vz)
-    print("姿态： roll ", posture.roll, " pitch ", posture.pitch, " yaw ", posture.yaw)
-    print("方向角: direction ", direction)
-
-    # 将时间和投弹位资信息记录到文件中
-    localtime = time.localtime(time.time())
-    time_data = str(localtime.tm_year) + '.' + str(localtime.tm_mon) + '.' + str(localtime.tm_mday) + ' ' + str(localtime.tm_hour) + ':' + str(localtime.tm_min) + ':' + str(localtime.tm_sec)
-    with open(file='/home/bobo/fc2023/data.txt', mode='a') as f:
-        f.write(time_data)
-        f.write('\n')
-        f.write("位置： lat "+str(position.lat)+" lon "+str(position.lat)+" alt "+str(position.alt))
-        f.write('\n')
-        f.write("速度:  north "+str(vx)+" east "+str(vy)+" down "+str(vz))
-        f.write('\n')
-        f.write("姿态： roll "+str(posture.roll)+" pitch "+str(posture.pitch)+" yaw "+str(posture.yaw))
-        f.write('\n')
-        f.write("方向（可用性未知） direction "+str(direction))
-        f.write("\n")
-
-
 
 # 飞机动作控制函数
 

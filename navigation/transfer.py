@@ -1,15 +1,10 @@
-from pymavlink import mavutil
-from .get_para import gain_posture_para
-from .class_list import track_point
-import cv2
-import numpy as np
-
 # yaw 偏航 pitch 俯仰 roll 滚转
 
 import cv2
 import numpy as np
 import math
-
+from .class_list import target_point
+CONSTANTS_RADIUS_OF_EARTH = 6371000.
 
 def pixel_to_world(camera_intrinsics, camera_rotation, camera_position, img_point):
     # 齐次坐标
@@ -78,11 +73,11 @@ class Pose:
     def get_rotation_matrix(self):
         return self.rotation_matrix
 
-def coordinate_transfer():
+def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y):
     # 已经有以下参数
-    camera_pose = Pose(0, 0, 92, 0, 0, 0)  # gps坐标，高度，偏航yaw，俯仰pitch，滚转roll
+    camera_pose = Pose(lat, lon, alt, yaw, pitch, roll)  # gps坐标，高度，偏航yaw，俯仰pitch，滚转roll
 
-    pixel_coords = [0, 0]  # 点在相机坐标系中的像素位置
+    pixel_coords = [vision_x, vision_y]  # 点在相机坐标系中的像素位置
 
     # 相机原始内参矩阵cameraMatrix
     cameraMatrix = np.array(
@@ -127,98 +122,43 @@ def coordinate_transfer():
 
     c = np.asmatrix(c).T  # 转变成列矩阵
 
-    pixel_to_world(newCameraMatrix, rc, c, undistortedPoint)
-    # 输出结果
+    matrix = pixel_to_world(newCameraMatrix, rc, c, undistortedPoint)
     # 输出的前两个为相对与现在的坐标，最后一位应为0
-'''
-#为视觉坐标转换准备的函数
-def coordinate_transfer(the_connection, vision_target, track_list):
-    # 传入参数
-    class Pose:
-        def __init__(self, x, y, z, roll, pitch, yaw) -> None:
-            self.x = x #相对飞机
-            self.y = y
-            self.z = z
-            self.roll = roll
-            self.pitch = pitch
-            self.yaw = yaw
 
-
-    camera_pose = Pose(1,2,3,4,5,6)  # gps坐标，相机事先与x,y,z夹角
-
-    pixel_coords = [7,8]  # 点在相机坐标系中的像素位置
-
-    # 内参矩阵cameraMatrix，需要根据实际情况定义
-    cameraMatrix = np.array(
-        [
-            [702.564636230469, 0, 960],
-            [0, 702.564636230469, 540],
-            [0, 0, 1]
-        ]
-    )
-    # 畸变参数k1，k2，k3，k4
-    distCoeffs = np.array([0.2499176859855652, 0.0136057548224926, -0.0620835833251476, 0.0121930716559291])
-    pose = gain_posture_para(the_connection)
-
-    # 对目标坐标去畸变
-    # 获取变化后相机内参
-    newCameraMatrix, _ = cv2.getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, (1920, 1080), 1.7, (1920, 1080), True)
-
-    # 假设要获取的像素坐标为 (x, y)
-    distortedPoint = np.array([[pixel_coords]], dtype=np.float32)  # 输入点
-
-    # undistortedPoint就是去畸变后的点[x,y]，尺寸为1080*1920
-    undistortedPoint = \
-    cv2.fisheye.undistortPoints(distortedPoint, cameraMatrix, distCoeffs, np.eye(3), newCameraMatrix)[0][0]
-
-    from math import cos, sin
-    # 计算点在实际中的世界坐标
-    # 旋转矩阵
-    theta, phi, psi = camera_pose.pitch, camera_pose.roll, camera_pose.yaw
-    r = np.array(
-        [
-            [cos(theta) * cos(psi), cos(theta) * sin(psi), - sin(theta)],
-            [sin(phi) * sin(theta) * cos(psi) - cos(phi) * sin(psi),
-             sin(phi) * sin(theta) * sin(psi) + cos(phi) * cos(psi), sin(phi) * cos(theta)],
-            [cos(phi) * sin(theta) * cos(psi) + sin(phi) * sin(psi),
-             cos(phi) * sin(theta) * sin(psi) - sin(phi) * cos(psi), cos(phi) * cos(theta)]
-        ]
-    )
-
-    # 平移矩阵
-    t = np.array(
-        [camera_pose.x, camera_pose.y, camera_pose.z]
-    )
-    pixel_to_world(newCameraMatrix, r, t, distortedPoint)
+    target = XYtoGPS(matrix[1], matrix[0], lat, lon)
+    return target
     # 输出结果
+    # 输出类型为类target_point，数字为-1
 
 
-# 解算世界坐标
-def pixel_to_world(camera_intrinsics, r, t, img_points):
-    K_inv = camera_intrinsics.I
-    R_inv = np.asmatrix(r).I
-    R_inv_T = np.dot(R_inv, np.asmatrix(t))
-    world_points = []
-    coords = np.zeros((3, 1), dtype=np.float64)
-    for img_point in img_points:
-        coords[0] = img_point[0]
-        coords[1] = img_point[1]
-        coords[2] = 1.0
-        cam_point = np.dot(K_inv, coords)
-        cam_R_inv = np.dot(R_inv, cam_point)
-        scale = R_inv_T[2][0] / cam_R_inv[2][0]
-        scale_world = np.multiply(scale, cam_R_inv)
-        world_point = np.asmatrix(scale_world) - np.asmatrix(R_inv_T)
-        pt = np.zeros((3, 1), dtype=np.float64)
-        pt[0] = world_point[0]
-        pt[1] = world_point[1]
-        pt[2] = 0
-        world_points.append(pt.T.tolist())
+# 相对坐标转为gps坐标（网上抄的） X向北，Y向东
+def XYtoGPS(x, y, ref_lat, ref_lon):
+    # input GPS and Reference GPS in degrees
+    # output XY in meters (m) X:North Y:East
+    x_rad = float(x) / CONSTANTS_RADIUS_OF_EARTH
+    y_rad = float(y) / CONSTANTS_RADIUS_OF_EARTH
+    c = math.sqrt(x_rad * x_rad + y_rad * y_rad)
 
-    return world_points
+    ref_lat_rad = math.radians(ref_lat)
+    ref_lon_rad = math.radians(ref_lon)
 
-def track_point_selecting(frequency=10):
-    pass
-    point = track_point(0,0,0,0,0,0,0)
-    return point
-'''
+    ref_sin_lat = math.sin(ref_lat_rad)
+    ref_cos_lat = math.cos(ref_lat_rad)
+
+    if abs(c) > 0:
+        sin_c = math.sin(c)
+        cos_c = math.cos(c)
+
+        lat_rad = math.asin(cos_c * ref_sin_lat + (x_rad * sin_c * ref_cos_lat) / c)
+        lon_rad = (ref_lon_rad + math.atan2(y_rad * sin_c, c * ref_cos_lat * cos_c - x_rad * ref_sin_lat * sin_c))
+
+        lat = math.degrees(lat_rad)
+        lon = math.degrees(lon_rad)
+
+    else:
+        lat = math.degrees(ref_lat)
+        lon = math.degrees(ref_lon)
+
+    target = target_point(lat, lon, -1)
+
+    return target
