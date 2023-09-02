@@ -121,20 +121,20 @@ while result == 0:
     wp_detect_list = wp_detect_course(wp_detect, 3, alt=alt)
 
     while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_detect_list) - 1:
-        cur = int(time.time() * 1000)
+        # cur = int(time.time() * 1000)
 
         # 截图
         vis.shot()
 
         # 读取当前姿态和位置
-        track = gain_track_point(the_connection)
+        # track = gain_track_point(the_connection)
 
         # 视觉处理
         tmp = vis.run()
 
         # 坐标解算
 
-        pre = int(time.time() * 1000)
+        # pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
 
         # 根据数字识别判断是否继续

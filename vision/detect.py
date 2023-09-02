@@ -63,10 +63,6 @@ class Vision:
         print(f'高度{self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)}')
         print(f'宽度{self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)}')
 
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-
-        out = cv2.VideoWriter('testwrite.avi', fourcc, 60.0, (1920, 1080), True)
-
         self.numrec = NumberRecognizer('./anotherVision/weights/cnn2.pkl')
 
     @smart_inference_mode()
@@ -159,7 +155,6 @@ class Vision:
                     if top < 0 or left < 0 or down > hei or right > wid:  # 舍弃边界图片，确保标靶完整
                         continue
                     img = img[top:down, left:right]  # 对原图切片，截取标靶
-                    img = cv2.copyMakeBorder(img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, 0)
 
                     img_rotated = rotate(img)
                     if img_rotated.shape[:2] == (0, 0):  # 未检测到数字正方形
