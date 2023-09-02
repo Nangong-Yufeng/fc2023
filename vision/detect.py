@@ -39,7 +39,7 @@ class Vision:
         ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
         # 参数
-        weights = ROOT / 'weights/s_low/best.pt'  # 权重文件
+        weights = ROOT / 'best.pt'  # 权重文件
         data = ROOT / 'ngyf.yaml'  # 类别等信息
         imgsz = (640, 640)  # 新图大小
         half = False  # use FP16 half-precision inference
@@ -56,6 +56,16 @@ class Vision:
         # 加载摄像头
         self.im0 = None
         self.cap = cv2.VideoCapture(source)
+        self.cap.set(cv2.CAP_PROP_FPS, 60)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        print(f'帧率{self.cap.get(cv2.CAP_PROP_FPS)}')
+        print(f'高度{self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)}')
+        print(f'宽度{self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)}')
+
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+
+        out = cv2.VideoWriter('testwrite.avi', fourcc, 60.0, (1920, 1080), True)
 
         self.numrec = NumberRecognizer('./anotherVision/weights/cnn2.pkl')
 
