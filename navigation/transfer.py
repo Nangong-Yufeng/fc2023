@@ -73,7 +73,7 @@ class Pose:
     def get_rotation_matrix(self):
         return self.rotation_matrix
 
-def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y):
+def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vision_num):
     # 已经有以下参数
     camera_pose = Pose(lat, lon, alt, yaw, pitch, roll)  # gps坐标，高度，偏航yaw，俯仰pitch，滚转roll
 
@@ -125,9 +125,10 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y):
     matrix = pixel_to_world(newCameraMatrix, rc, c, undistortedPoint)
     # 输出的前两个为相对与现在的坐标，最后一位应为0
 
-    target = XYtoGPS(matrix[1], matrix[0], lat, lon)
+    location = XYtoGPS(matrix[1], matrix[0], lat, lon)
+    target = target_point(location[0], location[1], vision_num)
     return target
-    # 输出结果，输出类型为类target_point，数字为-1
+    # 输出结果，输出类型为类target_point
 
 
 # 相对坐标转为gps坐标（网上抄的），X向北，Y向东
@@ -158,6 +159,4 @@ def XYtoGPS(x, y, ref_lat, ref_lon):
         lat = math.degrees(ref_lat)
         lon = math.degrees(ref_lon)
 
-    target = target_point(lat, lon, -1)
-
-    return target
+    return [lat, lon]

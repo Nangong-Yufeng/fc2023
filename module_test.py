@@ -6,6 +6,7 @@ the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
 mode_set(the_connection, 0)
 '''
+# 信息读取的测试
 while not input("enter"):
     position = gain_position_now(the_connection)
     posture = gain_posture_para(the_connection)
