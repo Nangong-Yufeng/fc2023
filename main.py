@@ -142,7 +142,7 @@ while result == -1:
         if len(vision_position_list) != 0:
             n = 0
             track = delay_eliminate(track_list, time_stamp)
-            coordinate_transfer(track.lat, track.lon, track.alt, track.yaw, track.pitch, track.roll, vision_position_list[n].x, vision_position_list[n].y)
+            target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw, track.pitch, track.roll, vision_position_list[n].x, vision_position_list[n].y)
 
 
         # 根据数字识别判断是否继续
