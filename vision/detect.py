@@ -46,14 +46,17 @@ class Vision:
         dnn = False  # use OpenCV DNN for ONNX inference
         self.conf_thres = conf_thres
 
+        print("视觉：加载权重文件")
         device = select_device(device)
         self.model = DetectMultiBackend(weights, device=device, dnn=dnn, data=data, fp16=half)
         self.stride, self.pt = self.model.stride, self.model.pt
         self.imgsz = check_img_size(imgsz, s=self.stride)  # check image size
+        print("视觉：进行模型热身")
         bs = 1
         self.model.warmup(imgsz=(1 if self.pt or self.model.triton else bs, 3, *imgsz))  # warmup
 
         # 加载摄像头
+        print("视觉：加载摄像头")
         self.im0 = None
         self.cap = cv2.VideoCapture(source)
         self.cap.set(cv2.CAP_PROP_FPS, 60)
@@ -63,6 +66,8 @@ class Vision:
         print(f'高度{self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)}')
         print(f'宽度{self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)}')
 
+        # 加载数字识别ocr
+        print("视觉：加载数字识别ocr")
         self.numrec = NumberRecognizer('./anotherVision/weights/cnn2.pkl')
 
     @smart_inference_mode()
@@ -165,7 +170,8 @@ class Vision:
                         continue
 
                     ret = self.numrec.recognize(img_crop)
-                    print(f'检测到数字: {ret}')
+                    if ret != -1:
+                        print(f'检测到数字: {ret}')
                     res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=ret))
                     # 在原图上画框
                     if view_img:  # Add bbox to image
