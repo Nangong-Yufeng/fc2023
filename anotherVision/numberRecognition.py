@@ -46,8 +46,3 @@ class NumberRecognizer:
         return int(text)
 
 
-if __name__ == "__main__":
-    nr = NumberRecognizer()
-    image = cv2.imread("C:/Users/lwy/Desktop/20/DJI_004567.jpg")
-    predicted_number = nr.recognize(image)
-    print(predicted_number)
