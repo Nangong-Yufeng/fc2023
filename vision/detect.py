@@ -68,7 +68,7 @@ class Vision:
 
         # 加载数字识别ocr
         print("视觉：加载数字识别ocr")
-        self.numrec = NumberRecognizer('./anotherVision/weights/cnn2.pkl')
+        self.numrec = NumberRecognizer()
 
     @smart_inference_mode()
     def detect(
