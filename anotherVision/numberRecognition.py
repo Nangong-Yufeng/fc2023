@@ -47,7 +47,7 @@ class NumberRecognizer:
 
 
 if __name__ == "__main__":
-    nr = NumberRecognizer("C:/Users/lwy/Desktop/nangongyufeng/fc2023/anotherVision/weights/cnn2.pkl")
+    nr = NumberRecognizer()
     image = cv2.imread("C:/Users/lwy/Desktop/20/DJI_004567.jpg")
     predicted_number = nr.recognize(image)
     print(predicted_number)
