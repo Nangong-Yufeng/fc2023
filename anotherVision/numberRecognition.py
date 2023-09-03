@@ -11,7 +11,7 @@ class NumberRecognizer:
     """负责完成数字识别任务，由标靶识别模块使用
     """
 
-    def __init__(self, weight_path: str) -> None:
+    def __init__(self) -> None:
         """
         Args:
             path (str): 要载入的模型的路径
