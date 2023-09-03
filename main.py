@@ -111,31 +111,33 @@ while True:
 
 # 循环侦察任务（用于完整任务）
 result = -1
-
+"""
 # 侦察区坐标，使用环绕航线
 wp1 = Waypoint(22.5899275, 113.9751526, 120)
 wp2 = Waypoint(22.5899248, 113.9755938, 120)
 wp_detect = [wp1, wp2]
 alt = 120
 track_list = []
-
+"""
 # 开始侦察
 while result == -1:
     wp_detect_list = wp_detect_course(wp_detect, 3, alt=alt)
 
     # 一圈侦察任务未完成时
     while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_detect_list) - 1:
-        cur = int(time.time() * 1000)
+        # cur = int(time.time() * 1000)
 
         # 读取当前姿态和位置
         time_stamp = gain_track_of_time(the_connection, track_list)
 
         # 截图
         vis.shot()
+        if vis.im0 is None:
+            break
 
         # 视觉处理
         vision_position_list = vis.run()
-        pre = int(time.time() * 1000)
+        # pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
 
         # 坐标解算
@@ -146,7 +148,7 @@ while result == -1:
 
 
         # 根据数字识别判断是否继续
-        result = -1
+    result = -1
 
     # 若没有识别到数字，降低高度继续进行
     alt -= 10
@@ -154,6 +156,6 @@ while result == -1:
 '''
 执行投弹
 '''
-loiter_at_present(the_connection, 50)
+# loiter_at_present(the_connection, 50)
 
 

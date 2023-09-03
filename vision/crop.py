@@ -27,7 +27,7 @@ def crop(img):
     # 限制正方形的最小面积，避免图中仍有小的黑色正方形框
     # 提取数字所在平行四边形，并变换为正方形
     for rect in rects:
-        if rect[1][1][1] != 0 and rect[1][1][0] / rect[1][1][1] < 1.25 and rect[1][1][0] / rect[1][1][1] > 0.8 and rect[1][1][0] * rect[1][1][1] > 0.1 * img_length:
+        if rect[1][1][1] != 0 and rect[1][1][0] / rect[1][1][1] < 1.25 and rect[1][1][0] / rect[1][1][1] > 0.8 and rect[1][1][0] * rect[1][1][1] > 0.0004 * (img_length ** 2):
             epsilon = 0.1 * cv2.arcLength(contours[rect[0]], True)
             approx = cv2.approxPolyDP(contours[rect[0]], epsilon, True)
             approx = np.squeeze(approx, 1)

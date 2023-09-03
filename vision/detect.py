@@ -39,7 +39,7 @@ class Vision:
         ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
         # 参数
-        weights = ROOT / 'best.pt'  # 权重文件
+        weights = ROOT / 'weights/m_low.pt'  # 权重文件
         data = ROOT / 'ngyf.yaml'  # 类别等信息
         imgsz = (640, 640)  # 新图大小
         half = False  # use FP16 half-precision inference
@@ -180,8 +180,11 @@ class Vision:
                         annotator.box_label(xyxy, label, color=colors(c, True))
 
             im0 = annotator.result()
+
             # 若设置展示，则画出图片/视频
             if view_img:
+                ratio = 720 / im0.shape[0]
+                im0 = cv2.resize(im0, None, fx=ratio, fy=ratio)
                 cv2.imshow('0', im0)
                 cv2.waitKey(1)
         return res
