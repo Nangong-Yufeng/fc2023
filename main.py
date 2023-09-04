@@ -4,7 +4,7 @@
 
 from utils import title
 import time
-from vision.detect import Vision
+from vision.vision_class import Vision
 from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
                         rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
                         loiter_at_present, delay_eliminate, coordinate_transfer)
@@ -88,7 +88,7 @@ arm(the_connection)
 标靶识别
 """
 # 参数和初始化
-vis = Vision(source=0, device='0', conf_thres=0.7)
+vis = Vision(source='D:/ngyf/videos/DJI_0023.MP4', device='0', conf_thres=0.7)
 
 # 循环侦察任务（用于操场测试）
 '''
@@ -111,14 +111,14 @@ while True:
 
 # 循环侦察任务（用于完整任务）
 result = -1
-"""
+
 # 侦察区坐标，使用环绕航线
 wp1 = Waypoint(22.5899275, 113.9751526, 120)
 wp2 = Waypoint(22.5899248, 113.9755938, 120)
 wp_detect = [wp1, wp2]
 alt = 120
 track_list = []
-"""
+
 # 开始侦察
 while result == -1:
     wp_detect_list = wp_detect_course(wp_detect, 3, alt=alt)
@@ -156,6 +156,6 @@ while result == -1:
 '''
 执行投弹
 '''
-# loiter_at_present(the_connection, 50)
+loiter_at_present(the_connection, 50)
 
 
