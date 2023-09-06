@@ -16,12 +16,14 @@ def gain_ground_speed(the_connection):
     return speed
 
 
+# 不使用track_point类中姿态的部分
 def gain_position_now(the_connection):
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
     wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms, 0, 0, 0)
     return wp_now
 
 
+# 大概是弃用了
 def waypoint_reached(the_connection):
 
     msg = the_connection.recv_match(type='MISSION_ITEM_REACHED', blocking=True)

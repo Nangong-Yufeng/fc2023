@@ -1,15 +1,21 @@
-from navigation import gain_position_now, bomb_drop, Waypoint, set_home, mode_set, gain_ground_speed, gain_posture_para, gain_track_of_time, delay_eliminate
+'''
+本程序用于各模块内容的分开测试
+'''
+from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
+                        rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
+                        loiter_at_present, delay_eliminate, coordinate_transfer, gain_position_now, gain_ground_speed,
+                        gain_posture_para,bombing_course, mission_current, bomb_drop)
 from pymavlink import mavutil
+from vision.detect import Vision
 import time
 
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
-mode_set(the_connection, 0)
-'''
 # 信息读取的测试
-while not input("enter"):
+def test_gain_inform(the_connection):
+  while not input("enter"):
     position = gain_position_now(the_connection)
     posture = gain_posture_para(the_connection)
+    '''
     speed_list = []
     vx = vy = vz = direction = 0
     alt = 0
@@ -23,6 +29,7 @@ while not input("enter"):
         vz += speed_list[count].vz
         direction += speed_list[count].direction
         alt += gain_position_now(the_connection).alt
+        # 也打印一些原始数据看看是否正常
         print("vx single: ", speed_list[count].vx)
         print("altitude single: ", gain_position_now(the_connection).alt)
     length = len(speed_list)
@@ -31,7 +38,12 @@ while not input("enter"):
     vz /= length
     direction /= length
     alt /= length
-
+    '''
+    speed = gain_ground_speed(the_connection)
+    vx = speed.vx
+    vy = speed.vy
+    vz = speed.vz
+    direction = speed.direction
     print("原始数据： ")
     print("位置： lat ", position.lat, " lon ", position.lon, " alt ", position.alt)
     print("速度:  north ", vx, 'east', vy, " down ", vz)
@@ -42,7 +54,7 @@ while not input("enter"):
     localtime = time.localtime(time.time())
     time_data = str(localtime.tm_year) + '.' + str(localtime.tm_mon) + '.' + str(localtime.tm_mday) + ' ' + str(
         localtime.tm_hour) + ':' + str(localtime.tm_min) + ':' + str(localtime.tm_sec)
-    with open(file='/home/bobo/fc2023/test_data.txt', mode='a') as f:
+    with open(file='/home/bobo/fc2023/gain_para_test_data.txt', mode='a') as f:
         f.write(time_data)
         f.write('\n')
         f.write("位置： lat " + str(position.lat) + " lon " + str(position.lat) + " alt " + str(position.alt))
@@ -53,13 +65,73 @@ while not input("enter"):
         f.write('\n')
         f.write("方向（可用性未知） direction " + str(direction))
         f.write("\n")
-'''
-track_list = []
 
-while True:
-    time_data = gain_track_of_time(the_connection, track_list)
-    track = delay_eliminate(track_list, time_data)
-    if track != None:
+
+# 测试二分法选择延迟前航点是否正确
+def test_time_selecting(the_connection):
+   track_list = []
+   while True:
+     time_data = gain_track_of_time(the_connection, track_list)
+     track = delay_eliminate(track_list, time_data)
+     if track != None:
         print("now:", time_data)
         print("trace:", track.time)
         print("delay: ", time_data-track.time, "\n")
+
+
+def test_location_transfer(the_connection, track_list):
+  # 参数和初始化
+  vis = Vision(source=0, device='0', conf_thres=0.7)
+  while True:
+    # 读取当前姿态和位置
+    cur = int(time.time() * 1000)
+    time_stamp = gain_track_of_time(the_connection, track_list)
+    # 截图
+    vis.shot()
+    # 视觉处理
+    vision_position_list = vis.run()
+    pre = int(time.time() * 1000)
+    # print(pre - cur, 'ms')
+    # 进行坐标解算和靶标信息存储
+    # 检测到靶标
+    if len(vision_position_list) != 0:
+        for n in range(len(vision_position_list)):
+            track = delay_eliminate(track_list, time_stamp)
+            target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
+                                         track.pitch, track.roll, vision_position_list[n].x,
+                                         vision_position_list[n].y, vision_position_list[n].number)
+            print("标靶坐标：lat = ", target.lat,", lon = ", target.lon, ", num = ", target.number)
+            with open(file='/home/bobo/fc2023/target_location_test_data.txt', mode='a') as f:
+                f.write("标靶坐标："+str(target.lat)+str(target.lon))
+
+    else:
+        continue
+
+
+def test_course_bombing(the_connection, home_position):
+    target = Waypoint(22,113,10)
+    position = gain_position_now(the_connection)
+    wp_list = bombing_course(position, target, 2,30,20)
+    mission_upload(the_connection, wp_list, home_position)
+
+    if input("输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
+        mode_set(the_connection, 10)
+
+    while mission_current(the_connection) < len(wp_list) - 2:
+        test_gain_inform(the_connection)
+    bomb_drop(the_connection)
+
+
+
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+
+mode_set(the_connection, 0)
+
+# 设置home点
+home_position = Waypoint(22.5903516, 113.9755156, 0)
+set_home(the_connection, home_position)
+
+track_list = []
+
+test_course_bombing(the_connection, home_position)
+

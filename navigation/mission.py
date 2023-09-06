@@ -50,14 +50,7 @@ def mission_upload(the_connection, wp, home_position):
     waypoint_print_list = []
     for count in range(len(wp)):
         waypoint_print_list.append((wp[count].lat, wp[count].lon))
-    '''
-    msg = rec_match_received(the_connection, 'COMMAND_ACK')
-    if msg.result == 0:
-        print("Mission uploaded successfully")
-        return 1
-    else:
-        return -10
-    '''
+
     while True:
         message = the_connection.recv_match(blocking=True)
         message = message.to_dict()
@@ -260,9 +253,9 @@ def wp_detect_course(wp, precision, alt):
 '''
 投弹相关函数
 '''
-# 自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（顺或逆）
+# 自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（默认为逆时针）
 # 修正，采用半圆航线飞至一定距离后，弧形航线进场投弹；后半段航线不变，前半段改变。此方法适用于盘旋侦察，如使用其他侦察航线则需要
-def bombing_course(wp_now, wp_target, precision, course_len, direction, radius):
+def bombing_course(wp_now, wp_target, precision, course_len, radius, direction=1):
 
 # 自动生成航路点集
     lat_len = wp_now.lat - wp_target.lat
@@ -279,7 +272,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, direction, radius):
     s_lat = course_len * math.sin(theta) * 1e-5
     s_lon = course_len * math.cos(theta) * 1e-5
     # 将任务结尾设定在越过目标点一定距离的地方
-    flyby_len = 100
+    flyby_len = 20
     flyby_lat = flyby_len*math.sin(theta+math.pi) * 1e-5
     flyby_lon = flyby_len*math.cos(theta+math.pi) * 1e-5
 
