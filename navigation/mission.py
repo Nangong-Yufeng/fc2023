@@ -239,13 +239,35 @@ def wp_circle_course(wp, precision, angle, direction=1):
     return wp_list
 
 
-# 根据两个航点，在其中生成圆形侦察航线（视解算正确率进行航线形状修改），主要功能是可以改变高度
+# 根据两个航点，在其中生成操场形侦察航线（视解算正确率进行航线形状修改），主要功能是可以改变高度
 def wp_detect_course(wp, precision, alt):
-    wp1 = Waypoint(wp[0].lat, wp[0].lon, alt)
-    wp2 = Waypoint(wp[1].lat, wp[1].lon, alt)
-    detect_course = wp_circle_course([wp1,wp2], precision, 180, 1)
+    if wp[0].lat - wp[1].lat > 0:
+        lat_south = wp[1].lat
+        lat_north = wp[0].lat
+    else:
+        lat_south = wp[0].lat
+        lat_north = wp[1].lat
+
+    if wp[0].lon - wp[1].lon > 0:
+        lon_west = wp[1].lon
+        lon_east = wp[0].lon
+    else:
+        lon_west = wp[0].lon
+        lon_east = wp[1].lon
+
+    # 有必要根据比赛场地的方向关系修改
+    wp1 = Waypoint(lat_south, lon_west, alt)
+    wp2 = Waypoint(lat_south, lon_east, alt)
+    wp3 = Waypoint(lat_north, lon_east, alt)
+    wp4 = Waypoint(lat_north, lon_west, alt)
+
+    detect_course = wp_straight_course([wp1, wp2], precision)
     detect_course.pop(-1)
-    detect_course.extend(wp_circle_course([wp2,wp1], precision, 180, 1))
+    detect_course.extend(wp_circle_course([wp2, wp3], precision, 180, 1))
+    detect_course.pop(-1)
+    detect_course.extend(wp_straight_course([wp3, wp4], precision))
+    detect_course.pop(-1)
+    detect_course.extend(wp_circle_course([wp4, wp1], precision, 180, 1))
     detect_course.pop(-1)
     return detect_course
 
