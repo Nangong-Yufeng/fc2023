@@ -4,7 +4,7 @@
 
 from utils import title
 import time
-from vision.detect import Vision
+from vision.vision_class import Vision
 from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
                         rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
                         loiter_at_present, delay_eliminate, coordinate_transfer)
@@ -88,7 +88,7 @@ arm(the_connection)
 标靶识别
 """
 # 参数和初始化
-vis = Vision(source=0, device='0', conf_thres=0.7)
+vis = Vision(source='D:/ngyf/videos/DJI_0023.MP4', device='0', conf_thres=0.7)
 
 # 循环侦察任务（用于操场测试）
 '''
@@ -125,20 +125,26 @@ while result == -1:
 
     # 一圈侦察任务未完成时
     while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_detect_list) - 1:
-        cur = int(time.time() * 1000)
+        # cur = int(time.time() * 1000)
 
         # 读取当前姿态和位置
         time_stamp = gain_track_of_time(the_connection, track_list)
 
         # 截图
         vis.shot()
+        if vis.im0 is None:
+            break
 
         # 视觉处理
         vision_position_list = vis.run()
-        pre = int(time.time() * 1000)
+        # pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
 
         # 进行坐标解算和靶标信息存储
+
+
+        # 根据数字识别判断是否继续
+        result = -1
 
         # 检测到靶标
         if len(vision_position_list) != 0:
@@ -153,6 +159,7 @@ while result == -1:
         # 没有检测到靶标
         else:
             result = -1
+
 
     # 若没有识别到数字，降低高度继续进行
     alt -= 10

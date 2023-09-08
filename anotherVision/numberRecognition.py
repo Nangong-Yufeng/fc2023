@@ -11,7 +11,7 @@ class NumberRecognizer:
     """负责完成数字识别任务，由标靶识别模块使用
     """
 
-    def __init__(self, weight_path: str) -> None:
+    def __init__(self) -> None:
         """
         Args:
             path (str): 要载入的模型的路径
@@ -46,8 +46,3 @@ class NumberRecognizer:
         return int(text)
 
 
-if __name__ == "__main__":
-    nr = NumberRecognizer("C:/Users/lwy/Desktop/nangongyufeng/fc2023/anotherVision/weights/cnn2.pkl")
-    image = cv2.imread("C:/Users/lwy/Desktop/20/DJI_004567.jpg")
-    predicted_number = nr.recognize(image)
-    print(predicted_number)
