@@ -140,15 +140,26 @@ while result == -1:
         # pre = int(time.time() * 1000)
         # print(pre - cur, 'ms')
 
-        # 坐标解算
-        if len(vision_position_list) != 0:
-            n = 0
-            track = delay_eliminate(track_list, time_stamp)
-            target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw, track.pitch, track.roll, vision_position_list[n].x, vision_position_list[n].y)
+        # 进行坐标解算和靶标信息存储
 
 
         # 根据数字识别判断是否继续
-    result = -1
+        result = -1
+
+        # 检测到靶标
+        if len(vision_position_list) != 0:
+            for n in range(len(vision_position_list)):
+              track = delay_eliminate(track_list, time_stamp)
+              target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
+                                           track.pitch, track.roll, vision_position_list[n].x,
+                                           vision_position_list[n].y, vision_position_list[n].number)
+            '''
+            检测结果的判别和存储，不会写
+            '''
+        # 没有检测到靶标
+        else:
+            result = -1
+
 
     # 若没有识别到数字，降低高度继续进行
     alt -= 10

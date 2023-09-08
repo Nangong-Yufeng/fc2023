@@ -7,8 +7,9 @@ from .error_process import error_process, rec_match_received
 from .trajectory import trajectory_cal
 import time
 
-
-# 通用任务函数
+'''
+通用任务函数
+'''
 
 def send_mission_list(the_connection, wp):
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
@@ -49,14 +50,7 @@ def mission_upload(the_connection, wp, home_position):
     waypoint_print_list = []
     for count in range(len(wp)):
         waypoint_print_list.append((wp[count].lat, wp[count].lon))
-    '''
-    msg = rec_match_received(the_connection, 'COMMAND_ACK')
-    if msg.result == 0:
-        print("Mission uploaded successfully")
-        return 1
-    else:
-        return -10
-    '''
+
     while True:
         message = the_connection.recv_match(blocking=True)
         message = message.to_dict()
@@ -131,6 +125,9 @@ def clear_waypoint(vehicle):
     print("Total mission item count:", count)
 
 
+'''
+对接视觉需要的函数
+'''
 # 对摄像头延时等影响造成延迟的消除，delay具体值需要使用实验测定
 def delay_eliminate(track_list, time, delay=100):
     # 使用二分法查找离要求最近的时刻
@@ -156,8 +153,17 @@ def delay_eliminate(track_list, time, delay=100):
         return track_list[head+1]
 
 
-# 指定形状航线生成函数
+# 将三或四个标靶进行区分，以供后续识别信息的读入匹配（新比赛为4， 老比赛为3）
+def target_differentiation(target_list, target_point, precision=0.00005, length=4):
+    # 探测到的目标小于总数，说明还有为探测到的内容
+    if len(target_list) < length:
+        target_list.append(target_point)
+    # 所有标靶已探测到
 
+
+'''
+指定形状航线生成函数
+'''
 # 根据上传的两个坐标点，通过自动设置更多的坐标点，生成一个两坐标之间的直线航线
 def wp_straight_course(wp, precision):
 
@@ -243,11 +249,13 @@ def wp_detect_course(wp, precision, alt):
     detect_course.pop(-1)
     return detect_course
 
-# 投弹相关函数
 
-# 自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（顺或逆）
+'''
+投弹相关函数
+'''
+# 自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（默认为逆时针）
 # 修正，采用半圆航线飞至一定距离后，弧形航线进场投弹；后半段航线不变，前半段改变。此方法适用于盘旋侦察，如使用其他侦察航线则需要
-def bombing_course(wp_now, wp_target, precision, course_len, direction, radius):
+def bombing_course(wp_now, wp_target, precision, course_len, radius, direction=1):
 
 # 自动生成航路点集
     lat_len = wp_now.lat - wp_target.lat
@@ -259,12 +267,12 @@ def bombing_course(wp_now, wp_target, precision, course_len, direction, radius):
         theta += math.pi
 
     # 暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
-    #d_lat = 2 * radius * math.sin(theta) * 1e-5
-    #d_lon = 2 * (radius / 1.1) * math.cos(theta) * 1e-5
+    # d_lat = 2 * radius * math.sin(theta) * 1e-5
+    # d_lon = 2 * (radius / 1.1) * math.cos(theta) * 1e-5
     s_lat = course_len * math.sin(theta) * 1e-5
     s_lon = course_len * math.cos(theta) * 1e-5
     # 将任务结尾设定在越过目标点一定距离的地方
-    flyby_len = 100
+    flyby_len = 20
     flyby_lat = flyby_len*math.sin(theta+math.pi) * 1e-5
     flyby_lon = flyby_len*math.cos(theta+math.pi) * 1e-5
 
@@ -354,8 +362,8 @@ def bomb_drop(the_connection):
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 1000, 0, 0, 0, 0, 0)
     print("bomb away!")
 
-# 飞机动作控制函数
 
+# 飞机动作控制函数
 def loiter_at_present(the_connection, alt):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, -30, 0, 0, 0, alt)
