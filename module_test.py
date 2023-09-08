@@ -6,7 +6,7 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
                         loiter_at_present, delay_eliminate, coordinate_transfer, gain_position_now, gain_ground_speed,
                         gain_posture_para,bombing_course, mission_current, bomb_drop)
 from pymavlink import mavutil
-from vision.detect import Vision
+#from vision.detect import Vision
 import time
 
 
@@ -15,30 +15,6 @@ def test_gain_inform(the_connection):
   while not input("enter"):
     position = gain_position_now(the_connection)
     posture = gain_posture_para(the_connection)
-    '''
-    speed_list = []
-    vx = vy = vz = direction = 0
-    alt = 0
-
-    # 由于瞬时读取的速度和高度值非常奇怪，使用连续读取几次的方式考察情况是否有改善
-    for count in range(0, 3):
-        speed = gain_ground_speed(the_connection)
-        speed_list.append(speed)
-        vx += speed_list[count].vx
-        vy += speed_list[count].vy
-        vz += speed_list[count].vz
-        direction += speed_list[count].direction
-        alt += gain_position_now(the_connection).alt
-        # 也打印一些原始数据看看是否正常
-        print("vx single: ", speed_list[count].vx)
-        print("altitude single: ", gain_position_now(the_connection).alt)
-    length = len(speed_list)
-    vx /= length
-    vy /= length
-    vz /= length
-    direction /= length
-    alt /= length
-    '''
     speed = gain_ground_speed(the_connection)
     vx = speed.vx
     vy = speed.vy
@@ -78,7 +54,7 @@ def test_time_selecting(the_connection):
         print("trace:", track.time)
         print("delay: ", time_data-track.time, "\n")
 
-
+'''
 def test_location_transfer(the_connection, track_list):
   # 参数和初始化
   vis = Vision(source=0, device='0', conf_thres=0.7)
@@ -106,7 +82,7 @@ def test_location_transfer(the_connection, track_list):
 
     else:
         continue
-
+'''
 
 def test_course_bombing(the_connection, home_position):
     target = Waypoint(22,113,10)
@@ -126,6 +102,10 @@ def test_course_bombing(the_connection, home_position):
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
 mode_set(the_connection, 0)
+
+input("输入任意内容获取坐标")
+wp = gain_position_now(the_connection)
+print("落点坐标 lat ", wp.lat, " lon ", wp.lon)
 
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
