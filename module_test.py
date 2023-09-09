@@ -99,7 +99,9 @@ def test_course_bombing(the_connection, home_position):
     bomb_drop(the_connection)
 
 
-
+'''
+测试进程
+'''
 the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
 mode_set(the_connection, 0)
