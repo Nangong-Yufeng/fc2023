@@ -84,7 +84,7 @@ def gain_track_of_time(the_connection, track_list, time_last=50):
         track_list.pop(0)
     else:
         pass
-    return position.time
+    return [position.time,position.alt]
     #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
 
 
