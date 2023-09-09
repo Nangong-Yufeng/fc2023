@@ -118,6 +118,7 @@ wp2 = Waypoint(22.5899248, 113.9755938, 120)
 wp_detect = [wp1, wp2]
 alt = 120
 track_list = []
+target_dict = {}
 
 # 开始侦察
 while result == -1:
@@ -128,38 +129,51 @@ while result == -1:
         # cur = int(time.time() * 1000)
 
         # 读取当前姿态和位置
-        time_stamp = gain_track_of_time(the_connection, track_list)
+        inform = gain_track_of_time(the_connection, track_list)
+        time_stamp = inform[0]
+        alt = inform[1]
 
-        # 截图
-        vis.shot()
-        if vis.im0 is None:
-            break
+        # 只在20米以下的高度进行视觉识别，避免生成过多错误结果
+        if alt <= 20:
 
-        # 视觉处理
-        vision_position_list = vis.run()
-        # pre = int(time.time() * 1000)
-        # print(pre - cur, 'ms')
+         # 截图
+         vis.shot()
+         if vis.im0 is None:
+            continue
 
-        # 进行坐标解算和靶标信息存储
+         # 视觉处理
+         vision_position_list = vis.run()
+         # pre = int(time.time() * 1000)
+         # print(pre - cur, 'ms')
 
+         # 进行坐标解算和靶标信息存储
 
-        # 根据数字识别判断是否继续
-        result = -1
-
-        # 检测到靶标
-        if len(vision_position_list) != 0:
+         # 检测到靶标
+         if len(vision_position_list) != 0:
             for n in range(len(vision_position_list)):
               track = delay_eliminate(track_list, time_stamp)
               target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
                                            track.pitch, track.roll, vision_position_list[n].x,
                                            vision_position_list[n].y, vision_position_list[n].number)
+              # 视觉识别成功但数字识别失败
+              if target.number < 0:
+                  continue
+              # 数字识别得到结果
+              else:
+                  # 原目标表内没有该项
+                  if target_dict.get(target.number, __default=-1) < 0:
+                      target_dict[target.number] = 1
+
+
             '''
             检测结果的判别和存储，不会写
             '''
-        # 没有检测到靶标
-        else:
+         # 没有检测到靶标
+         else:
             result = -1
-
+        # 高度大于二十米，不进行检测
+        else:
+            continue
 
     # 若没有识别到数字，降低高度继续进行
     alt -= 10
