@@ -6,7 +6,7 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
                         loiter_at_present, delay_eliminate, coordinate_transfer, gain_position_now, gain_ground_speed,
                         gain_posture_para,bombing_course, mission_current, bomb_drop)
 from pymavlink import mavutil
-#from vision.detect import Vision
+from vision.vision_class import Vision
 import time
 
 
@@ -54,7 +54,7 @@ def test_time_selecting(the_connection):
         print("trace:", track.time)
         print("delay: ", time_data-track.time, "\n")
 
-'''
+
 def test_location_transfer(the_connection, track_list):
   # 参数和初始化
   vis = Vision(source=0, device='0', conf_thres=0.7)
@@ -75,43 +75,50 @@ def test_location_transfer(the_connection, track_list):
             track = delay_eliminate(track_list, time_stamp)
             target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
                                          track.pitch, track.roll, vision_position_list[n].x,
-                                         vision_position_list[n].y, vision_position_list[n].number)
+                                         vision_position_list[n].y, vision_position_list[n].num)
             print("标靶坐标：lat = ", target.lat,", lon = ", target.lon, ", num = ", target.number)
-            with open(file='/home/bobo/fc2023/target_location_test_data.txt', mode='a') as f:
-                f.write("标靶坐标："+str(target.lat)+str(target.lon))
-
+            with open(file='/home/bobo/fc2023/gain_para_test_data.txt', mode='a') as f:
+                f.write("lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.number))
+                f.write('\n')
     else:
-        continue
-'''
+        print("none target detected")
+
 
 def test_course_bombing(the_connection, home_position):
-    target = Waypoint(22,113,10)
+    target = Waypoint(22.5904647, 113.9623430,10)
+    input("生成航线")
     position = gain_position_now(the_connection)
-    wp_list = bombing_course(position, target, 2,30,20)
+    wp_list = bombing_course(position, target, 2,30,10)
     mission_upload(the_connection, wp_list, home_position)
 
     if input("输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
         mode_set(the_connection, 10)
 
-    while mission_current(the_connection) < len(wp_list) - 2:
+    while mission_current(the_connection) < len(wp_list) - 3:
         test_gain_inform(the_connection)
     bomb_drop(the_connection)
 
 
-
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+'''
+测试进程
+'''
+the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
 mode_set(the_connection, 0)
 
-input("输入任意内容获取坐标")
-wp = gain_position_now(the_connection)
-print("落点坐标 lat ", wp.lat, " lon ", wp.lon)
+if input("输入O获取坐标, 输入其他跳过： ") == '0':
+    wp = gain_position_now(the_connection)
+    print("坐标 lat:", wp.lat, " lon:", wp.lon)
+
+if input("输入0测试数传传输频率（大概需要10秒），输入其他跳过： ") == '0':
+    frequency = gain_transform_frequency(the_connection)
+    print("数传传输频率：", frequency, "Hz")
 
 # 设置home点
-home_position = Waypoint(22.5903516, 113.9755156, 0)
-set_home(the_connection, home_position)
+home_position = Waypoint(22.5904647, 113.9623430, 0)
+#set_home(the_connection, home_position)
 
 track_list = []
 
-test_course_bombing(the_connection, home_position)
-
+test_location_transfer(the_connection,track_list)
+# test_course_bombing(the_connection, home_position)
