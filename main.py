@@ -9,41 +9,49 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
                         rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
                         loiter_at_present, delay_eliminate, coordinate_transfer)
 from pymavlink import mavutil
+# 目标字典的目标存储个数
+LEN_OF_TARGET_LIST = 200
 
 
-def vision_test_court(the_connection):
-    # 已知航点(操场的四个角)
-    a = input("输入需要的环线高度（输入为空则默认为120米）： ")
-    if a == '':
-        alt = 120
+# 计算目标字典表中存储目标总数
+def length_of_dict(dict):
+    value = dict.values()
+    length = 0
+    for n in range(len(value)):
+        length += value[n]
+    return length
+
+
+# 判定是否完成了识别目标
+def detect_completed(dict):
+    key = dict.keys()
+    key.sort(key=dict.get, reverse=True)
+    if len(key) >= 3:
+        target1, target2, target3 = key[0:3]
+        if dict[target1] + dict[target2] + dict[target3] > 0.7 * LEN_OF_TARGET_LIST:
+            return [target1, target2, target3]
+        else:
+            return [-1, -1, -1]
+    return [-1, -1, -1]
+
+
+# 排除错误识别结果
+def eliminate_error_target(dict):
+    # 字典总数未达到设定目标
+    if length_of_dict(dict) <= LEN_OF_TARGET_LIST:
+        return -10
+    # 字典总数量达到目标，删除出现次数最少的键值对
     else:
-        alt = int(a, base=10)
-    print(alt)
+        key = dict.keys()
+        key.sort(key=dict.get)
+        last_target = key[0]
+        result = dict.pop(last_target, default=-5)
+        if result == -5:
+            print("error in eliminate_error_target")
+            return result
+        else:
+            return result
 
-    wp1 = Waypoint(22.5899275, 113.9751526, alt)
-    wp2 = Waypoint(22.5899248, 113.9755938, alt)
-    wp3 = Waypoint(22.5909185, 113.9755938, alt)
-    wp4 = Waypoint(22.5909266, 113.9752198, alt)
-    wp = [wp1, wp2, wp3, wp4]
-
-    # 环操场航点
-    wp_line1 = [wp[3], wp[0]]
-    wp_circle1 = [wp[0], wp[1]]
-    wp_line2 = [wp[1], wp[2]]
-    wp_circle2 = [wp[2], wp[3]]
-
-    wp_list = (wp_circle_course(wp_circle1, 3, 180, 1))
-    wp_list.pop(-1)
-    wp_list.pop(-1)
-    wp_list.extend(wp_straight_course(wp_line2, 3))
-    wp_list.pop(-1)
-    wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
-    wp_list.pop(-1)
-    wp_list.extend(wp_straight_course(wp_line1, 3))
-
-    mission_upload(the_connection, wp_list, home_position)
-
-    return wp_list
 
 '''
 帅(😅)
@@ -88,26 +96,7 @@ arm(the_connection)
 标靶识别
 """
 # 参数和初始化
-vis = Vision(source='D:/ngyf/videos/DJI_0023.MP4', device='0', conf_thres=0.7)
-
-# 循环侦察任务（用于操场测试）
-'''
-while True:
-    wp_list = vision_test_court(the_connection)
-
-    if input("输入0切换自动模式开始任务（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
-        mode_set(the_connection, 10)
-
-    while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list) - 1:
-        cur = int(time.time() * 1000)
-        vis.shot()
-        track = gain_track_point(the_connection)
-        vis.run()
-        pre = int(time.time() * 1000)
-        # print(pre - cur, 'ms')
-    mode_set(the_connection, 11)
-    print("circle completed, stand by at home")
-'''
+vis = Vision(source=0, device='0', conf_thres=0.7)
 
 # 循环侦察任务（用于完整任务）
 result = -1
@@ -118,11 +107,16 @@ wp2 = Waypoint(22.5899248, 113.9755938, 120)
 wp_detect = [wp1, wp2]
 alt = 120
 track_list = []
+target_list = []
 target_dict = {}
+target_result = [ -1, -1, -1]
 
 # 开始侦察
 while result == -1:
+    # 生成下一圈侦察航线
     wp_detect_list = wp_detect_course(wp_detect, 3, alt=alt)
+    # 上传下一圈任务
+    mission_upload(the_connection, wp_detect, home_position)
 
     # 一圈侦察任务未完成时
     while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_detect_list) - 1:
@@ -136,47 +130,72 @@ while result == -1:
         # 只在20米以下的高度进行视觉识别，避免生成过多错误结果
         if alt <= 20:
 
-         # 截图
-         vis.shot()
-         if vis.im0 is None:
-            continue
+           # 截图
+           vis.shot()
+           if vis.im0 is None:
+              print("signal lost")
+              continue
 
-         # 视觉处理
-         vision_position_list = vis.run()
-         # pre = int(time.time() * 1000)
-         # print(pre - cur, 'ms')
+           # 视觉处理
+           vision_position_list = vis.run()
+           # pre = int(time.time() * 1000)
+           # print(pre - cur, 'ms')
 
-         # 进行坐标解算和靶标信息存储
+           # 进行坐标解算和靶标信息存储
 
-         # 检测到靶标
-         if len(vision_position_list) != 0:
-            for n in range(len(vision_position_list)):
-              track = delay_eliminate(track_list, time_stamp)
-              target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
+           # 检测到靶标
+           if len(vision_position_list) != 0:
+              for n in range(len(vision_position_list)):
+                track = delay_eliminate(track_list, time_stamp)
+                target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
                                            track.pitch, track.roll, vision_position_list[n].x,
                                            vision_position_list[n].y, vision_position_list[n].number)
-              # 视觉识别成功但数字识别失败
-              if target.number < 0:
-                  continue
-              # 数字识别得到结果
-              else:
-                  # 原目标表内没有该项
-                  if target_dict.get(target.number, __default=-1) < 0:
-                      target_dict[target.number] = 1
+                # 视觉识别成功但数字识别失败
+                if target.number < 0:
+                   continue
+                # 数字识别得到结果
+                else:
+                   target_list.append(target)
+                   # 该目标是第一次出现
+                   if target_dict.get(target.number, __default=-1) < 0:
+                       target_dict[target.number] = 1
+                   # 该目标不是第一次出现，且数量小于指定数量
+                   elif target_dict.get(target.number, __default=-1) < 0.3 * LEN_OF_TARGET_LIST:
+                       target_dict[target.number] += 1
+                   # 该目标不是第一次出现，但存储数量已经达到指定上限
+                   else:
+                       continue
+              # 如果超出设定范围，删除数量最少的一项
+              eliminate_error_target(target_dict)
 
+              # 判定侦察任务是否完成， 若得到探测结果，传入target列表，长度为3
+              target_result = detect_completed(target_dict)
+              result = target_result[0]
 
-            '''
-            检测结果的判别和存储，不会写
-            '''
-         # 没有检测到靶标
-         else:
-            result = -1
+           # 没有检测到靶标
+           else:
+              result = -1
         # 高度大于二十米，不进行检测
         else:
             continue
 
     # 若没有识别到数字，降低高度继续进行
-    alt -= 10
+    if alt > 15:
+       alt -= 0.5
+
+# 侦察完成，进行标靶数据处理
+target1_list = []
+target2_list = []
+target3_list = []
+# 对三个靶标的所有坐标值进行筛选存储
+for count in range(len(target_list)):
+    if target_list[count].number == target_result[0]:
+        target1_list.append(target_list[count])
+    elif target_list[count].number == target_result[1]:
+        target2_list.append(target_list[count])
+    elif target_list[count].number == target_result[2]:
+        target3_list.append(target_list[count])
+
 
 '''
 执行投弹
