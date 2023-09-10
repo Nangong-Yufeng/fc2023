@@ -30,7 +30,7 @@ def test_gain_inform(the_connection):
     localtime = time.localtime(time.time())
     time_data = str(localtime.tm_year) + '.' + str(localtime.tm_mon) + '.' + str(localtime.tm_mday) + ' ' + str(
         localtime.tm_hour) + ':' + str(localtime.tm_min) + ':' + str(localtime.tm_sec)
-    with open(file='/home/bobo/fc2023/gain_para_test_data.txt', mode='a') as f:
+    with open(file='C:/Users/35032/Desktop/gain_data_test.txt', mode='a') as f:
         f.write(time_data)
         f.write('\n')
         f.write("位置： lat " + str(position.lat) + " lon " + str(position.lat) + " alt " + str(position.alt))
@@ -77,7 +77,7 @@ def test_location_transfer(the_connection, track_list):
                                          track.pitch, track.roll, vision_position_list[n].x,
                                          vision_position_list[n].y, vision_position_list[n].num)
             print("标靶坐标：lat = ", target.lat,", lon = ", target.lon, ", num = ", target.number)
-            with open(file='/home/bobo/fc2023/gain_para_test_data.txt', mode='a') as f:
+            with open(file='C:/Users/35032/Desktop/location.txt', mode='a') as f:
                 f.write("lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.number))
                 f.write('\n')
     else:
