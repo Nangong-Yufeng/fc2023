@@ -184,7 +184,6 @@ while result == -1:
        alt -= 0.5
 
 # 侦察完成，进行标靶数据处理
-
 target1_list = []
 target2_list = []
 target3_list = []
