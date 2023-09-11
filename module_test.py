@@ -57,16 +57,20 @@ def test_time_selecting(the_connection):
 
 def test_location_transfer(the_connection, track_list):
   # 参数和初始化
+  pre_time = 0
   vis = Vision(source=0, device='0', conf_thres=0.7)
   while True:
     # 读取当前姿态和位置
     cur = int(time.time() * 1000)
-    time_stamp = gain_track_of_time(the_connection, track_list)
+    time_stamp = gain_track_of_time(the_connection, track_list)[0]
+    print("循环时间： ", time_stamp - pre_time)
+    pre_time = time_stamp
     # 截图
+    time_vision = int(time.time() * 1000)
     vis.shot()
     # 视觉处理
     vision_position_list = vis.run()
-    pre = int(time.time() * 1000)
+    print(time.time() * 1000 - time_vision)
     # print(pre - cur, 'ms')
     # 进行坐标解算和靶标信息存储
     # 检测到靶标
@@ -120,5 +124,5 @@ home_position = Waypoint(22.5904647, 113.9623430, 0)
 
 track_list = []
 
-test_location_transfer(the_connection,track_list)
+test_location_transfer(the_connection, track_list)
 # test_course_bombing(the_connection, home_position)
