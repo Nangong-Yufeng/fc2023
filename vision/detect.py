@@ -1,6 +1,8 @@
 """
 检测标靶，返回数值与坐标
 """
+import time
+
 import cv2
 import numpy as np
 import torch
@@ -27,8 +29,6 @@ def detect(
     classes=None,  # filter by class: --class 0, or --class 0 2 3
     agnostic_nms=False,  # class-agnostic NMS
     line_thickness=3,  # bounding box thickness (pixels)
-    hide_labels=False,  # hide labels
-    hide_conf=False,  # hide confidences
 ):
     """ 检测标靶，返回数值与坐标
 
@@ -87,8 +87,8 @@ def detect(
 
             # Print results
             # 统计检测到的每一个class的预测框数量
-            for c in det[:, 5].unique():
-                n = (det[:, 5] == c).sum()  # detections per class
+            # for c in det[:, 5].unique():
+            #     n = (det[:, 5] == c).sum()  # detections per class
 
             # Write results
             for *xyxy, conf, cls in reversed(det):  # reversed反转列表顺序
@@ -113,14 +113,16 @@ def detect(
                 if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形
                     continue
 
+                tmp = int(time.time() * 1000)
                 ret = numrec.recognize(img_crop)
+                print("数字识别时间： ", int(time.time() * 1000) - tmp)
                 if ret != -1:
                     print(f'检测到数字: {ret}')
                 res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=ret))
                 # 在原图上画框
                 if view_img:  # Add bbox to image
                     c = int(cls)  # integer class
-                    label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
+                    label = f'{names[c]} {conf:.2f}'
                     annotator.box_label(xyxy, label, color=colors(c, True))
 
         im0 = annotator.result()
