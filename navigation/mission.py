@@ -129,7 +129,7 @@ def clear_waypoint(vehicle):
 对接视觉需要的函数
 '''
 # 对摄像头延时等影响造成延迟的消除，delay具体值需要使用实验测定
-def delay_eliminate(track_list, time, delay=250):
+def delay_eliminate(track_list, time, delay=350):
     # 使用二分法查找离要求最近的时刻
     tail = len(track_list)-1
     head = 0

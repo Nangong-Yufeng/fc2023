@@ -70,7 +70,7 @@ def test_location_transfer(the_connection, track_list):
     vis.shot()
     # 视觉处理
     vision_position_list = vis.run()
-    print(time.time() * 1000 - time_vision)
+    print("视觉时间： ", int(time.time() * 1000) - time_vision)
     # print(pre - cur, 'ms')
     # 进行坐标解算和靶标信息存储
     # 检测到靶标

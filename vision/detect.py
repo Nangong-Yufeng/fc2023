@@ -1,6 +1,8 @@
 """
 检测标靶，返回数值与坐标
 """
+import time
+
 import cv2
 import numpy as np
 import torch
@@ -113,7 +115,9 @@ def detect(
                 if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形
                     continue
 
+                tmp = int(time.time() * 1000)
                 ret = numrec.recognize(img_crop)
+                print("数字识别时间： ", int(time.time() * 1000) - tmp)
                 if ret != -1:
                     print(f'检测到数字: {ret}')
                 res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=ret))
