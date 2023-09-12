@@ -7,7 +7,9 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
                         gain_posture_para,bombing_course, mission_current, bomb_drop)
 from pymavlink import mavutil
 from vision.vision_class import Vision
+from main import detect_completed, eliminate_error_target
 import time
+LEN_OF_TARGET_LIST = 200
 
 
 # 信息读取的测试
@@ -101,6 +103,69 @@ def test_course_bombing(the_connection, home_position):
     while mission_current(the_connection) < len(wp_list) - 3:
         test_gain_inform(the_connection)
     bomb_drop(the_connection)
+
+
+
+# 测试 过程淘汰 算法的正确性，需要vis参数设置为视频导入
+def test_target_selection(the_connection):
+    # 参数和初始化
+    vis = Vision(source=0, device='0', conf_thres=0.7)
+    track_list = []
+    target_list = []
+    target_dict = {}
+    target_result = [-1, -1, -1]
+    result = -1
+
+    while result < 0:
+        # 截图
+        vis.shot()
+        if vis.im0 is None:
+            print("signal lost")
+            continue
+
+        inform = gain_track_of_time(the_connection, track_list)
+        time_stamp = inform[0]
+
+        # 视觉处理
+        vision_position_list = vis.run()
+        # pre = int(time.time() * 1000)
+        # print(pre - cur, 'ms')
+
+        # 进行坐标解算和靶标信息存储
+
+        # 检测到靶标
+        if len(vision_position_list) != 0:
+            for n in range(len(vision_position_list)):
+                track = delay_eliminate(track_list, time_stamp)
+                target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
+                                             track.pitch, track.roll, vision_position_list[n].x,
+                                             vision_position_list[n].y, vision_position_list[n].number)
+                # 视觉识别成功但数字识别失败
+                if target.number < 0:
+                    continue
+                # 数字识别得到结果
+                else:
+                    target_list.append(target)
+                    # 该目标是第一次出现
+                    if target_dict.get(target.number, __default=-1) < 0:
+                        target_dict[target.number] = 1
+                    # 该目标不是第一次出现，且数量小于指定数量
+                    elif target_dict.get(target.number, __default=-1) < 0.3 * LEN_OF_TARGET_LIST:
+                        target_dict[target.number] += 1
+                    # 该目标不是第一次出现，但存储数量已经达到指定上限
+                    else:
+                        continue
+            # 如果超出设定范围，删除数量最少的一项
+            eliminate_error_target(target_dict)
+
+            # 判定侦察任务是否完成， 若得到探测结果，传入target列表，长度为3
+            target_result = detect_completed(target_dict)
+            result = target_result[0]
+
+        # 没有检测到靶标
+        else:
+            result = -1
+    print("detection completed!")
 
 
 '''
