@@ -19,6 +19,9 @@ def length_of_dict(dict):
     length = 0
     for n in range(len(value)):
         length += value[n]
+
+    # 调试用
+    print("识别到目标总数： ", length)
     return length
 
 
@@ -29,6 +32,7 @@ def detect_completed(dict):
     if len(key) >= 3:
         target1, target2, target3 = key[0:3]
         if dict[target1] + dict[target2] + dict[target3] > 0.7 * LEN_OF_TARGET_LIST:
+            print("vision detection result:   ", target1, "   ", target2, "   ", target3)
             return [target1, target2, target3]
         else:
             return [-1, -1, -1]
@@ -50,6 +54,9 @@ def eliminate_error_target(dict):
             print("error in eliminate_error_target")
             return result
         else:
+            # 测试用
+            print("delete error result ", result)
+
             return result
 
 
