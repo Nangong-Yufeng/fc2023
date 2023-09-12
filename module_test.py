@@ -106,9 +106,9 @@ def test_course_bombing(the_connection, home_position):
 '''
 测试进程
 '''
-the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
 
-mode_set(the_connection, 0)
+#mode_set(the_connection, 0)
 
 if input("输入O获取坐标, 输入其他跳过： ") == '0':
     wp = gain_position_now(the_connection)
