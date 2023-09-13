@@ -73,10 +73,10 @@ class Pose:
     def get_rotation_matrix(self): 
         return self.rotation_matrix
 
-def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vision_num): 
+def coordinate_transfer(lat, lon, alt, -yaw, pitch, roll, vision_x, vision_y, vision_num):   
     # 已经有以下参数
     # 将相机设为0，0，即坐标系是米级
-    camera_pose = Pose(0, 0, alt, yaw, pitch, roll)  # gps坐标，高度，偏航yaw，俯仰pitch，滚转roll    
+    camera_pose = Pose(0, 0, alt, yaw, pitch, roll)  # gps坐标，高度，偏航yaw，俯仰pitch，滚转roll     
 
     pixel_coords = [vision_x, vision_y]  # 点在相机坐标系中的像素位置
 
