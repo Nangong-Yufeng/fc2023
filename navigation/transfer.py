@@ -30,10 +30,10 @@ def pixel_to_world(camera_intrinsics, camera_rotation, camera_position, img_poin
     Mat2 = R_inv.dot(T)
     Z_c = (Z_w + float(Mat2[2][0])) / float(Mat1[2][0])  # 计算尺度因子，用于缩放点到世界坐标系
 
-    print(f'float(Mat1[2][0]: {float(Mat1[2][0])}')
-    print(f'Z_c: {Z_c}')
-    print(f'coord in camera:{K_inv.dot(uv1)}')
-    print(f'T: {T}')
+    ## print(f'float(Mat1[2][0]: {float(Mat1[2][0])}')
+    ## print(f'Z_c: {Z_c}')
+    ## print(f'coord in camera:{K_inv.dot(uv1)}')
+    ## print(f'T: {T}')
     return R_inv.dot(Z_c * K_inv.dot(uv1) - T)
 
 
@@ -79,6 +79,7 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vis
 
     pixel_coords = [vision_x, vision_y]  # 点在相机坐标系中的像素位置
 
+    print(f'pixel_coords: {pixel_coords}')
     # 相机原始内参矩阵cameraMatrix
     cameraMatrix = np.array(
         [
@@ -92,6 +93,8 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vis
 
     # 计算旋转矩阵
     rc = camera_pose.get_rotation_matrix()
+
+    print(f'rc: {rc}')
 
     # 对于地面坐标系xoy，若x指向东方，y指向北方
     # 对于飞机，x轴指向正北，y轴指向正东， z轴指向正上
@@ -108,7 +111,7 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vis
     undistortedPoint = \
     cv2.fisheye.undistortPoints(distortedPoint, cameraMatrix, distCoeffs, np.eye(3), newCameraarray)[0][
         0]
-
+    print(f'undistortedPoint: {undistortedPoint}')
     newCameraMatrix = np.mat(newCameraarray)
 
     from math import cos, sin

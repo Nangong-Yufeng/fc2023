@@ -7,9 +7,57 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
                         gain_posture_para,bombing_course, mission_current, bomb_drop, command_retry)
 from pymavlink import mavutil
 from vision.vision_class import Vision
-from main import detect_completed, eliminate_error_target
 import time
-LEN_OF_TARGET_LIST = 200
+LEN_OF_TARGET_LIST = 100
+
+
+# 计算目标字典表中存储目标总数
+def length_of_dict(dict):
+    value = list(dict.values())
+    length = 0
+    for n in range(len(value)):
+        length += value[n]
+
+    # 调试用
+    print("识别到目标总数： ", length)
+    return length
+
+
+# 判定是否完成了识别目标
+def detect_completed(dict):
+    key = list(dict.keys())
+    key.sort(key=dict.get, reverse=True)
+    if len(key) >= 3:
+        target1, target2, target3 = key[0:3]
+        if dict[target1] + dict[target2] + dict[target3] > 0.7 * LEN_OF_TARGET_LIST:
+            print("vision detection result:   ", target1, "   ", target2, "   ", target3)
+            for n in range(len(key)):
+                print("result: ", key[n], "count: ", dict[key[n]])
+            return [target1, target2, target3]
+        else:
+            return [-1, -1, -1]
+    return [-1, -1, -1]
+
+
+# 排除错误识别结果
+def eliminate_error_target(dict):
+    # 字典总数未达到设定目标
+    if length_of_dict(dict) <= LEN_OF_TARGET_LIST:
+        return -10
+    # 字典总数量达到目标，删除出现次数最少的键值对
+    else:
+        key = list(dict.keys())
+        key.sort(key=dict.get)
+        last_target = key[0]
+        result = dict.pop(last_target, -5)
+        if result == -5:
+            print("error in eliminate_error_target")
+            return result
+        else:
+            # 测试用
+            print("delete error result ", last_target)
+
+            return result
 
 
 # 信息读取的测试
@@ -60,7 +108,6 @@ def test_time_selecting(the_connection):
 def test_location_transfer(the_connection, track_list):
   # 参数和初始化
   pre_time = 0
-  vis = Vision(source=0, device='0', conf_thres=0.7)
   while True:
     # 读取当前姿态和位置
     cur = int(time.time() * 1000)
@@ -83,6 +130,7 @@ def test_location_transfer(the_connection, track_list):
                                          track.pitch, track.roll, vision_position_list[n].x,
                                          vision_position_list[n].y, vision_position_list[n].num)
             print("标靶坐标：lat = ", target.lat,", lon = ", target.lon, ", num = ", target.number)
+            print("坐标和姿态：lat = ", track.lat, " lon: ", track.lon, " alt: ", track.alt, " pitch: ", track.pitch, " yaw: ", track.yaw, " roll: ", track.roll)
             with open(file='C:/Users/35032/Desktop/location.txt', mode='a') as f:
                 f.write("lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.number))
                 f.write('\n')
@@ -106,10 +154,9 @@ def test_course_bombing(the_connection, home_position):
 
 
 
-# 测试 过程淘汰 算法的正确性，需要vis参数设置为视频导入
+# 测试 过程淘汰 算法的正确性
 def test_target_selection(the_connection):
     # 参数和初始化
-    vis = Vision(source=0, device='0', conf_thres=0.7)
     track_list = []
     target_list = []
     target_dict = {}
@@ -137,20 +184,21 @@ def test_target_selection(the_connection):
         if len(vision_position_list) != 0:
             for n in range(len(vision_position_list)):
                 track = delay_eliminate(track_list, time_stamp)
-                target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
-                                             track.pitch, track.roll, vision_position_list[n].x,
-                                             vision_position_list[n].y, vision_position_list[n].number)
                 # 视觉识别成功但数字识别失败
-                if target.number < 0:
+                if vision_position_list[n].num < 0:
                     continue
                 # 数字识别得到结果
                 else:
+                    target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
+                                                 track.pitch, track.roll, vision_position_list[n].x,
+                                                 vision_position_list[n].y, vision_position_list[n].num)
+                    print("检测到靶标数字： ", target.number)
                     target_list.append(target)
                     # 该目标是第一次出现
-                    if target_dict.get(target.number, __default=-1) < 0:
+                    if target_dict.get(target.number, -1) < 0:
                         target_dict[target.number] = 1
                     # 该目标不是第一次出现，且数量小于指定数量
-                    elif target_dict.get(target.number, __default=-1) < 0.3 * LEN_OF_TARGET_LIST:
+                    elif target_dict.get(target.number, -1) < 0.3 * LEN_OF_TARGET_LIST:
                         target_dict[target.number] += 1
                     # 该目标不是第一次出现，但存储数量已经达到指定上限
                     else:
@@ -171,7 +219,7 @@ def test_target_selection(the_connection):
 '''
 测试进程
 '''
-the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
+the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
 command_retry(the_connection, 'mode_set', 0)
 
@@ -184,15 +232,17 @@ if input("输入0测试数传传输频率（大概需要10秒），输入其他�
     print("数传传输频率：", frequency, "Hz")
 
 # 设置home点
-home_position = Waypoint(22.5904647, 113.9623430, 0)
-command_retry(the_connection, 'set_home', home_position)
+home_position = Waypoint(22.590727599999997, 113.96202369999999, 0)
+#command_retry(the_connection, 'set_home', home_position)
 
 # 图像参数和初始化
-vis = Vision(source=0, device='0', conf_thres=0.7)
+#vis = Vision(source=0, device='0', conf_thres=0.7)
+vis = Vision(source="D:/ngyf/videos/DJIG0007.mov", device='0', conf_thres=0.7)
 
 track_list = []
 
 command_retry(the_connection, 'arm')
 
-test_location_transfer(the_connection, track_list)
+# test_location_transfer(the_connection, track_list)
 # test_course_bombing(the_connection, home_position)
+test_target_selection(the_connection)

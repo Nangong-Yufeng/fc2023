@@ -10,12 +10,12 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
                         loiter_at_present, delay_eliminate, coordinate_transfer)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
-LEN_OF_TARGET_LIST = 200
+LEN_OF_TARGET_LIST = 100
 
 
 # 计算目标字典表中存储目标总数
 def length_of_dict(dict):
-    value = dict.values()
+    value = list(dict.values())
     length = 0
     for n in range(len(value)):
         length += value[n]
@@ -27,12 +27,14 @@ def length_of_dict(dict):
 
 # 判定是否完成了识别目标
 def detect_completed(dict):
-    key = dict.keys()
+    key = list(dict.keys())
     key.sort(key=dict.get, reverse=True)
     if len(key) >= 3:
         target1, target2, target3 = key[0:3]
         if dict[target1] + dict[target2] + dict[target3] > 0.7 * LEN_OF_TARGET_LIST:
             print("vision detection result:   ", target1, "   ", target2, "   ", target3)
+            for n in range(len(key)):
+                print("result: ", key[n], "count: ", dict[key[n]])
             return [target1, target2, target3]
         else:
             return [-1, -1, -1]
@@ -46,16 +48,16 @@ def eliminate_error_target(dict):
         return -10
     # 字典总数量达到目标，删除出现次数最少的键值对
     else:
-        key = dict.keys()
+        key = list(dict.keys())
         key.sort(key=dict.get)
         last_target = key[0]
-        result = dict.pop(last_target, default=-5)
+        result = dict.pop(last_target, -5)
         if result == -5:
             print("error in eliminate_error_target")
             return result
         else:
             # 测试用
-            print("delete error result ", result)
+            print("delete error result ", last_target)
 
             return result
 
@@ -154,23 +156,24 @@ while result == -1:
            if len(vision_position_list) != 0:
               for n in range(len(vision_position_list)):
                 track = delay_eliminate(track_list, time_stamp)
-                target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
-                                           track.pitch, track.roll, vision_position_list[n].x,
-                                           vision_position_list[n].y, vision_position_list[n].number)
                 # 视觉识别成功但数字识别失败
-                if target.number < 0:
-                   continue
+                if vision_position_list[n].num < 0:
+                    continue
                 # 数字识别得到结果
                 else:
-                   target_list.append(target)
-                   # 该目标是第一次出现
-                   if target_dict.get(target.number, __default=-1) < 0:
+                    target = coordinate_transfer(track.lat, track.lon, track.alt, track.yaw,
+                                                 track.pitch, track.roll, vision_position_list[n].x,
+                                                 vision_position_list[n].y, vision_position_list[n].num)
+                    print("检测到靶标数字： ", target.number)
+                    target_list.append(target)
+                    # 该目标是第一次出现
+                    if target_dict.get(target.number, -1) < 0:
                        target_dict[target.number] = 1
                    # 该目标不是第一次出现，且数量小于指定数量
-                   elif target_dict.get(target.number, __default=-1) < 0.3 * LEN_OF_TARGET_LIST:
+                    elif target_dict.get(target.number, -1) < 0.3 * LEN_OF_TARGET_LIST:
                        target_dict[target.number] += 1
                    # 该目标不是第一次出现，但存储数量已经达到指定上限
-                   else:
+                    else:
                        continue
               # 如果超出设定范围，删除数量最少的一项
               eliminate_error_target(target_dict)
@@ -190,6 +193,7 @@ while result == -1:
     if alt > 15:
        alt -= 0.5
 
+print("detection completed!")
 # 侦察完成，进行标靶数据处理
 target1_list = []
 target2_list = []
