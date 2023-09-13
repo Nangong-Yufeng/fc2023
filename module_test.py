@@ -4,7 +4,7 @@
 from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
                         rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
                         loiter_at_present, delay_eliminate, coordinate_transfer, gain_position_now, gain_ground_speed,
-                        gain_posture_para,bombing_course, mission_current, bomb_drop)
+                        gain_posture_para,bombing_course, mission_current, bomb_drop, command_retry)
 from pymavlink import mavutil
 from vision.vision_class import Vision
 from main import detect_completed, eliminate_error_target
@@ -173,7 +173,7 @@ def test_target_selection(the_connection):
 '''
 the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
 
-#mode_set(the_connection, 0)
+command_retry(the_connection, 'mode_set', 0)
 
 if input("输入O获取坐标, 输入其他跳过： ") == '0':
     wp = gain_position_now(the_connection)
@@ -185,9 +185,14 @@ if input("输入0测试数传传输频率（大概需要10秒），输入其他�
 
 # 设置home点
 home_position = Waypoint(22.5904647, 113.9623430, 0)
-#set_home(the_connection, home_position)
+command_retry(the_connection, 'set_home', home_position)
+
+# 图像参数和初始化
+vis = Vision(source=0, device='0', conf_thres=0.7)
 
 track_list = []
+
+command_retry(the_connection, 'arm')
 
 test_location_transfer(the_connection, track_list)
 # test_course_bombing(the_connection, home_position)
