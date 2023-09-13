@@ -1,6 +1,32 @@
 import time
+import sys
 from pymavlink import mavutil
-from .error_process import error_process, is_none_return, rec_match_received
+
+
+# 有时由于信号干扰中断，脚本可能收不到需要的mavlink msg或者其反馈，需要进行错误处理
+def is_none_return(msg):
+    if msg is not None:
+        return False
+    else:
+        return True
+
+
+# 针对mav_recv_match做一个问题处理，如果没有收到消息，则等待一段时间后重复至一定次数
+def rec_match_received(the_connection, type, times=5):
+    count = 0
+    while True:
+        msg = the_connection.recv_match(type=type, blocking=True, timeout=5)
+
+        if not is_none_return(msg):
+            return msg
+        elif count < times:
+            time.sleep(2)
+            count += 1
+            print("None message match ", type, "retry No.", count)
+            continue
+        else:
+            print("system error")
+            sys.exit(1)
 
 def arm(the_connection, times=5):
     the_connection.wait_heartbeat()
@@ -24,21 +50,54 @@ def arm(the_connection, times=5):
             result = -1
             continue
           else:
-            error_process(the_connection)
+            return -1
 
-            # 使用long信息发送arm的command
        if result == 0:
           print("arm successfully")
+          return 1
        else:
           print("arm failed")
           msg = rec_match_received(the_connection, "GPS_RAW_INT")
           if msg.fix_type == 3 or msg.fix_type == 4:
-            force_arm(the_connection)
+            if input('解锁失败，但GPS连接正常，输入0以强制解锁: ') == '0':
+                pass
+            else:
+                print("arm failed")
+                return -1
+            return force_arm(the_connection)
+          elif input("GPS未连接，若仍要强制解锁，输入0: ") == '0':
+            return force_arm(the_connection)
           else:
-            error_process(the_connection)
+            return -1
     else:
         print("skip arm")
-        pass
+        return 1
+
+
+def force_arm(the_connection, times=5):
+    count = 0
+    while True:
+        the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 2989, 0, 0, 0, 0, 0)
+        msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+
+        if is_none_return(msg) == False:
+            result = msg.result
+            break
+        elif count < times:
+            time.sleep(2)
+            count += 1
+            print("receive None msg, retry No.", count)
+            result = -1
+            continue
+        else:
+            return -1
+
+    if result == 0:
+        print("force arm successfully")
+        return 1
+    else:
+        return -1
 
 
 def mode_set(the_connection, mode, times=5):
@@ -60,7 +119,7 @@ def mode_set(the_connection, mode, times=5):
           result = -1
           continue
        else:
-          error_process(the_connection)
+          return -1
 
     #根据com_ack判断模式设置结果
     if result == 0:
@@ -89,10 +148,7 @@ def mode_set(the_connection, mode, times=5):
         return mode
     else:
         print("failed to set mode")
-        if input("输入0以尝试重新设置飞行模式（输入其他结束程序）： ") == '0':
-           return -2
-        else:
-           error_process(the_connection)
+        return -1
 
 
 def set_home(the_connection, position_re, times=5, mode=0):
@@ -115,49 +171,18 @@ def set_home(the_connection, position_re, times=5, mode=0):
             result = -1
             continue
         else:
-            error_process(the_connection)
+            return -1
 
     #mode为1表示使用当前位置为home点，mode为0则为指定位置
-    if msg.result == 0 and mode == 1:
+    if result == 0 and mode == 1:
         print("set current location as home successfully")
-        return 0
-    elif msg.result == 0 and mode == 0:
+        return 1
+    elif result == 0 and mode == 0:
         print("successfully set home as lat = %s, lon = %s, re_alt = %s meters" %(position_re.lat, position_re.lon, position_re.alt))
+        return 1
     else:
         print("home set failed")
-        error_process(the_connection)
-
-
-def force_arm(the_connection, times=5):
-    if input('解锁失败，但GPS连接正常，输入0以强制解锁 ') == '0':
-        pass
-    else:
-        print("arm failed")
-        error_process(the_connection)
-
-    count = 0
-    while True:
-        the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
-                                             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 2989, 0, 0, 0, 0, 0)
-        msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
-        print(msg)
-
-        if is_none_return(msg) == False:
-            result = msg.result
-            break
-        elif count < times:
-            time.sleep(2)
-            count += 1
-            print("receive None msg, retry No.", count)
-            result = -1
-            continue
-        else:
-            error_process(the_connection)
-
-    if result == 0:
-        print("force arm successfully")
-    else:
-        error_process(the_connection)
+        return -1
 
 
 def arm_check(the_connection):

@@ -1,5 +1,5 @@
 from navigation import (gain_position_now, bomb_drop, Waypoint, set_home, mode_set,
-                        gain_ground_speed, gain_posture_para, force_arm, arm_check, reboot)
+                        gain_ground_speed, gain_posture_para, force_arm, arm_check, reboot, command_retry)
 from pymavlink import mavutil
 import time
 
@@ -7,13 +7,15 @@ import time
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 # the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
-mode_set(the_connection, 0)
+command_retry(the_connection, 'mode_set', 0)
 
 arm_check(the_connection)
 
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
-set_home(the_connection, home_position)
+#command_retry(the_connection, 'set_home', home_position)
+
+command_retry(the_connection, 'arm')
 
 # 测试投弹装置
 if input("输入0测试投弹，输入其他跳过： ") == '0':
