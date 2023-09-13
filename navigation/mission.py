@@ -153,14 +153,6 @@ def delay_eliminate(track_list, time, delay=350):
         return track_list[head+1]
 
 
-# 将三或四个标靶进行区分，以供后续识别信息的读入匹配（新比赛为4， 老比赛为3）
-def target_differentiation(target_list, target_point, precision=0.00005, length=4):
-    # 探测到的目标小于总数，说明还有为探测到的内容
-    if len(target_list) < length:
-        target_list.append(target_point)
-    # 所有标靶已探测到
-
-
 '''
 指定形状航线生成函数
 '''
