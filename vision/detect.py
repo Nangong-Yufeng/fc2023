@@ -109,9 +109,15 @@ def detect(
                 if img_rotated.shape[:2] == (0, 0):  # 未检测到数字正方形
                     continue
 
+                # cv2.imwrite(f'D:/ngyf/crops/r{time.time()}.jpg', img_rotated)
+
                 img_crop = crop(img_rotated)
                 if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形
                     continue
+
+                # cv2.imwrite(f'D:/ngyf/crops/{time.time()}.jpg', img_crop)
+                # img_crop = cv2.cvtColor(img_crop, cv2.COLOR_BGR2GRAY)
+                # cv2.equalizeHist(img_crop, img_crop)
 
                 tmp = int(time.time() * 1000)
                 ret = numrec.recognize(img_crop)

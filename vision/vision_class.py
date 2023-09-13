@@ -55,7 +55,7 @@ class Vision:
         self.im0 = None
         self.cap = cv2.VideoCapture(source)#, cv2.CAP_DSHOW
         print("视觉：设置视频格式")
-        self.cap.set(cv2.CAP_PROP_FPS, 60)
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         print("视觉：设置完成")
@@ -78,5 +78,6 @@ class Vision:
         Return:
              list (vision_position): 标靶中心坐标、数值列表
         """
+        # self.im0 = cv2.resize(self.im0, (1920, 1080))
         im = MyLoadIamge(im0=self.im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
         return detect(im0=self.im0, im=im, model=self.model, conf_thres=self.conf_thres, numrec=self.numrec)
