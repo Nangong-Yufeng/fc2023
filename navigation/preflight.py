@@ -138,7 +138,7 @@ def force_arm(the_connection, times=5):
     count = 0
     while True:
         the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
-                                             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 21196, 0, 0, 0, 0, 0)
+                                             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 2989, 0, 0, 0, 0, 0)
         msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
         print(msg)
 
@@ -158,3 +158,50 @@ def force_arm(the_connection, times=5):
         print("force arm successfully")
     else:
         error_process(the_connection)
+
+
+def arm_check(the_connection):
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                the_connection.target_component,
+                mavutil.mavlink.MAV_CMD_RUN_PREARM_CHECKS, # command
+                0, # confirmation
+                0, # param1
+                0, # param2
+                0, # param3
+                0, # param4
+                0, # param5
+                0, # param6
+                0) # param7
+    msg = the_connection.recv_match(type="SYS_STATUS", blocking=True)
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                         0,  # confirmation
+                                         1,# param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
+
+    print(msg)
+
+
+def reboot(the_connection):
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN,  # command
+                                         0,  # confirmation
+                                         1,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
+    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
+    if msg.result == 0:
+        print("reboot successfully")
+    else:
+        print("reboot failed")
