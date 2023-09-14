@@ -66,3 +66,5 @@ loiter_at_present(the_connection, 100)
 #execute_bomb_course(the_connection, home_position, track_list, gain_position_now(the_connection), wp_target, precision=3, course_len=200, direction=1, radius=200)
 
 mode_set(the_connection, 11)
+
+

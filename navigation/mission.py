@@ -269,16 +269,19 @@ def wp_detect_course(wp, precision, alt):
 '''
 # 自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（默认为逆时针）
 # 修正，采用半圆航线飞至一定距离后，弧形航线进场投弹；后半段航线不变，前半段改变。此方法适用于盘旋侦察，如使用其他侦察航线则需要
-def bombing_course(wp_now, wp_target, precision, course_len, radius, direction=1):
+def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, direction=1):
 
 # 自动生成航路点集
     lat_len = wp_now.lat - wp_target.lat
     lon_len = wp_now.lon - wp_target.lon
+    '''
     theta = math.atan(lat_len / lon_len)
     if lon_len >= 0: # 一四象限
         pass
     else: # 二三象限
         theta += math.pi
+    '''
+    theta = theta * math.pi / 180
 
     # 暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
     # d_lat = 2 * radius * math.sin(theta) * 1e-5
@@ -293,7 +296,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, direction=1
     # 生成两段弧线和一段直线组成的掉头航线
     wp_start = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
     wp_mid = Waypoint(wp_start.lat+s_lat*0.5, wp_start.lon+s_lon*0.5, wp_now.alt)
-    wp_end = Waypoint(wp_target.lat+flyby_lat, wp_target.lon+flyby_lon, 15)
+    wp_end = Waypoint(wp_target.lat+flyby_lat, wp_target.lon+flyby_lon, 40)
     wp_far = Waypoint(wp_now.lat+2*s_lat, wp_now.lon+2*s_lon, wp_now.alt)
 
     half_chord_len = 0.6*radius*1e-5 # 转向处的半弦长
