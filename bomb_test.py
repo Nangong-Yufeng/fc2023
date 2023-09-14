@@ -7,6 +7,12 @@ import time
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 # the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
+while input("gain position: ") != 0:
+    print(input("position inform: "))
+    wp = gain_position_now(the_connection)
+    print(wp.lat, wp.lon)
+
+
 reboot(the_connection)
 
 command_retry(the_connection, 'mode_set', 0)
@@ -15,7 +21,7 @@ arm_check(the_connection)
 
 
 # 设置home点
-home_position = Waypoint(22.5903516, 113.9755156, 0)
+home_position = Waypoint(22.7526209,113.88290509999999, 0)
 #command_retry(the_connection, 'set_home', home_position)
 
 gain_transform_frequency(the_connection)

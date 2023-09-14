@@ -139,10 +139,10 @@ def test_location_transfer(the_connection, track_list):
 
 
 def test_course_bombing(the_connection, home_position):
-    target = Waypoint(22.5904647, 113.9623430,10)
+    target = Waypoint(22.7526211,113.88290509999999,10)
     input("生成航线")
     position = gain_position_now(the_connection)
-    wp_list = bombing_course(position, target, 2,30,10)
+    wp_list = bombing_course(position, target, 2,30,20, 30)
     mission_upload(the_connection, wp_list, home_position)
 
     if input("输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
@@ -232,7 +232,8 @@ if input("输入0测试数传传输频率（大概需要10秒），输入其他�
     print("数传传输频率：", frequency, "Hz")
 
 # 设置home点
-home_position = Waypoint(22.590727599999997, 113.96202369999999, 0)
+#home_position = Waypoint(22.590727599999997, 113.96202369999999, 0)
+home_position = Waypoint(22.7526209 , 13.88290509999999, 0)
 #command_retry(the_connection, 'set_home', home_position)
 
 # 图像参数和初始化
@@ -244,5 +245,5 @@ track_list = []
 command_retry(the_connection, 'arm')
 
 # test_location_transfer(the_connection, track_list)
-# test_course_bombing(the_connection, home_position)
-test_target_selection(the_connection)
+test_course_bombing(the_connection, home_position)
+# test_target_selection(the_connection)
