@@ -23,6 +23,10 @@ def crop(img):
     rects = [(i, cv2.minAreaRect(contour)) for i, contour in enumerate(contours)]
     rects.sort(key=lambda x: x[1][1][0]*x[1][1][1], reverse=True)
 
+    # img = img / 255.0  # 注意255.0得采用浮点数
+    # img = np.power(img, 2.0) * 255.0
+    # img = img.astype(np.uint8)
+
     # 寻找近似为正方形的框，即为数字框
     # 限制正方形的最小面积，避免图中仍有小的黑色正方形框
     # 提取数字所在平行四边形，并变换为正方形
