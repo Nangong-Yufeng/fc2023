@@ -192,7 +192,12 @@ def wp_circle_course(wp, precision, angle, direction=1):
     angle = angle * math.pi / 180 # 转为弧度制
 
     # 注意使用弧度制
-    theta_start = math.atan(lat_len/lon_len)
+    if lon_len == 0 and lat_len > 0:
+        theta_start = math.pi * 0.5
+    elif lon_len == 0 and lat_len < 0:
+        theta_start = math.pi * 1.5
+    else:
+        theta_start = math.atan(lat_len/lon_len)
     if lon_len >= 0: # 一四象限
         pass
     else: # 二三象限
@@ -272,16 +277,17 @@ def wp_detect_course(wp, precision, alt):
 def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, direction=1):
 
 # 自动生成航路点集
+    wp_now.alt = 35
     lat_len = wp_now.lat - wp_target.lat
     lon_len = wp_now.lon - wp_target.lon
-    '''
+
     theta = math.atan(lat_len / lon_len)
     if lon_len >= 0: # 一四象限
         pass
     else: # 二三象限
         theta += math.pi
-    '''
-    theta = theta * math.pi / 180
+
+    #theta = theta * math.pi / 180
 
     # 暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
     # d_lat = 2 * radius * math.sin(theta) * 1e-5
@@ -289,14 +295,14 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
     s_lat = course_len * math.sin(theta) * 1e-5
     s_lon = course_len * math.cos(theta) * 1e-5
     # 将任务结尾设定在越过目标点一定距离的地方
-    flyby_len = 20
+    flyby_len = 30
     flyby_lat = flyby_len*math.sin(theta+math.pi) * 1e-5
     flyby_lon = flyby_len*math.cos(theta+math.pi) * 1e-5
 
     # 生成两段弧线和一段直线组成的掉头航线
     wp_start = Waypoint(wp_now.lat+s_lat, wp_now.lon+s_lon, wp_now.alt)
     wp_mid = Waypoint(wp_start.lat+s_lat*0.5, wp_start.lon+s_lon*0.5, wp_now.alt)
-    wp_end = Waypoint(wp_target.lat+flyby_lat, wp_target.lon+flyby_lon, 40)
+    wp_end = Waypoint(wp_target.lat+flyby_lat, wp_target.lon+flyby_lon, 30)
     wp_far = Waypoint(wp_now.lat+2*s_lat, wp_now.lon+2*s_lon, wp_now.alt)
 
     half_chord_len = 0.6*radius*1e-5 # 转向处的半弦长
@@ -325,7 +331,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
     wp_circle_list.pop(-1)
 
     # 直线进入投弹航线
-    wp_line_list = wp_straight_course(wp_line1, precision)
+    wp_line_list = wp_straight_course(wp_line1, precision+3)
     wp_line_list.pop(-1)
     wp_line_list.extend(wp_straight_course(wp_line2, precision))
 
