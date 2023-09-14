@@ -13,6 +13,7 @@ command_retry(the_connection, 'mode_set', 0)
 
 arm_check(the_connection)
 
+
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
 #command_retry(the_connection, 'set_home', home_position)
