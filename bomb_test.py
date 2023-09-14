@@ -1,5 +1,5 @@
 from navigation import (gain_position_now, bomb_drop, Waypoint, set_home, mode_set,
-                        gain_ground_speed, gain_posture_para, force_arm, arm_check, reboot, command_retry)
+                        gain_ground_speed, gain_posture_para, force_arm, arm_check, reboot, command_retry, gain_transform_frequency)
 from pymavlink import mavutil
 import time
 
@@ -7,13 +7,18 @@ import time
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 # the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
+reboot(the_connection)
+
 command_retry(the_connection, 'mode_set', 0)
 
 arm_check(the_connection)
 
+
 # 设置home点
 home_position = Waypoint(22.5903516, 113.9755156, 0)
 #command_retry(the_connection, 'set_home', home_position)
+
+gain_transform_frequency(the_connection)
 
 command_retry(the_connection, 'arm')
 

@@ -4,6 +4,17 @@ from .error_process import rec_match_received
 
 
 def gain_posture_para(the_connection):
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                         0,  # confirmation
+                                         30,# param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
     msg = rec_match_received(the_connection, 'ATTITUDE')
     pose = posture_inform(msg.time_boot_ms, msg.roll, msg.pitch, msg.yaw,
                           msg.rollspeed, msg.pitchspeed, msg.yawspeed)
@@ -18,8 +29,34 @@ def gain_ground_speed(the_connection):
 
 # 不使用track_point类中姿态的部分
 def gain_position_now(the_connection):
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                               the_connection.target_component,
+                                               512,  # command
+                                               0,  # confirmation
+                                               33,  # param1
+                                               0,  # param2
+                                               0,  # param3
+                                               0,  # param4
+                                               0,  # param5
+                                               0,  # param6
+                                               0)  # param7
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         512,  # command
+                                         0,  # confirmation
+                                         30,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
+    #msg = the_connection.recv_match(type='GLOBAL_POSITION_INT')
     msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
     wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms, 0, 0, 0)
+    msg = rec_match_received(the_connection, 'ATTITUDE')
+    pose = posture_inform(msg.time_boot_ms, msg.roll, msg.pitch, msg.yaw,
+                          msg.rollspeed, msg.pitchspeed, msg.yawspeed)
     return wp_now
 
 
@@ -103,11 +140,12 @@ def gain_transform_frequency(the_connection):
     time_list = []
     count = 0
     fre = 0
-    while count < 3:
-        msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
-        #rec_match_received(the_connection, 'ATTITUDE')
+    while count < 20:
+        msg = gain_position_now(the_connection)
+        #msg = gain_posture_para(the_connection)
+        #msg = gain_track_point(the_connection)
         if len(time_list) <= 50:
-            time_list.append(msg.time_boot_ms)
+            time_list.append(msg.time)
         else:
             frequency = 50 / (time_list[50] - time_list[0]) * 1000
             print("frequency: ", frequency, "\n")
