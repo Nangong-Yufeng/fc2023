@@ -204,6 +204,12 @@ def test_target_selection(the_connection, home_position):
                                                  track.pitch, track.roll, vision_position_list[n].x,
                                                  vision_position_list[n].y, vision_position_list[n].num)
                     print("检测到靶标数字： ", target.number)
+                    print("标靶坐标：lat = ", target.lat, ", lon = ", target.lon, ", num = ", target.number)
+                    print("坐标和姿态：lat = ", track.lat, " lon: ", track.lon, " alt: ", track.alt, " pitch: ",
+                          track.pitch, " yaw: ", track.yaw, " roll: ", track.roll)
+                    with open(file='C:/Users/35032/Desktop/location.txt', mode='a') as f:
+                        f.write("lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.number))
+                        f.write('\n')
                     target_list.append(target)
                     # 该目标是第一次出现
                     if target_dict.get(target.number, -1) < 0:
