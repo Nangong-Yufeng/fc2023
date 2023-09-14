@@ -247,3 +247,4 @@ command_retry(the_connection, 'arm')
 # test_location_transfer(the_connection, track_list)
 test_course_bombing(the_connection, home_position)
 # test_target_selection(the_connection)
+
