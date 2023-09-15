@@ -98,7 +98,6 @@ def process_image_and_pose(track_queue):
 
         # 检测到靶标
         if len(vision_position_list) != 0:
-
           for n in range(len(vision_position_list)):
 
             current_time = int(round(time.time() * 1000)) - TIME_DELAY_MS
