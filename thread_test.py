@@ -79,7 +79,6 @@ def get_attitude_data(track_queue):
                 break
 
 
-
 # 线程2：处理图像、数字后处理和坐标解算
 def process_image_and_pose(track_queue):
     target_list = []
