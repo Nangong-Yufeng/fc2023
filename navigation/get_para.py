@@ -15,7 +15,8 @@ def gain_posture_para(the_connection):
                                          0,  # param5
                                          0,  # param6
                                          0)  # param7
-    msg = rec_match_received(the_connection, 'ATTITUDE')
+    msg = the_connection.recv_match(type='ATTITUDE', blocking=True)
+    #msg = rec_match_received(the_connection, 'ATTITUDE')
     pose = posture_inform(msg.time_boot_ms, msg.roll, msg.pitch, msg.yaw,
                           msg.rollspeed, msg.pitchspeed, msg.yawspeed)
     return pose
@@ -40,8 +41,8 @@ def gain_position_now(the_connection):
                                                0,  # param5
                                                0,  # param6
                                                0)  # param7
-    #msg = the_connection.recv_match(type='GLOBAL_POSITION_INT')
-    msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
+    msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
+    #msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
     wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms, 0, 0, 0)
     return wp_now
 
@@ -107,7 +108,7 @@ def gain_track_of_time(the_connection, track_list, time_last=50):
         track_list.pop(0)
     else:
         pass
-    return [position.time,position.alt]
+    return [position.time, position.alt]
     #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
 
 

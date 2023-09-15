@@ -1,14 +1,22 @@
+import random
+
 from navigation import (gain_position_now, bomb_drop, Waypoint, set_home, mode_set,
-                        gain_ground_speed, gain_posture_para, force_arm, arm_check, reboot, command_retry, gain_transform_frequency)
+                        gain_ground_speed, gain_posture_para, force_arm, arm_check, reboot, command_retry, gain_transform_frequency,
+                        wp_bombing_course, mission_upload, wp_detect_course, wp_circle_course)
 from pymavlink import mavutil
 import time
+while True:
+ t = time.time()
+ print(t)
+ #print(int(round(t * 1000)))
+ time.sleep(1)
 
 # 连接飞行器  device部分，可以在mission planner中成功连接后直接复制过来
-#the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
-the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+# the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
 mode_set(the_connection, 0)
-
+'''
 while input("gain position: ") != 0:
     print(input("position inform: "))
     wp = gain_position_now(the_connection)
@@ -20,15 +28,19 @@ reboot(the_connection)
 command_retry(the_connection, 'mode_set', 0)
 
 arm_check(the_connection)
-
+'''
 
 # 设置home点
 home_position = Waypoint(22.7526209,113.88290509999999, 0)
 #command_retry(the_connection, 'set_home', home_position)
+target2 = Waypoint(22.7525209,113.88280509999999, 0)
+#gain_transform_frequency(the_connection)
 
-gain_transform_frequency(the_connection)
+target = home_position
+course = wp_circle_course([target, target2], angle=200, precision=3)#wp_detect_course(target, 30)
+mission_upload(the_connection, course, home_position)
 
-command_retry(the_connection, 'arm')
+#command_retry(the_connection, 'arm')
 
 # 测试投弹装置
 if input("输入0测试投弹，输入其他跳过： ") == '0':

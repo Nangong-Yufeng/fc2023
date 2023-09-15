@@ -38,6 +38,17 @@ def arm(the_connection, times=5):
        while True:
           the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                              mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0)
+          the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                               the_connection.target_component,
+                                               mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                               0,  # confirmation
+                                               77,  # param1
+                                               0,  # param2
+                                               0,  # param3
+                                               0,  # param4
+                                               0,  # param5
+                                               0,  # param6
+                                               0)  # param7
           msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
 
           if is_none_return(msg) == False:
@@ -57,6 +68,17 @@ def arm(the_connection, times=5):
           return 1
        else:
           print("arm failed")
+          the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                               the_connection.target_component,
+                                               mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                               0,  # confirmation
+                                               24,  # param1
+                                               0,  # param2
+                                               0,  # param3
+                                               0,  # param4
+                                               0,  # param5
+                                               0,  # param6
+                                               0)  # param7
           msg = rec_match_received(the_connection, "GPS_RAW_INT")
           if msg.fix_type == 3 or msg.fix_type == 4:
             if input('解锁失败，但GPS连接正常，输入0以强制解锁: ') == '0':
@@ -79,13 +101,24 @@ def force_arm(the_connection, times=5):
     while True:
         the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                              mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 2989, 0, 0, 0, 0, 0)
-        msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
+        the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                             the_connection.target_component,
+                                             mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                             0,  # confirmation
+                                             77,  # param1
+                                             0,  # param2
+                                             0,  # param3
+                                             0,  # param4
+                                             0,  # param5
+                                             0,  # param6
+                                             0)  # param7
+        msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
 
         if is_none_return(msg) == False:
             result = msg.result
             break
         elif count < times:
-            time.sleep(2)
+            time.sleep(0.5)
             count += 1
             print("receive None msg, retry No.", count)
             result = -1
@@ -107,6 +140,17 @@ def mode_set(the_connection, mode, times=5):
     while True:
        the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0, 1, mode, 0, 0, 0, 0, 0)
+       the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                            the_connection.target_component,
+                                            mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                            0,  # confirmation
+                                            77,  # param1
+                                            0,  # param2
+                                            0,  # param3
+                                            0,  # param4
+                                            0,  # param5
+                                            0,  # param6
+                                            0)  # param7
        msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
 
        if not is_none_return(msg):
@@ -159,6 +203,17 @@ def set_home(the_connection, position_re, times=5, mode=0):
         the_connection.mav.command_int_send(the_connection.target_system, the_connection.target_component, 3,
                                             mavutil.mavlink.MAV_CMD_DO_SET_HOME, 0, 0, mode, 0, 0, 0,
                                             int(position_re.lat * 1e7), int(position_re.lon * 1e7), position_re.alt)
+        the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                             the_connection.target_component,
+                                             mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                             0,  # confirmation
+                                             77,  # param1
+                                             0,  # param2
+                                             0,  # param3
+                                             0,  # param4
+                                             0,  # param5
+                                             0,  # param6
+                                             0)  # param7
         msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, timeout=5)
 
         if is_none_return(msg) == False:
@@ -197,19 +252,18 @@ def arm_check(the_connection):
                 0, # param5
                 0, # param6
                 0) # param7
-    msg = the_connection.recv_match(type="SYS_STATUS", blocking=True)
     the_connection.mav.command_long_send(the_connection.target_system,  # target_system
                                          the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
                                          0,  # confirmation
-                                         1,# param1
+                                         1,  # param1
                                          0,  # param2
                                          0,  # param3
                                          0,  # param4
                                          0,  # param5
                                          0,  # param6
                                          0)  # param7
-
+    msg = the_connection.recv_match(type="SYS_STATUS", blocking=True)
     print(msg)
 
 
@@ -219,6 +273,17 @@ def reboot(the_connection):
                                          mavutil.mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN,  # command
                                          0,  # confirmation
                                          1,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                         0,  # confirmation
+                                         77,  # param1
                                          0,  # param2
                                          0,  # param3
                                          0,  # param4

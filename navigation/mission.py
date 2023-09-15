@@ -4,8 +4,7 @@ from .class_list import Waypoint, track_point
 from .get_para import gain_mission, waypoint_reached, gain_position_now, mission_current, gain_track_of_time, gain_ground_speed, gain_posture_para
 from .preflight import mode_set
 from .error_process import error_process, rec_match_received
-from .trajectory import trajectory_cal
-import time
+CONSTANTS_RADIUS_OF_EARTH = 6371000
 
 '''
 通用任务函数
@@ -156,6 +155,41 @@ def delay_eliminate(track_list, time, delay=500):
 '''
 指定形状航线生成函数
 '''
+def XYtoGPS(x, y, ref_lat, ref_lon):
+    # input GPS and Reference GPS in degrees
+    # output XY in meters (m) X:North Y:East
+    x_rad = float(x) / CONSTANTS_RADIUS_OF_EARTH
+    y_rad = float(y) / CONSTANTS_RADIUS_OF_EARTH
+    c = math.sqrt(x_rad * x_rad + y_rad * y_rad)
+
+    ref_lat_rad = math.radians(ref_lat)
+    ref_lon_rad = math.radians(ref_lon)
+
+    ref_sin_lat = math.sin(ref_lat_rad)
+    ref_cos_lat = math.cos(ref_lat_rad)
+
+    if abs(c) > 0:
+        sin_c = math.sin(c)
+        cos_c = math.cos(c)
+
+        lat_rad = math.asin(cos_c * ref_sin_lat + (x_rad * sin_c * ref_cos_lat) / c)
+        lon_rad = (ref_lon_rad + math.atan2(y_rad * sin_c, c * ref_cos_lat * cos_c - x_rad * ref_sin_lat * sin_c))
+
+        lat = math.degrees(lat_rad)
+        lon = math.degrees(lon_rad)
+
+    else:
+        lat = math.degrees(ref_lat)
+        lon = math.degrees(ref_lon)
+
+    return [lat, lon]
+
+def GPStoDISTANCE(wp1, wp2):
+    C = (math.sin(wp1.lat * math.pi / 180) * math.sin(wp2.lat * math.pi / 180) +
+         math.cos(wp1.lat * math.pi / 180) * math.cos(wp2.lat * math.pi / 180) * math.cos((wp1.lon - wp2.lon) * math.pi / 180))
+    Distance = CONSTANTS_RADIUS_OF_EARTH * math.acos(C) * math.pi / 180
+    return Distance
+
 # 根据上传的两个坐标点，通过自动设置更多的坐标点，生成一个两坐标之间的直线航线
 def wp_straight_course(wp, precision):
 
@@ -188,9 +222,10 @@ def wp_circle_course(wp, precision, angle, direction=1):
     # 半圆因为角度计算关系不能直接用下面的方法，但我懒得加一个专门的半圆航线了
     if angle == 180:
         angle = 179.9
+    # 转为弧度制
+    angle = angle * math.pi / 180
 
-    angle = angle * math.pi / 180 # 转为弧度制
-
+    # 精度差为零时需要单独计算
     # 注意使用弧度制
     if lon_len == 0 and lat_len > 0:
         theta_start = math.pi * 0.5
@@ -198,13 +233,15 @@ def wp_circle_course(wp, precision, angle, direction=1):
         theta_start = math.pi * 1.5
     else:
         theta_start = math.atan(lat_len/lon_len)
-    if lon_len >= 0: # 一四象限
+    if lon_len >= 0: #一四象限
         pass
-    else: # 二三象限
+    else: #二三象限
         theta_start += math.pi
 
     # 计算半径和角度步长
     radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.45 / math.sin(angle*0.5)#非常粗略
+    #r_2 = math.asin(math.sqrt(pow(math.sin(lat_len / 2), 2) + math.cos(wp[1].lat * math.pi / 180) * math.cos(wp[0].lat * math.pi / 180)*pow(lon_len, 2))) * CONSTANTS_RADIUS_OF_EARTH
+    #r_2 = GPStoDISTANCE(wp[0], wp[1])
     theta_step = angle / precision
 
     # 判断圆心位置
@@ -213,19 +250,37 @@ def wp_circle_course(wp, precision, angle, direction=1):
                           wp[0].lon+radius*math.cos(0.5*math.pi+theta_start-0.5*angle),
                           wp[0].alt+0.5*alt_len)
 
+        '''
+        # 新方法
+        [lat, lon] = XYtoGPS(r_2*math.sin(0.5*math.pi+theta_start-0.5*angle),
+                             r_2*math.cos(0.5*math.pi+theta_start-0.5*angle), wp[0].lat, wp[0].lon)
+        center = Waypoint(lat, lon, wp[0].alt+0.5*alt_len)
+        '''
+
     else:
         center = Waypoint(wp[0].lat+radius*math.sin(-0.5*math.pi+theta_start+0.5*angle),
                           wp[0].lon+radius*math.cos(-0.5*math.pi+theta_start+0.5*angle),
                           wp[0].alt+0.5*alt_len)
 
+        '''
+        # 新方法
+        [lat, lon] = XYtoGPS(r_2 * math.sin(-0.5 * math.pi + theta_start + 0.5 * angle),
+                             r_2 * math.cos(-0.5 * math.pi + theta_start + 0.5 * angle), wp[0].lat, wp[0].lon)
+        center = Waypoint(lat, lon, wp[0].alt + 0.5 * alt_len)
+        '''
+
     wp_list = [wp[0]]
     for i in range(0, precision):
         if direction >= 0:
-           theta = (+theta_start - math.pi*0.5 - angle*0.5) + theta_step * (i+1) #顺时针适用
+           theta = (+theta_start - math.pi*0.5 - angle*0.5) + theta_step * (i+1)# 顺时针适用
         else:
-           theta = (+theta_start + math.pi*0.5 + angle*0.5) - theta_step * (i+1) #逆时针适用
+           theta = (+theta_start + math.pi*0.5 + angle*0.5) - theta_step * (i+1)# 逆时针适用
         lat_new = center.lat + radius * math.sin(theta)
         lon_new = center.lon + radius * math.cos(theta)
+
+        # 新方法
+        # [lat_new, lon_new] = XYtoGPS(r_2*math.sin(theta), r_2*math.cos(theta), lat_new, lon_new)
+
         alt_new = wp[0].alt + alt_len / precision * (i+1)
         wp_new = Waypoint(lat_new, lon_new, alt_new)
         # wp_new.show()
@@ -236,8 +291,56 @@ def wp_circle_course(wp, precision, angle, direction=1):
     return wp_list
 
 
-# 根据两个航点，在其中生成操场形侦察航线（视解算正确率进行航线形状修改），主要功能是可以改变高度
-def wp_detect_course(wp, precision, alt):
+# 根据两个航点，在其中生成四瓣型侦察航线（视解算正确率进行航线形状修改），根据靶标与起飞区的相对方向对航点顺序进行调整
+def wp_detect_course(wp, alt, approach_angle='east'):
+    # 生成侦察区四邻域顶点，距中心30米
+    wp_north = Waypoint(wp.lat + 0.0003, wp.lon, alt)
+    wp_west = Waypoint(wp.lat, wp.lon - 0.0003, alt)
+    wp_south = Waypoint(wp.lat - 0.0003, wp.lon, alt)
+    wp_east = Waypoint(wp.lat, wp.lon + 0.0003, alt)
+
+    if approach_angle == 'east':
+        [wp1, wp2, wp3, wp4] = [wp_west, wp_east, wp_south, wp_north]
+    elif approach_angle == 'west':
+        [wp1, wp2, wp3, wp4] = [wp_east, wp_west, wp_north, wp_south]
+    elif approach_angle == 'south':
+        [wp1, wp2, wp3, wp4] = [wp_north, wp_south, wp_west, wp_east]
+    #elif approach_angle == 'north':
+    else:
+        [wp1, wp2, wp3, wp4] = [wp_south, wp_north, wp_east, wp_west]
+
+    line12 = wp_straight_course([wp1, wp2], 2)
+    circle23 = wp_circle_course([wp2, wp3], 4, 270)
+    line34 = wp_straight_course([wp3, wp4], 2)
+    circle42 = wp_circle_course([wp4, wp2], 4, 270)
+    line21 = wp_straight_course([wp2, wp1], 2)
+    circle14 = wp_circle_course([wp1, wp4], 4, 270)
+    line43 = wp_straight_course([wp4, wp3], 2)
+    circle31 = wp_circle_course([wp3, wp1], 4, 270)
+
+    detect_course = line12
+    detect_course.pop(-1)
+    detect_course.extend(circle23)
+    detect_course.pop(-1)
+    detect_course.pop(-1)
+    detect_course.extend(line34)
+    detect_course.pop(-1)
+    detect_course.extend(circle42)
+    detect_course.pop(-1)
+    detect_course.pop(-1)
+    detect_course.extend(line21)
+    detect_course.pop(-1)
+    detect_course.extend(circle14)
+    detect_course.pop(-1)
+    detect_course.pop(-1)
+    detect_course.extend(line43)
+    detect_course.pop(-1)
+    detect_course.extend(circle31)
+    detect_course.pop(-1)
+
+    return detect_course
+
+    '''
     if wp[0].lat - wp[1].lat > 0:
         lat_south = wp[1].lat
         lat_north = wp[0].lat
@@ -267,13 +370,13 @@ def wp_detect_course(wp, precision, alt):
     detect_course.extend(wp_circle_course([wp4, wp1], precision, 180, 1))
     detect_course.pop(-1)
     return detect_course
+    '''
 
 
 '''
 投弹相关函数
 '''
-# 自动生成投弹航线并执行，采用反向飞离然后一字掉头后直线进场的方式，参数可决定转转弯方向（默认为逆时针）
-# 修正，采用半圆航线飞至一定距离后，弧形航线进场投弹；后半段航线不变，前半段改变。此方法适用于盘旋侦察，如使用其他侦察航线则需要
+# 已弃用，见wp_bombing_course
 def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, direction=1):
 
 # 自动生成航路点集
@@ -337,46 +440,68 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 
     wp_bomb_drop = wp_circle_list
     wp_bomb_drop.extend(wp_line_list)
-    '''
-    wp_line1 = [wp_now, wp_start]
-    wp_circle1 = [wp_start, wp1]
-    wp_circle2 = [wp1, wp2]
-    wp_circle3 = [wp2, wp_start]
-    wp_line2 = [wp_start, wp_target]
-    wp_line3 = [wp_target, wp_end]
 
-    #直线开始进入掉头航线
-    wp_line1_list = wp_straight_course(wp_line1, 3)
-    wp_line1_list.pop(0) #起点航线有些奇怪，简单地去掉开头几个航点能让飞机跑的更好，后续加入飞机的方向可能会更好一些
-    wp_line1_list.pop(0)
-    #wp_line1_list = [wp_start]
-
-    #掉头部分航路点
-    wp_circle_list = wp_circle_course(wp_circle1, precision, 30, -direction)
-    wp_circle_list.pop(-1) #取出重复的航点
-    wp_circle_list.extend(wp_circle_course(wp_circle2, 2*precision, 270, direction))
-    wp_circle_list.pop(-1)
-    wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, -direction))
-    wp_circle_list.pop(-1)
-    wp_circle_list.pop(-1)
-
-    #完成掉头进入直线投弹航线
-    wp_line2_list = wp_straight_course(wp_line2, 3)
-    wp_line2_list.pop(-1)
-    wp_line3_list = wp_straight_course(wp_line3, 3)
-
-    wp_bomb_drop = wp_line1_list
-    wp_bomb_drop.extend(wp_circle_list)
-    wp_bomb_drop.extend(wp_line2_list)
-    wp_bomb_drop.extend(wp_line3_list)
-    '''
     return wp_bomb_drop
 
 
-def not_guilty_to_drop_the_bomb(the_connection, wp_target, time):
-    wp_target = Waypoint(-35.35941937, 149.16062729, 0)
-    # 经过投弹解算后认为的落点与目标的距离
-    distance = trajectory_cal(the_connection, 0.5, wp_target)
+# 投弹航线生成，以进场航线指向为主要参数, 角度以正北为零点，逆时针增加0-360
+def wp_bombing_course(wp_target, approach_angle,
+                      length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
+                      precision_circle=4, precision_approach=3, precision_bomb=10, precision_enter=2,
+                      alt_target=10, alt_bomb_start=20, alt_approach=40, alt_left=30):
+    # 转为弧度制
+    approach_angle = (approach_angle - 90) * math.pi / 180
+
+    wp_target.alt = alt_target
+
+    # 生成投弹航线
+    len_north1 = length_bomb * math.sin(approach_angle)
+    len_east1 = length_bomb * math.cos(approach_angle)
+    [lat1, lon1] = XYtoGPS(len_north1, len_east1, ref_lat=wp_target.lat, ref_lon=wp_target.lon)
+    wp_bomb = Waypoint(lat=lat1, lon=lon1, alt=alt_bomb_start)
+    # 生成投弹部分航线
+    '''需要更改为两侧航点'''
+    bomb_line = wp_straight_course([wp_bomb, wp_target], precision_bomb)
+
+    # 生成直线进近航线
+    len_north2 = length_approach * math.sin(approach_angle)
+    len_east2 = length_approach * math.cos(approach_angle)
+    [lat2, lon2] = XYtoGPS(len_north2, len_east2, ref_lat=wp_bomb.lat, ref_lon=wp_bomb.lon)
+    wp_approach = Waypoint(lat=lat2, lon=lon2, alt=alt_approach)
+    approach_line = wp_straight_course([wp_approach, wp_bomb], precision_approach)
+
+    # 生成掉头对准航线
+    len_north3 = 2 * radius * math.sin(approach_angle - 0.5 * math.pi)
+    len_east3 = 2 * radius * math.cos(approach_angle - 0.5 * math.pi)
+    [lat3, lon3] = XYtoGPS(len_north3, len_east3, ref_lat=wp_approach.lat, ref_lon=wp_approach.lon)
+    wp_turn_start = Waypoint(lat=lat3, lon=lon3, alt=alt_approach)
+    turn_circle = wp_circle_course([wp_turn_start, wp_approach], precision_circle, 180)
+
+    # 生成几个航点使飞机更好地进入掉头航线
+    len_north4 = length_enter * math.sin(approach_angle + math.pi)
+    len_east4 = length_enter * math.cos(approach_angle + math.pi)
+    [lat4, lon4] = XYtoGPS(len_north4, len_east4, ref_lat=wp_turn_start.lat, ref_lon=wp_turn_start.lon)
+    wp_enter = Waypoint(lat=lat4, lon=lon4, alt=alt_approach)
+    enter_line = wp_straight_course([wp_enter, wp_turn_start], precision_enter)
+
+    # 生成靶标后航点以保持飞机平飞
+    len_north5 = length_left * math.sin(approach_angle + math.pi)
+    len_east5 = length_left * math.cos(approach_angle + math.pi)
+    [lat5, lon5] = XYtoGPS(len_north5, len_east5, ref_lat=wp_target.lat, ref_lon=wp_target.lon)
+    wp_left = Waypoint(lat=lat5, lon=lon5, alt=alt_left)
+
+    # 生成完整投弹航线
+    bomb_course = enter_line
+    bomb_course.pop(-1)
+    bomb_course.extend(turn_circle)
+    bomb_course.pop(-1)
+    bomb_course.pop(-1)
+    bomb_course.extend(approach_line)
+    bomb_course.pop(-1)
+    bomb_course.extend(bomb_line)
+    bomb_course.append(wp_left)
+
+    return bomb_course
 
 
 # 驱动电机执行投弹动作
@@ -386,7 +511,9 @@ def bomb_drop(the_connection):
     print("bomb away!")
 
 
-# 飞机动作控制函数
+'''
+飞机动作控制函数
+'''
 def loiter_at_present(the_connection, alt):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, -30, 0, 0, 0, alt)
@@ -395,7 +522,7 @@ def loiter_at_present(the_connection, alt):
     if result == 0:
         lat = gain_position_now(the_connection).lat
         lon = gain_position_now(the_connection).lon
-        print("loiter at present of lat: ",lat, "lon: ", lon, "alt: ", alt)
+        print("loiter at present of lat: ", lat, "lon: ", lon, "alt: ", alt)
     else:
        print("loiter failed")
        error_process(the_connection)
