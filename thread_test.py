@@ -11,6 +11,7 @@ from pymavlink import mavutil
 LEN_OF_TARGET_LIST = 100
 TIME_DELAY_MS = 200
 
+
 # 计算目标字典表中存储目标总数
 def length_of_dict(dict):
     value = list(dict.values())
