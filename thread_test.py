@@ -123,12 +123,10 @@ def process_image_and_pose(track_queue):
 
                 # 使用三次多项式插值
                 roll_interp = interp1d(selected_timestamps, [data["roll"] for data in selected_tracks], kind='cubic')
-                pitch_interp = interp1d(selected_timestamps, [data["pitch"] for data in selected_tracks],
-                                        kind='cubic')
+                pitch_interp = interp1d(selected_timestamps, [data["pitch"] for data in selected_tracks], kind='cubic')
                 yaw_interp = interp1d(selected_timestamps, [data["yaw"] for data in selected_tracks], kind='cubic')
                 lat_interp = interp1d(selected_timestamps, [data["lat"] for data in selected_tracks], kind='cubic')
-                lon_interp = interp1d(selected_timestamps, [data["lon"] for data in selected_tracks],
-                                        kind='cubic')
+                lon_interp = interp1d(selected_timestamps, [data["lon"] for data in selected_tracks], kind='cubic')
                 alt_interp = interp1d(selected_timestamps, [data["alt"] for data in selected_tracks], kind='cubic')
 
                 # 获取插值后的姿态数据
