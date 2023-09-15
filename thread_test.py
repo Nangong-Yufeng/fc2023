@@ -107,7 +107,7 @@ def process_image_and_pose(track_queue):
             timestamps, tracks = zip(*list(track_queue.queue))
 
             # 如果有足够的数据点，执行插值
-            if len(tracks) >= 4:
+            if len(tracks) >= 10:
                 # 根据时间戳排序数据点
                 sorted_indices = sorted(range(len(timestamps)), key=lambda i: abs(timestamps[i] - current_time))
 
