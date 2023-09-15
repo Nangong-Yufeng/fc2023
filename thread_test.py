@@ -9,6 +9,7 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
 from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 100
+TIME_DELAY_MS = 200
 
 # 计算目标字典表中存储目标总数
 def length_of_dict(dict):
@@ -73,7 +74,7 @@ def get_attitude_data(track_queue):
         current_time = int(round(time.time() * 1000))
         while not track_queue.empty():
             data = track_queue.get()
-            if current_time - data[1] <= 5.0:  # 假设保留最近1秒的数据点
+            if current_time - data[1] <= 5000:  # 假设保留最近5秒的数据点
                 track_queue.put(data)
                 break
 
@@ -82,7 +83,7 @@ def get_attitude_data(track_queue):
 # 线程2：处理图像、数字后处理和坐标解算
 def process_image_and_pose(track_queue):
     target_list = []
-    target_dict={}
+    target_dict = {}
     vis = Vision(source="D:/ngyf/videos/DJIG0007.mov", device='0', conf_thres=0.7)
     result = -1
     while result < 0:
@@ -100,7 +101,7 @@ def process_image_and_pose(track_queue):
 
           for n in range(len(vision_position_list)):
 
-            current_time = int(round(time.time() * 1000))
+            current_time = int(round(time.time() * 1000)) - TIME_DELAY_MS
 
             # 提取时间戳和对应的姿态数据
             timestamps, tracks = zip(*list(track_queue.queue))
@@ -110,7 +111,7 @@ def process_image_and_pose(track_queue):
                 # 根据时间戳排序数据点
                 sorted_indices = sorted(range(len(timestamps)), key=lambda i: abs(timestamps[i] - current_time))
 
-                # 获取最接近当前时间的10个数据点的索引
+                # 获取最接近指定时间的10个数据点的索引
                 '''
                 需要添加对错误gps信息的剔除
                 '''
