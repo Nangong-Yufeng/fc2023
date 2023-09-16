@@ -245,7 +245,7 @@ def wp_circle_course(wp, precision, angle, direction=1):
     theta_step = angle / precision
 
     # 判断圆心位置
-    if direction >= 0:
+    if (direction >= 0 and angle < 180) or (direction < 0 and angle > 180):
         center = Waypoint(wp[0].lat+radius*math.sin(0.5*math.pi+theta_start-0.5*angle),
                           wp[0].lon+radius*math.cos(0.5*math.pi+theta_start-0.5*angle),
                           wp[0].alt+0.5*alt_len)
@@ -287,6 +287,7 @@ def wp_circle_course(wp, precision, angle, direction=1):
         wp_list.append(wp_new)
         i += 1
 
+    wp_list.pop(-1)
     wp_list.append(wp[1])
     return wp_list
 
@@ -294,12 +295,13 @@ def wp_circle_course(wp, precision, angle, direction=1):
 # 根据两个航点，在其中生成四瓣型侦察航线（视解算正确率进行航线形状修改），根据靶标与起飞区的相对方向对航点顺序进行调整
 def wp_detect_course(wp, alt, approach_angle='east'):
     # 生成侦察区四邻域顶点，距中心30米
-    wp_north = Waypoint(wp.lat + 0.0003, wp.lon, alt)
-    wp_west = Waypoint(wp.lat, wp.lon - 0.0003, alt)
-    wp_south = Waypoint(wp.lat - 0.0003, wp.lon, alt)
-    wp_east = Waypoint(wp.lat, wp.lon + 0.0003, alt)
+    wp_north = Waypoint(wp.lat + 0.0004, wp.lon, alt)
+    wp_west = Waypoint(wp.lat, wp.lon - 0.0004, alt)
+    wp_south = Waypoint(wp.lat - 0.0004, wp.lon, alt)
+    wp_east = Waypoint(wp.lat, wp.lon + 0.0004, alt)
 
     if approach_angle == 'east':
+        print("approaching towards east")
         [wp1, wp2, wp3, wp4] = [wp_west, wp_east, wp_south, wp_north]
     elif approach_angle == 'west':
         [wp1, wp2, wp3, wp4] = [wp_east, wp_west, wp_north, wp_south]
@@ -310,28 +312,25 @@ def wp_detect_course(wp, alt, approach_angle='east'):
         [wp1, wp2, wp3, wp4] = [wp_south, wp_north, wp_east, wp_west]
 
     line12 = wp_straight_course([wp1, wp2], 2)
-    circle23 = wp_circle_course([wp2, wp3], 4, 270)
+    circle23 = wp_circle_course([wp2, wp3], 4, 270, direction=-1)
     line34 = wp_straight_course([wp3, wp4], 2)
-    circle42 = wp_circle_course([wp4, wp2], 4, 270)
+    circle42 = wp_circle_course([wp4, wp2], 4, 270, direction=-1)
     line21 = wp_straight_course([wp2, wp1], 2)
-    circle14 = wp_circle_course([wp1, wp4], 4, 270)
+    circle14 = wp_circle_course([wp1, wp4], 4, 270, direction=-1)
     line43 = wp_straight_course([wp4, wp3], 2)
-    circle31 = wp_circle_course([wp3, wp1], 4, 270)
+    circle31 = wp_circle_course([wp3, wp1], 4, 270, direction=-1)
 
     detect_course = line12
     detect_course.pop(-1)
     detect_course.extend(circle23)
     detect_course.pop(-1)
-    detect_course.pop(-1)
     detect_course.extend(line34)
     detect_course.pop(-1)
     detect_course.extend(circle42)
     detect_course.pop(-1)
-    detect_course.pop(-1)
     detect_course.extend(line21)
     detect_course.pop(-1)
     detect_course.extend(circle14)
-    detect_course.pop(-1)
     detect_course.pop(-1)
     detect_course.extend(line43)
     detect_course.pop(-1)

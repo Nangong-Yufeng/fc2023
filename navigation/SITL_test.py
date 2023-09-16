@@ -33,7 +33,7 @@ wp4 = Waypoint(-35.3654516, 149.1654714, 80)
 wp_target = Waypoint(-35.3600136, 149.1645655, 10)
 
 wp = [wp4, wp2]
-wp_detect = wp_detect_course([wp_target, wp1], 3, 100)
+wp_detect = wp_detect_course(wp1, 30, 'north')
 
 # 起飞并飞往侦察点
 mode_set(the_connection, 13)
@@ -44,14 +44,10 @@ mission_upload(the_connection, wp_detect, home_position)
 
 mode_set(the_connection, 10)
 
-alti = 120
+alti = 20
 while True:
-   wp_detect = wp_detect_course([wp_target, wp1], 5, alti)
-   mission_upload(the_connection, wp_detect, home_position)
    if rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_detect) - 1:
-      time.sleep(2)
-      if alti > 10:
-          alti -= 1
+      continue
    else:
       print("单圈侦察航线完成，自动进行下一圈侦察")
       print("航线高度： ", alti)
