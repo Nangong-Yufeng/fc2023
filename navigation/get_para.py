@@ -1,6 +1,7 @@
 from pymavlink import mavutil
 from .class_list import Position_relative, posture_inform, track_point, speed_inform
 from .error_process import rec_match_received
+import time
 
 
 def gain_posture_para(the_connection):
@@ -132,7 +133,7 @@ def gain_transform_frequency(the_connection):
         #msg = gain_posture_para(the_connection)
         msg = gain_track_point(the_connection)
         if len(time_list) <= 50:
-            time_list.append(msg.time)
+            time_list.append(int(time.time()*1000))
         else:
             frequency = 50 / (time_list[50] - time_list[0]) * 1000
             print("frequency: ", frequency, "\n")
@@ -140,5 +141,3 @@ def gain_transform_frequency(the_connection):
             fre = (frequency + fre * count) / (count+1)
             count += 1
     return fre
-
-

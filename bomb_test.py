@@ -5,15 +5,12 @@ from navigation import (gain_position_now, bomb_drop, Waypoint, set_home, mode_s
                         wp_bombing_course, mission_upload, wp_detect_course, wp_circle_course)
 from pymavlink import mavutil
 import time
-while True:
- t = time.time()
- print(t)
- #print(int(round(t * 1000)))
- time.sleep(1)
 
 # 连接飞行器  device部分，可以在mission planner中成功连接后直接复制过来
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 # the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+
+#gain_transform_frequency(the_connection)
 
 mode_set(the_connection, 0)
 '''
@@ -31,13 +28,13 @@ arm_check(the_connection)
 '''
 
 # 设置home点
-home_position = Waypoint(22.7526209,113.88290509999999, 0)
+home_position = Waypoint(22.7526209, 113.88290509999999, 0)
 #command_retry(the_connection, 'set_home', home_position)
 target2 = Waypoint(22.7525209,113.88280509999999, 0)
 #gain_transform_frequency(the_connection)
 
 target = home_position
-course = wp_circle_course([target, target2], angle=200, precision=3)#wp_detect_course(target, 30)
+course = wp_detect_course(target, 30, approach_angle='north')#wp_circle_course([target, target2], angle=270, precision=3)
 mission_upload(the_connection, course, home_position)
 
 #command_retry(the_connection, 'arm')
