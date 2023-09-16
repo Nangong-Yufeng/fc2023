@@ -5,15 +5,12 @@ from navigation import (gain_position_now, bomb_drop, Waypoint, set_home, mode_s
                         wp_bombing_course, mission_upload, wp_detect_course, wp_circle_course)
 from pymavlink import mavutil
 import time
-while True:
- t = time.time()
- print(t)
- #print(int(round(t * 1000)))
- time.sleep(1)
 
 # 连接飞行器  device部分，可以在mission planner中成功连接后直接复制过来
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 # the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+
+gain_transform_frequency(the_connection)
 
 mode_set(the_connection, 0)
 '''
