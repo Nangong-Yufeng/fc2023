@@ -141,4 +141,3 @@ def gain_transform_frequency(the_connection):
             fre = (frequency + fre * count) / (count+1)
             count += 1
     return fre
-
