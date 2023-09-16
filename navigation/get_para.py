@@ -128,9 +128,9 @@ def gain_transform_frequency(the_connection):
     count = 0
     fre = 0
     while count < 3:
-        msg = gain_position_now(the_connection)
+        #msg = gain_position_now(the_connection)
         #msg = gain_posture_para(the_connection)
-        #msg = gain_track_point(the_connection)
+        msg = gain_track_point(the_connection)
         if len(time_list) <= 50:
             time_list.append(msg.time)
         else:

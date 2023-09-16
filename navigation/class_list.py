@@ -22,6 +22,7 @@ class Waypoint(Position_relative):
         return target_distance
 
 
+
 # 记录飞机航点（含时间信息）
 class track_point(Position_relative):
     def __init__(self, lat, lon, alt, time, roll, pitch, yaw):

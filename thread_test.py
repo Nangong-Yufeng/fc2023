@@ -1,7 +1,7 @@
 import threading
 import queue
 import time
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, UnivariateSpline
 from vision.vision_class import Vision
 from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
                         rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
@@ -66,16 +66,17 @@ def get_attitude_data(track_queue):
     while True:
         # 模拟从传感器中获取姿态数据
         track = gain_track_point(the_connection)
+        print(track.time)
         timestamp = int(round(time.time() * 1000))
 
         # 将姿态数据和时间戳添加到姿态队列中
-        track_queue.put((track, timestamp))
+        track_queue.put((timestamp, track))
 
         # 清除过时的数据点
         current_time = int(round(time.time() * 1000))
         while not track_queue.empty():
             data = track_queue.get()
-            if current_time - data[1] <= 5000:  # 假设保留最近5秒的数据点
+            if current_time - data[0] <= 5000:  # 假设保留最近5秒的数据点
                 track_queue.put(data)
                 break
 
@@ -84,7 +85,7 @@ def get_attitude_data(track_queue):
 def process_image_and_pose(track_queue):
     target_list = []
     target_dict = {}
-    vis = Vision(source="D:/ngyf/videos/DJIG0007.mov", device='0', conf_thres=0.7)
+    vis = Vision(source="D:/ngyf/videos/DJI_0001.MP4", device='0', conf_thres=0.7)
     result = -1
     while result < 0:
         # 图像处理
@@ -97,7 +98,7 @@ def process_image_and_pose(track_queue):
         vision_position_list = vis.run()
 
         # 检测到靶标
-        if len(vision_position_list) != 0:
+        if len(vision_position_list) != 0 and track_queue:
           for n in range(len(vision_position_list)):
 
             current_time = int(round(time.time() * 1000)) - TIME_DELAY_MS
@@ -108,50 +109,63 @@ def process_image_and_pose(track_queue):
             # 如果有足够的数据点，执行插值
             if len(tracks) >= 10:
                 # 根据时间戳排序数据点
-                sorted_indices = sorted(range(len(timestamps)), key=lambda i: abs(timestamps[i] - current_time))
+                sorted_indices = sorted(range(len(timestamps)), key=lambda i: -timestamps[i])
 
                 # 获取最接近指定时间的10个数据点的索引
                 '''
                 需要添加对错误gps信息的剔除
                 '''
-                selected_indices = sorted_indices[:10]
+                selected_indices = sorted_indices[9::-1]
 
                 # 提取选定的数据点
                 selected_tracks = [tracks[i] for i in selected_indices]
                 selected_timestamps = [timestamps[i] for i in selected_indices]
 
+                for i in range(len(selected_timestamps)-1):
+                    if selected_timestamps[i] == selected_timestamps[i+1]:
+                        selected_timestamps[i+1] += 1
+
+                print("time_stamps:", selected_timestamps)
+
                 # 使用三次多项式插值
-                roll_interp = interp1d(selected_timestamps, [data["roll"] for data in selected_tracks], kind='cubic')
-                pitch_interp = interp1d(selected_timestamps, [data["pitch"] for data in selected_tracks], kind='cubic')
-                yaw_interp = interp1d(selected_timestamps, [data["yaw"] for data in selected_tracks], kind='cubic')
-                lat_interp = interp1d(selected_timestamps, [data["lat"] for data in selected_tracks], kind='cubic')
-                lon_interp = interp1d(selected_timestamps, [data["lon"] for data in selected_tracks], kind='cubic')
-                alt_interp = interp1d(selected_timestamps, [data["alt"] for data in selected_tracks], kind='cubic')
-
-                # 获取插值后的姿态数据
-                target = coordinate_transfer(lat_interp(current_time), lon_interp(current_time), alt_interp(current_time), yaw_interp(current_time),
-                                             pitch_interp(current_time), roll_interp(current_time), vision_position_list[n].x,
-                                             vision_position_list[n].y, vision_position_list[n].num)
-                print("检测到靶标数字： ", target.number)
-                print("标靶坐标：lat = ", target.lat, ", lon = ", target.lon, ", num = ", target.number)
-
-                target_list.append(target)
-                target_list.append(target)
-                # 该目标是第一次出现
-                if target_dict.get(target.number, -1) < 0:
-                    target_dict[target.number] = 1
-                # 该目标不是第一次出现，且数量小于指定数量
-                elif target_dict.get(target.number, -1) < 0.3 * LEN_OF_TARGET_LIST:
-                    target_dict[target.number] += 1
-                # 该目标不是第一次出现，但存储数量已经达到指定上限
-                else:
+                roll_interp = UnivariateSpline(selected_timestamps, [data.roll for data in selected_tracks], s=0)
+                pitch_interp = UnivariateSpline(selected_timestamps, [data.pitch for data in selected_tracks],s=0)
+                yaw_interp = UnivariateSpline(selected_timestamps, [data.yaw for data in selected_tracks], s=0)
+                lat_interp = UnivariateSpline(selected_timestamps, [data.lat for data in selected_tracks], s=0)
+                lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=0)
+                alt_interp = UnivariateSpline(selected_timestamps, [data.alt for data in selected_tracks], s=0)
+                # 视觉识别成功但数字识别失败
+                if vision_position_list[n].num < 0:
                     continue
-                # 如果超出设定范围，删除数量最少的一项
-                eliminate_error_target(target_dict)
+                # 数字识别得到结果
+                else:
+                    # 获取插值后的姿态数据
+                    target = coordinate_transfer(lat_interp(current_time), lon_interp(current_time), alt_interp(current_time), yaw_interp(current_time),
+                                                pitch_interp(current_time), roll_interp(current_time), vision_position_list[n].x,
+                                                vision_position_list[n].y, vision_position_list[n].num)
+                    print("检测到靶标数字： ", target.number)
+                    print("标靶坐标：lat = ", target.lat, ", lon = ", target.lon, ", num = ", target.number)
+                    print("飞机位姿： ", lat_interp(current_time), lon_interp(current_time), alt_interp(current_time), yaw_interp(current_time),
+                                                pitch_interp(current_time), roll_interp(current_time), vision_position_list[n].x,
+                                                vision_position_list[n].y, vision_position_list[n].num)
 
-                # 判定侦察任务是否完成， 若得到探测结果，传入target列表，长度为3
-                target_result = detect_completed(target_dict)
-                result = target_result[0]
+                    target_list.append(target)
+                    target_list.append(target)
+                    # 该目标是第一次出现
+                    if target_dict.get(target.number, -1) < 0:
+                       target_dict[target.number] = 1
+                    # 该目标不是第一次出现，且数量小于指定数量
+                    elif target_dict.get(target.number, -1) < 0.3 * LEN_OF_TARGET_LIST:
+                       target_dict[target.number] += 1
+                    # 该目标不是第一次出现，但存储数量已经达到指定上限
+                    else:
+                        continue
+                    # 如果超出设定范围，删除数量最少的一项
+                    eliminate_error_target(target_dict)
+
+                 # 判定侦察任务是否完成， 若得到探测结果，传入target列表，长度为3
+                    target_result = detect_completed(target_dict)
+                    result = target_result[0]
             else:
                 continue
 
@@ -162,11 +176,11 @@ def process_image_and_pose(track_queue):
 
 # 线程3：航点任务循环
 def detect_mission_circling(the_connection):
-    pass
+    gain_transform_frequency(the_connection)
 
 
 if __name__ == "__main__":
-    the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+    the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
     track_queue = queue.Queue()  # 使用队列来存储姿态数据
 
