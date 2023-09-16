@@ -81,7 +81,7 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vis
 
     pixel_coords = [vision_x, vision_y]  # 点在相机坐标系中的像素位置
 
-    print(f'pixel_coords: {pixel_coords}')
+    # print(f'pixel_coords: {pixel_coords}')
     # 相机原始内参矩阵cameraMatrix
     cameraMatrix = np.array(
         [
@@ -96,7 +96,7 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vis
     # 计算旋转矩阵
     rc = camera_pose.get_rotation_matrix()
 
-    print(f'rc: {rc}')
+    # print(f'rc: {rc}')
 
     # 对于地面坐标系xoy，若x指向东方，y指向北方
     # 对于飞机，x轴指向正北，y轴指向正东， z轴指向正上
@@ -107,12 +107,22 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vis
     newCameraarray, _ = cv2.getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, (1920, 1080), 1.7, (1920, 1080), True)
 
     # 假设要获取的像素坐标为 (x, y)
-    distortedPoint = np.array([[pixel_coords]], dtype=np.float32)  # 输入点  
+    distortedPoint = np.array([[pixel_coords]], dtype=np.float32)  # 输入点
 
     # undistortedPoint就是去畸变后的点[x,y]，尺寸为1080*1920
     undistortedPoint = \
     cv2.fisheye.undistortPoints(distortedPoint, cameraMatrix, distCoeffs, np.eye(3), newCameraarray)[0][0]
-    print(f'undistortedPoint: {undistortedPoint}')
+    # print(f'undistortedPoint: {undistortedPoint}')
+    with open(file='C:/Users/35032/Desktop/transfer.txt', mode='a') as f:
+        f.write("lat: " + str(lat) + " lon: " + str(lon) + " alt: " + str(alt) + " num: " + str(vision_num))
+        f.write('\n')
+        f.write(" pitch: " + str(pitch) + " roll: " + str(roll) + " yaw: " + str(yaw))
+        f.write('\n')
+        f.write(str(f'undistortedPoint: {undistortedPoint}'))
+        f.write('\n')
+        f.write(str(f'pixel_coords: {pixel_coords}'))
+        f.write('\n')
+
     newCameraMatrix = np.mat(newCameraarray)
 
     from math import cos, sin

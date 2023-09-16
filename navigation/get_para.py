@@ -132,8 +132,9 @@ def gain_transform_frequency(the_connection):
         #msg = gain_position_now(the_connection)
         #msg = gain_posture_para(the_connection)
         msg = gain_track_point(the_connection)
+        print(msg.time)
         if len(time_list) <= 50:
-            time_list.append(int(time.time()*1000))
+            time_list.append(msg.time)
         else:
             frequency = 50 / (time_list[50] - time_list[0]) * 1000
             print("frequency: ", frequency, "\n")

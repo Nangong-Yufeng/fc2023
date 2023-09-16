@@ -121,7 +121,7 @@ def detect(
 
                 tmp = int(time.time() * 1000)
                 ret = numrec.recognize(img_crop)
-                print("数字识别时间： ", int(time.time() * 1000) - tmp)
+                #print("数字识别时间： ", int(time.time() * 1000) - tmp)
                 if ret != -1:
                     print(f'检测到数字: {ret}')
                 res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=ret))
