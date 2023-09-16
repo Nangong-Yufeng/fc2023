@@ -13,8 +13,8 @@ from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 100
 TIME_DELAY_MS = 200
-wp_detect = Waypoint(22.5899275, 113.9751526, 30)
-wp_home = Waypoint(22.5899275, 113.9751526, 0)
+wp_detect = Waypoint(22.8024229, 113.94126109999999, 30)
+wp_home = Waypoint(22.8024229, 113.94126109999999, 0)
 
 '''
 线程1：获取姿态数据并生成带时间戳的姿态序列
@@ -26,7 +26,7 @@ def get_attitude_data(track_queue, detect_result):
     while not detect_result.empty():
         # 获取位姿态数据
         track = gain_track_point(the_connection)
-        print("线程1运行： ", track.time)
+        # print("线程1运行： ", track.time)
         timestamp = track.time + time_gap
 
         # 将姿态数据和时间戳添加到姿态队列中
@@ -46,7 +46,7 @@ def get_attitude_data(track_queue, detect_result):
 def process_image_and_pose(track_queue, detect_result):
     target_list = []
     target_dict = {}
-    vis = Vision(source="D:/ngyf/videos/DJI_0001.MP4", device='0', conf_thres=0.7)
+    vis = Vision(source=0, device='0', conf_thres=0.7)#"D:/ngyf/videos/DJI_0001.MP4"
     result = -1
     while result < 0:
         # 图像处理
@@ -146,13 +146,14 @@ def detect_mission_circling(the_connection, detect_result):
     set_home(the_connection, wp_home)
 
     # 设置模式为纯手动
-    # command_retry(the_connection, 'mode_set', 0)
+    command_retry(the_connection, 'mode_set', 0)
 
     # 解锁飞机
-    # arm(the_connection)
+
+    arm(the_connection)
 
     # 生成并上传任务
-    detect_course = wp_detect_course(wp_detect, 30)
+    detect_course = wp_detect_course(wp_detect, 30, 'north')
     mission_upload(the_connection, detect_course, wp_home)
 
     # 切换自动飞行
@@ -179,14 +180,6 @@ if __name__ == "__main__":
     with open(file='C:/Users/35032/Desktop/transfer.txt', mode='a') as f:
         f.write("time_delay" + str(TIME_DELAY_MS))
 
-    while input("输入任意内容获取坐标, 输入0结束： ") != '0':
-        name = input("坐标标签： ")
-        wp = gain_position_now(the_connection)
-        print(name + "lat:", wp.lat, " lon:", wp.lon, " alt: ", wp.alt)
-        with open(file='C:/Users/35032/Desktop/transfer.txt', mode='a') as f:
-            f.write(name + "lat:" + wp.lat + " lon:" + wp.lon + " alt: " + wp.alt)
-
-
     track_queue = queue.Queue()  # 使用队列来存储姿态数据
     detect_result = queue.Queue()
     detect_result.put(-1)
@@ -196,12 +189,12 @@ if __name__ == "__main__":
     image_thread = threading.Thread(target=process_image_and_pose, args=(track_queue, detect_result))
     mission_thread = threading.Thread(target=detect_mission_circling, args=(the_connection, detect_result))
 
-    attitude_thread.start()
-    image_thread.start()
+    #attitude_thread.start()
+    #image_thread.start()
     mission_thread.start()
 
-    attitude_thread.join()
-    image_thread.join()
+    #attitude_thread.join()
+    #image_thread.join()
     mission_thread.join()
 
     if detect_result.empty():

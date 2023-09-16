@@ -238,9 +238,10 @@ def test_target_selection(the_connection, home_position):
 '''
 the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
-command_retry(the_connection, 'mode_set', 0)
+# command_retry(the_connection, 'mode_set', 0)
 
-if input("输入O获取坐标, 输入其他跳过： ") == '0':
+while input("输入O获取坐标, 输入其他跳过： ") == '0':
+    print(input("位置信息： "))
     wp = gain_position_now(the_connection)
     print("坐标 lat:", wp.lat, " lon:", wp.lon, " alt: ", wp.alt)
 

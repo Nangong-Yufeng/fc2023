@@ -296,10 +296,10 @@ def wp_circle_course(wp, precision, angle, direction=1):
 # 根据两个航点，在其中生成四瓣型侦察航线（视解算正确率进行航线形状修改），根据靶标与起飞区的相对方向对航点顺序进行调整
 def wp_detect_course(wp, alt, approach_angle='east'):
     # 生成侦察区四邻域顶点，距中心30米
-    wp_north = Waypoint(wp.lat + 0.0004, wp.lon, alt)
-    wp_west = Waypoint(wp.lat, wp.lon - 0.0004, alt)
-    wp_south = Waypoint(wp.lat - 0.0004, wp.lon, alt)
-    wp_east = Waypoint(wp.lat, wp.lon + 0.0004, alt)
+    wp_north = Waypoint(wp.lat + 0.0003, wp.lon, alt)
+    wp_west = Waypoint(wp.lat, wp.lon - 0.0003, alt)
+    wp_south = Waypoint(wp.lat - 0.0003, wp.lon, alt)
+    wp_east = Waypoint(wp.lat, wp.lon + 0.0003, alt)
 
     if approach_angle == 'east':
         print("approaching towards east")
@@ -313,13 +313,13 @@ def wp_detect_course(wp, alt, approach_angle='east'):
         [wp1, wp2, wp3, wp4] = [wp_south, wp_north, wp_east, wp_west]
 
     line12 = wp_straight_course([wp1, wp2], 2)
-    circle23 = wp_circle_course([wp2, wp3], 4, 270, direction=-1)
+    circle23 = wp_circle_course([wp2, wp3], 3, 270, direction=-1)
     line34 = wp_straight_course([wp3, wp4], 2)
-    circle42 = wp_circle_course([wp4, wp2], 4, 270, direction=-1)
+    circle42 = wp_circle_course([wp4, wp2], 3, 270, direction=-1)
     line21 = wp_straight_course([wp2, wp1], 2)
-    circle14 = wp_circle_course([wp1, wp4], 4, 270, direction=-1)
+    circle14 = wp_circle_course([wp1, wp4], 3, 270, direction=-1)
     line43 = wp_straight_course([wp4, wp3], 2)
-    circle31 = wp_circle_course([wp3, wp1], 4, 270, direction=-1)
+    circle31 = wp_circle_course([wp3, wp1], 3, 270, direction=-1)
 
     detect_course = line12
     detect_course.pop(-1)

@@ -53,7 +53,7 @@ class Vision:
         # 加载摄像头
         print("视觉：加载摄像头")
         self.im0 = None
-        self.cap = cv2.VideoCapture(source)#, cv2.CAP_DSHOW
+        self.cap = cv2.VideoCapture(source, cv2.CAP_DSHOW)#
         print("视觉：设置视频格式")
         self.cap.set(cv2.CAP_PROP_FPS, 30)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
