@@ -8,13 +8,13 @@ from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_s
                         rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
                         loiter_at_present, delay_eliminate, coordinate_transfer, gain_track_point,
                         length_of_dict, detect_completed, eliminate_error_target, command_retry,
-                        gain_position_now)
+                        gain_position_now,set_ground_speed)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 100
-TIME_DELAY_MS = 200
-wp_detect = Waypoint(22.8024229, 113.94126109999999, 30)
-wp_home = Waypoint(22.8024229, 113.94126109999999, 0)
+TIME_DELAY_MS = 300
+wp_detect = Waypoint(22.8027223, 114.2960957, 30)
+wp_home = Waypoint(22.8027619, 114.2959589, 0)
 
 '''
 线程1：获取姿态数据并生成带时间戳的姿态序列
@@ -143,7 +143,7 @@ def process_image_and_pose(track_queue, detect_result):
 线程3：航点任务循环
 '''
 def detect_mission_circling(the_connection, detect_result):
-    set_home(the_connection, wp_home)
+    #set_home(the_connection, wp_home)
 
     # 设置模式为纯手动
     command_retry(the_connection, 'mode_set', 0)
@@ -152,18 +152,17 @@ def detect_mission_circling(the_connection, detect_result):
 
     arm(the_connection)
 
-    # 生成并上传任务
-    detect_course = wp_detect_course(wp_detect, 30, 'north')
-    mission_upload(the_connection, detect_course, wp_home)
-
     # 切换自动飞行
     if input("输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
         command_retry(the_connection, 'mode_set', 10)
 
+    set_ground_speed(the_connection, 15)
+
     # 侦察部分航线
     while not detect_result.empty():
-        if rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(detect_course):
+        '''if rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(detect_course):
             continue
+        '''
         command_retry(the_connection, 'mode_set', 10)
         print("next detect circle")
 
@@ -175,10 +174,15 @@ if __name__ == "__main__":
     '''
     title.printTitle()
 
-    the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+    the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
+    print(the_connection.target_system, the_connection.target_component)
 
     with open(file='C:/Users/35032/Desktop/transfer.txt', mode='a') as f:
         f.write("time_delay" + str(TIME_DELAY_MS))
+
+    # 生成并上传任务
+    detect_course = wp_detect_course(wp_detect, 16, 'north')
+    mission_upload(the_connection, detect_course, wp_home)
 
     track_queue = queue.Queue()  # 使用队列来存储姿态数据
     detect_result = queue.Queue()
@@ -189,13 +193,14 @@ if __name__ == "__main__":
     image_thread = threading.Thread(target=process_image_and_pose, args=(track_queue, detect_result))
     mission_thread = threading.Thread(target=detect_mission_circling, args=(the_connection, detect_result))
 
-    #attitude_thread.start()
-    #image_thread.start()
+    attitude_thread.start()
+    image_thread.start()
     mission_thread.start()
 
-    #attitude_thread.join()
-    #image_thread.join()
+    attitude_thread.join()
+    image_thread.join()
     mission_thread.join()
 
     if detect_result.empty():
         print("侦察任务完成！")
+        loiter_at_present(the_connection, 50)

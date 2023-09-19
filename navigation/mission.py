@@ -12,9 +12,12 @@ LEN_OF_TARGET_LIST = 100
 '''
 
 def send_mission_list(the_connection, wp):
-    wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
-                                                            the_connection.target_component, len(wp),
-                                                            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+    print(the_connection.target_system, the_connection.target_component, len(wp), mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+    args = (the_connection.target_system,
+           the_connection.target_component,
+           len(wp))#, mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+    print(args)
+    wp_list = mavutil.mavlink.MAVLink_mission_count_message(*args)
     the_connection.mav.send(wp_list)
 
 
@@ -296,10 +299,10 @@ def wp_circle_course(wp, precision, angle, direction=1):
 # 根据两个航点，在其中生成四瓣型侦察航线（视解算正确率进行航线形状修改），根据靶标与起飞区的相对方向对航点顺序进行调整
 def wp_detect_course(wp, alt, approach_angle='east'):
     # 生成侦察区四邻域顶点，距中心30米
-    wp_north = Waypoint(wp.lat + 0.0003, wp.lon, alt)
-    wp_west = Waypoint(wp.lat, wp.lon - 0.0003, alt)
-    wp_south = Waypoint(wp.lat - 0.0003, wp.lon, alt)
-    wp_east = Waypoint(wp.lat, wp.lon + 0.0003, alt)
+    wp_north = Waypoint(wp.lat + 0.0004, wp.lon, alt)
+    wp_west = Waypoint(wp.lat, wp.lon - 0.0004, alt)
+    wp_south = Waypoint(wp.lat - 0.0004, wp.lon, alt)
+    wp_east = Waypoint(wp.lat, wp.lon + 0.0004, alt)
 
     if approach_angle == 'east':
         print("approaching towards east")
@@ -416,7 +419,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 def wp_bombing_course(wp_target, approach_angle,
                       length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
                       precision_circle=4, precision_approach=3, precision_bomb=10, precision_enter=2,
-                      alt_target=10, alt_bomb_start=20, alt_approach=40, alt_left=30):
+                      alt_target=7, alt_bomb_start=10, alt_approach=14, alt_left=15):
     # 转为弧度制
     approach_angle = (approach_angle - 90) * math.pi / 180
 
@@ -462,7 +465,6 @@ def wp_bombing_course(wp_target, approach_angle,
     bomb_course = enter_line
     bomb_course.pop(-1)
     bomb_course.extend(turn_circle)
-    bomb_course.pop(-1)
     bomb_course.pop(-1)
     bomb_course.extend(approach_line)
     bomb_course.pop(-1)
