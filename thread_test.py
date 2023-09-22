@@ -88,6 +88,7 @@ def process_image_and_pose(track_queue, detect_result):
                 selected_tracks = [tracks[i] for i in selected_indices]
                 selected_timestamps = [timestamps[i] for i in selected_indices]
 
+                # 强制数据递增
                 for i in range(len(selected_timestamps)-1):
                     if selected_timestamps[i] == selected_timestamps[i+1]:
                         selected_timestamps[i+1] += 1
@@ -113,7 +114,7 @@ def process_image_and_pose(track_queue, detect_result):
                                                 vision_position_list[n].y, vision_position_list[n].num)
 
                 target_list.append(target)
-                target_list.append(target)
+
                 # 该目标是第一次出现
                 if target_dict.get(target.number, -1) < 0:
                     target_dict[target.number] = 1
@@ -165,7 +166,6 @@ def detect_mission_circling(the_connection, detect_result):
         '''
         command_retry(the_connection, 'mode_set', 10)
         print("next detect circle")
-
 
 
 if __name__ == "__main__":

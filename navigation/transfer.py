@@ -22,7 +22,7 @@ def pixel_to_world(camera_intrinsics, camera_rotation, camera_position, img_poin
     # (2) t: 在世界坐标系中 A系原点 的位置向量
     # (3) 假设x是相机坐标系下世界原点的坐标，由(1)可得：r*x表示该点在A系下的坐标
     # (4) 由(2)可得，在A系中 世界坐标系原点 的位置向量是 -t，即 r*x = -t
-    # 则 x = r.I * r * x = r.I * -t = - r.I * t 
+    # 则 x = r.I * r * x = r.I * -t = - r.I * t
     T = -R_inv.I.dot(camera_position)
 
     Z_w = 0
