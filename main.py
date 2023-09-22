@@ -154,7 +154,6 @@ def process_image_and_pose(track_queue, detect_result):
 
     target1 = target_transfer(time_target_dict=time_target_dict, target_time=target_time, timestamps=timestamps,
                               tracks=tracks, vision_inform=vision_inform, num=num1, delay=TIME_DELAY_MS)
-
     '''
     基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
     '''
