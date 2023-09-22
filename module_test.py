@@ -4,7 +4,7 @@
 from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
                         rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
                         loiter_at_present, delay_eliminate, coordinate_transfer, gain_position_now, gain_ground_speed,
-                        gain_posture_para,bombing_course, mission_current, bomb_drop, command_retry)
+                        gain_posture_para,bombing_course, mission_current, bomb_drop, command_retry, loiter, wp_bombing_course)
 from pymavlink import mavutil
 from vision.vision_class import Vision
 import time
@@ -139,19 +139,25 @@ def test_location_transfer(the_connection, track_list):
 
 
 def test_course_bombing(the_connection, home_position):
-    target = Waypoint(22.752855999999997, 113.88290649999999, 10)
-    input("生成航线")
+    target = Waypoint(22.8025801, 114.2961667, 5)
     #position = gain_position_now(the_connection)
-    position = Waypoint(22.7521324, 113.8828353, 35)
+    position = Waypoint(22.8025382, 114.2961525, 50)
+
     #print("wp_now lat: ", position.lat, " lon: ", position.lon, " alt: ", position.alt)
-    wp_list = bombing_course(position, target, 2, 80, 80, theta=180)
+    wp_list = wp_bombing_course(target, 180)
     mission_upload(the_connection, wp_list, home_position)
 
-    if input("输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
+    command_retry(the_connection, 'arm')
+
+    # input("盘旋")
+    # loiter(the_connection, position)
+
+    if input("输入0切换自动模式开始投弹任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
         mode_set(the_connection, 10)
 
-    while mission_current(the_connection) < len(wp_list) - 6:
+    while mission_current(the_connection) < len(wp_list) - 13:
         pass
+        print(mission_current(the_connection))
     bomb_drop(the_connection)
 
 
@@ -159,7 +165,7 @@ def test_course_bombing(the_connection, home_position):
 # 测试 过程淘汰 算法的正确性
 def test_target_selection(the_connection, home_position):
     wp1 = Waypoint(22.7528506, 113.88279299999999, 30)
-    wp2 = Waypoint(22.7527099, 113.88314, 30)
+    wp2 = Waypoint(22.8025382, 114.2961525, 30)
     wp = [wp1, wp2]
     detect_course = wp_detect_course(wp, 2, 30)
     mission_upload(the_connection, detect_course, home_position)
@@ -236,11 +242,13 @@ def test_target_selection(the_connection, home_position):
 '''
 测试进程
 '''
-the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
+print(the_connection.target_system, the_connection.target_component)
 
-command_retry(the_connection, 'mode_set', 0)
+# command_retry(the_connection, 'mode_set', 0)
 
 if input("输入O获取坐标, 输入其他跳过： ") == '0':
+    print(input("位置信息： "))
     wp = gain_position_now(the_connection)
     print("坐标 lat:", wp.lat, " lon:", wp.lon, " alt: ", wp.alt)
 
@@ -250,11 +258,11 @@ if input("输入0测试数传传输频率（大概需要10秒），输入其他�
 
 # 设置home点
 #home_position = Waypoint(22.590727599999997, 113.96202369999999, 0)
-home_position = Waypoint(22.7526209 , 113.88290509999999, 0)
-command_retry(the_connection, 'set_home', home_position)
+home_position = Waypoint(22.8027619, 114.2959589, 0)
+#command_retry(the_connection, 'set_home', home_position)
 
 # 图像参数和初始化
-vis = Vision(source=0, device='0', conf_thres=0.7)
+#vis = Vision(source=0, device='0', conf_thres=0.7)
 #vis = Vision(source="D:/ngyf/videos/DJIG0007.mov", device='0', conf_thres=0.7)
 
 track_list = []
@@ -262,6 +270,6 @@ track_list = []
 command_retry(the_connection, 'arm')
 
 # test_location_transfer(the_connection, track_list)
-#test_course_bombing(the_connection, home_position)
-test_target_selection(the_connection, home_position)
+test_course_bombing(the_connection, home_position)
+# test_target_selection(the_connection, home_position)
 

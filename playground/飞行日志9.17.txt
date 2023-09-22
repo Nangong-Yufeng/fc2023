@@ -1,0 +1,6 @@
+time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200time_delay200lat: 22.802646855955967 lon: 114.29591513659855 alt: 12.778615336565666 num: 87
+
+middle： 22.8027223， 114.2960957
+num64： 22.8025801， 114.2961667
+num32： 22.8028447， 114.2961855
+num87： 22.8027841， 114.2959642

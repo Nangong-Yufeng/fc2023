@@ -92,6 +92,17 @@ def gain_mission(vehicle):
 
 
 def mission_current(the_connection):
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         512,  # command
+                                         0,  # confirmation
+                                         42,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
     mission_msg = rec_match_received(the_connection, "MISSION_CURRENT")
     return mission_msg.seq
 
@@ -131,7 +142,9 @@ def gain_transform_frequency(the_connection):
     while count < 3:
         #msg = gain_position_now(the_connection)
         #msg = gain_posture_para(the_connection)
-        msg = gain_track_point(the_connection)
+        print(mission_current(the_connection))
+        #msg = gain_track_point(the_connection)
+        #print(int(time.time()*1000))
         if len(time_list) <= 50:
             time_list.append(int(time.time()*1000))
         else:

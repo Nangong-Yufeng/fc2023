@@ -5,15 +5,19 @@ from .get_para import gain_mission, waypoint_reached, gain_position_now, mission
 from .preflight import mode_set
 from .error_process import error_process, rec_match_received
 CONSTANTS_RADIUS_OF_EARTH = 6371000
+LEN_OF_TARGET_LIST = 100
 
 '''
 通用任务函数
 '''
 
 def send_mission_list(the_connection, wp):
-    wp_list = mavutil.mavlink.MAVLink_mission_count_message(the_connection.target_system,
-                                                            the_connection.target_component, len(wp),
-                                                            mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+    print(the_connection.target_system, the_connection.target_component, len(wp), mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+    args = (the_connection.target_system,
+           the_connection.target_component,
+           len(wp))#, mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+    print(args)
+    wp_list = mavutil.mavlink.MAVLink_mission_count_message(*args)
     the_connection.mav.send(wp_list)
 
 
@@ -312,13 +316,13 @@ def wp_detect_course(wp, alt, approach_angle='east'):
         [wp1, wp2, wp3, wp4] = [wp_south, wp_north, wp_east, wp_west]
 
     line12 = wp_straight_course([wp1, wp2], 2)
-    circle23 = wp_circle_course([wp2, wp3], 4, 270, direction=-1)
+    circle23 = wp_circle_course([wp2, wp3], 3, 270, direction=-1)
     line34 = wp_straight_course([wp3, wp4], 2)
-    circle42 = wp_circle_course([wp4, wp2], 4, 270, direction=-1)
+    circle42 = wp_circle_course([wp4, wp2], 3, 270, direction=-1)
     line21 = wp_straight_course([wp2, wp1], 2)
-    circle14 = wp_circle_course([wp1, wp4], 4, 270, direction=-1)
+    circle14 = wp_circle_course([wp1, wp4], 3, 270, direction=-1)
     line43 = wp_straight_course([wp4, wp3], 2)
-    circle31 = wp_circle_course([wp3, wp1], 4, 270, direction=-1)
+    circle31 = wp_circle_course([wp3, wp1], 3, 270, direction=-1)
 
     detect_course = line12
     detect_course.pop(-1)
@@ -338,38 +342,6 @@ def wp_detect_course(wp, alt, approach_angle='east'):
     detect_course.pop(-1)
 
     return detect_course
-
-    '''
-    if wp[0].lat - wp[1].lat > 0:
-        lat_south = wp[1].lat
-        lat_north = wp[0].lat
-    else:
-        lat_south = wp[0].lat
-        lat_north = wp[1].lat
-
-    if wp[0].lon - wp[1].lon > 0:
-        lon_west = wp[1].lon
-        lon_east = wp[0].lon
-    else:
-        lon_west = wp[0].lon
-        lon_east = wp[1].lon
-
-    # 有必要根据比赛场地的方向关系修改
-    wp1 = Waypoint(lat_south, lon_west, alt)
-    wp2 = Waypoint(lat_south, lon_east, alt)
-    wp3 = Waypoint(lat_north, lon_east, alt)
-    wp4 = Waypoint(lat_north, lon_west, alt)
-
-    detect_course = wp_straight_course([wp1, wp2], precision)
-    detect_course.pop(-1)
-    detect_course.extend(wp_circle_course([wp2, wp3], precision, 180, 1))
-    detect_course.pop(-1)
-    detect_course.extend(wp_straight_course([wp3, wp4], precision))
-    detect_course.pop(-1)
-    detect_course.extend(wp_circle_course([wp4, wp1], precision, 180, 1))
-    detect_course.pop(-1)
-    return detect_course
-    '''
 
 
 '''
@@ -447,7 +419,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 def wp_bombing_course(wp_target, approach_angle,
                       length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
                       precision_circle=4, precision_approach=3, precision_bomb=10, precision_enter=2,
-                      alt_target=10, alt_bomb_start=20, alt_approach=40, alt_left=30):
+                      alt_target=7, alt_bomb_start=10, alt_approach=14, alt_left=15):
     # 转为弧度制
     approach_angle = (approach_angle - 90) * math.pi / 180
 
@@ -493,7 +465,6 @@ def wp_bombing_course(wp_target, approach_angle,
     bomb_course = enter_line
     bomb_course.pop(-1)
     bomb_course.extend(turn_circle)
-    bomb_course.pop(-1)
     bomb_course.pop(-1)
     bomb_course.extend(approach_line)
     bomb_course.pop(-1)
@@ -570,3 +541,55 @@ def yard_fly(the_connection, wp, home_position, track_list):
       loiter(the_connection, home_position)
       if input("输入0进行下一圈： ") == '0':
           pass
+
+
+'''
+数字后处理算法函数
+'''
+# 计算目标字典表中存储目标总数
+def length_of_dict(dict):
+    value = list(dict.values())
+    length = 0
+    for n in range(len(value)):
+        length += value[n]
+
+    # 调试用
+    print("识别到目标总数： ", length)
+    return length
+
+
+# 判定是否完成了识别目标
+def detect_completed(dict):
+    key = list(dict.keys())
+    key.sort(key=dict.get, reverse=True)
+    if len(key) >= 3:
+        target1, target2, target3 = key[0:3]
+        if dict[target1] + dict[target2] + dict[target3] > 0.7 * LEN_OF_TARGET_LIST:
+            print("vision detection result:   ", target1, "   ", target2, "   ", target3)
+            for n in range(len(key)):
+                print("result: ", key[n], "count: ", dict[key[n]])
+            return [target1, target2, target3]
+        else:
+            return [-1, -1, -1]
+    return [-1, -1, -1]
+
+
+# 排除错误识别结果
+def eliminate_error_target(dict):
+    # 字典总数未达到设定目标
+    if length_of_dict(dict) <= LEN_OF_TARGET_LIST:
+        return -10
+    # 字典总数量达到目标，删除出现次数最少的键值对
+    else:
+        key = list(dict.keys())
+        key.sort(key=dict.get)
+        last_target = key[0]
+        result = dict.pop(last_target, -5)
+        if result == -5:
+            print("error in eliminate_error_target")
+            return result
+        else:
+            # 测试用
+            print("delete error result ", last_target)
+
+            return result
