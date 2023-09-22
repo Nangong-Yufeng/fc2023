@@ -4,6 +4,9 @@ from .class_list import Waypoint, track_point
 from .get_para import gain_mission, waypoint_reached, gain_position_now, mission_current, gain_track_of_time, gain_ground_speed, gain_posture_para
 from .preflight import mode_set
 from .error_process import error_process, rec_match_received
+from .transfer import coordinate_transfer
+import bisect
+from scipy.interpolate import UnivariateSpline
 CONSTANTS_RADIUS_OF_EARTH = 6371000
 LEN_OF_TARGET_LIST = 100
 
@@ -568,7 +571,17 @@ def detect_completed(dict):
             print("vision detection result:   ", target1, "   ", target2, "   ", target3)
             for n in range(len(key)):
                 print("result: ", key[n], "count: ", dict[key[n]])
-            return [target1, target2, target3]
+            if len(key) >= 6:
+                target4, target5, target6 = key[3:6]
+                return [target1, target2, target3, target4, target5, target6]
+            elif len(key) >= 5:
+                target4, target5= key[3:5]
+                return [target1, target2, target3, target4, target5]
+            elif len(key) >= 4:
+                target4 = key[3:4]
+                return [target1, target2, target3, target4]
+            else:
+                return [target1, target2, target3]
         else:
             return [-1, -1, -1]
     return [-1, -1, -1]
@@ -593,3 +606,60 @@ def eliminate_error_target(dict):
             print("delete error result ", last_target)
 
             return result
+
+
+# 完整解算，传入靶标数字和各项记录消息，返回一个坐标
+def target_transfer(time_target_dict, vision_inform, num, timestamps, target_time, tracks, delay):
+    # 记录到的每一个侦察数据
+    for i in range(len(time_target_dict)):
+        # 识别到的数字不是正确数字
+        if vision_inform[i] != num:
+            continue
+
+        # 使用二分法查找检测目标在位姿点集中的位置
+        order = bisect.bisect_left(timestamps, target_time[i])
+
+        current_time = target_time[i]
+
+        # 对目标附近的插值取点进行保护
+        if order > 4:
+            fit_start = order - 5
+        else:
+            fit_start = 0
+        if order + 5 >= len(timestamps):
+            fit_end = len(timestamps) - 1
+        else:
+            fit_end = order + 5
+        if order == len(timestamps) or order == 0:
+            print("mother fucker")
+            continue
+
+        # 筛选拟合点范围
+        selected_indices = timestamps[fit_start:fit_end + 1]
+
+        # 提取选定的数据点
+        selected_tracks = [tracks[j] for j in selected_indices]
+        selected_timestamps = [timestamps[j] for j in selected_indices]
+
+        # 三次拟合插值
+        roll_interp = UnivariateSpline(selected_timestamps, [data.roll for data in selected_tracks], s=0)
+        pitch_interp = UnivariateSpline(selected_timestamps, [data.pitch for data in selected_tracks], s=0)
+        yaw_interp = UnivariateSpline(selected_timestamps, [data.yaw for data in selected_tracks], s=0)
+        lat_interp = UnivariateSpline(selected_timestamps, [data.lat for data in selected_tracks], s=0)
+        lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=0)
+        alt_interp = UnivariateSpline(selected_timestamps, [data.alt for data in selected_tracks], s=0)
+
+        target = coordinate_transfer(lat_interp(current_time), lon_interp(current_time), alt_interp(current_time),
+                                     yaw_interp(current_time),
+                                     pitch_interp(current_time), roll_interp(current_time), vision_inform[1],
+                                     vision_inform[2], vision_inform[0])
+
+        # 记录解算结果
+        with open(file='C:/Users/35032/Desktop/transfer_result.txt', mode='a') as f:
+            f.write("靶标坐标 lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.num)
+                    + " delay: " + str(delay))
+
+        '''
+        记录target并使用迭代算法得到最终结果
+        '''
+        return target
