@@ -63,8 +63,8 @@ def gain_mission(vehicle):
                                                            mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
     vehicle.mav.send(message)
 
-    message = rec_match_received(vehicle, mavutil.mavlink.MAVLink_mission_count_message.msgname)
-    #message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_count_message.msgname,blocking=True)
+    # message = rec_match_received(vehicle, mavutil.mavlink.MAVLink_mission_count_message.msgname)
+    message = vehicle.recv_match(type=mavutil.mavlink.MAVLink_mission_count_message.msgname,blocking=True)
     message = message.to_dict()
 
     count = message["count"]

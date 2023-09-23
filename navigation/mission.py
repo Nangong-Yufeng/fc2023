@@ -1,15 +1,18 @@
 from pymavlink import mavutil
+from math import *
 import math
-from .class_list import Waypoint, track_point
-from .get_para import (gain_mission, waypoint_reached, gain_position_now, mission_current,
-                       gain_track_of_time, gain_ground_speed, gain_posture_para, gain_heading)
+from .class_list import Waypoint
+from .get_para import (gain_mission, gain_position_now,
+                       gain_track_of_time, gain_heading)
 from .preflight import mode_set
 from .error_process import error_process, rec_match_received
 from .transfer import coordinate_transfer
 import bisect
 from scipy.interpolate import UnivariateSpline
+import numpy as np
 CONSTANTS_RADIUS_OF_EARTH = 6371000
 LEN_OF_TARGET_LIST = 100
+DETECT_CONFIDENCE = 0.7
 
 '''
 通用任务函数
@@ -106,16 +109,16 @@ def upload_mission_till_completed(the_connection, wp, home_position, track_list)
 # 似乎没用
 def clear_waypoint(vehicle):
     message = mavutil.mavlink.MAVLink_mission_clear_all_message(target_system=vehicle.target_system,
-                                                        target_component=vehicle.target_component,
-                                                        mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+                                                                target_component=vehicle.target_component,
+                                                                mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
 
     # send mission clear all command to the vehicle
     vehicle.mav.send(message)
 
     # create mission request list message
     message = mavutil.mavlink.MAVLink_mission_request_list_message(target_system=vehicle.target_system,
-                                                           target_component=vehicle.target_component,
-                                                           mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+                                                                target_component=vehicle.target_component,
+                                                                mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
 
     # send the message to the vehicle
     vehicle.mav.send(message)
@@ -135,7 +138,7 @@ def clear_waypoint(vehicle):
 '''
 对接视觉需要的函数
 '''
-# 对摄像头延时等影响造成延迟的消除，delay具体值需要使用实验测定
+# 手写方法，已弃用 对摄像头延时等影响造成延迟的消除，delay具体值需要使用实验测定
 def delay_eliminate(track_list, time, delay=500):
     # 使用二分法查找离要求最近的时刻
     tail = len(track_list)-1
@@ -191,6 +194,34 @@ def XYtoGPS(x, y, ref_lat, ref_lon):
         lon = math.degrees(ref_lon)
 
     return [lat, lon]
+
+def GPStoXY(lat, lon, height, ref_lat, ref_lon):
+    # input GPS and Reference GPS in degrees
+    # output XY in meters (m) X:North Y:East
+    lat_rad = radians(lat)
+    lon_rad = radians(lon)
+    ref_lat_rad = radians(ref_lat)
+    ref_lon_rad = radians(ref_lon)
+
+    sin_lat = sin(lat_rad)
+    cos_lat = cos(lat_rad)
+    ref_sin_lat = sin(ref_lat_rad)
+    ref_cos_lat = cos(ref_lat_rad)
+
+    cos_d_lon = cos(lon_rad - ref_lon_rad)
+
+    arg = np.clip(ref_sin_lat * sin_lat + ref_cos_lat * cos_lat * cos_d_lon, -1.0, 1.0)
+    c = acos(arg)
+
+    k = 1.0
+    if abs(c) > 0:
+        k = (c / sin(c))
+
+    x = float(k * (ref_cos_lat * sin_lat - ref_sin_lat * cos_lat * cos_d_lon) * CONSTANTS_RADIUS_OF_EARTH)
+    y = float(k * cos_lat * sin(lon_rad - ref_lon_rad) * CONSTANTS_RADIUS_OF_EARTH)
+
+    return [x, y, height]
+
 
 def GPStoDISTANCE(wp1, wp2):
     C = (math.sin(wp1.lat * math.pi / 180) * math.sin(wp2.lat * math.pi / 180) +
@@ -309,13 +340,11 @@ def wp_detect_course(wp, alt, approach_angle='east'):
     wp_east = Waypoint(wp.lat, wp.lon + 0.0004, alt)
 
     if approach_angle == 'east':
-        print("approaching towards east")
         [wp1, wp2, wp3, wp4] = [wp_west, wp_east, wp_south, wp_north]
     elif approach_angle == 'west':
         [wp1, wp2, wp3, wp4] = [wp_east, wp_west, wp_north, wp_south]
     elif approach_angle == 'south':
         [wp1, wp2, wp3, wp4] = [wp_north, wp_south, wp_west, wp_east]
-    #elif approach_angle == 'north':
     else:
         [wp1, wp2, wp3, wp4] = [wp_south, wp_north, wp_east, wp_west]
 
@@ -423,7 +452,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 def wp_bombing_course(wp_target, approach_angle,
                       length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
                       precision_circle=4, precision_approach=3, precision_bomb=10, precision_enter=2,
-                      alt_target=7, alt_bomb_start=10, alt_approach=14, alt_left=15):
+                      alt_target=7, alt_bomb_start=10, alt_approach=14, alt_left=15, length_side_points=10):
     # 转为弧度制
     approach_angle = (approach_angle - 90) * math.pi / 180
 
@@ -435,8 +464,7 @@ def wp_bombing_course(wp_target, approach_angle,
     [lat1, lon1] = XYtoGPS(len_north1, len_east1, ref_lat=wp_target.lat, ref_lon=wp_target.lon)
     wp_bomb = Waypoint(lat=lat1, lon=lon1, alt=alt_bomb_start)
     # 生成投弹部分航线
-    '''需要更改为两侧航点'''
-    bomb_line = wp_straight_course([wp_bomb, wp_target], precision_bomb)
+    bomb_line = wp_bombing_insert_course([wp_bomb, wp_target], precision_bomb, length_side_points)
 
     # 生成直线进近航线
     len_north2 = length_approach * math.sin(approach_angle)
@@ -478,6 +506,55 @@ def wp_bombing_course(wp_target, approach_angle,
     return bomb_course
 
 
+# 投弹左右插点航线
+def wp_bombing_insert_course(wp, numbers, distance):
+
+    start_GPS = [wp[0].lat, wp[0].lon, wp[0].alt]
+    end_GPS = [wp[1].lat, wp[1].lon, wp[1].alt]
+
+    start = GPStoXY(start_GPS[0], start_GPS[1], start_GPS[2], start_GPS[0], start_GPS[1])
+    # print(start)
+    end = GPStoXY(end_GPS[0], end_GPS[1], end_GPS[2], start_GPS[0], start_GPS[1])
+    # print(end)
+    x = (end[0] - start[0]) / (numbers + 1)
+    y = (end[1] - start[1]) / (numbers + 1)
+    z = (end[2] - start[2]) / (numbers + 1)
+    if y == 0:
+        theta = pi / 2
+    elif x == 0:
+        theta = 0
+    else:
+        k = x / y
+
+        # 求出斜率
+        theta = atan(-1 / k)
+
+    temp_result = np.zeros((numbers, 3))
+    result = np.zeros((numbers, 3))
+
+    for i in range(numbers):
+        if i % 2 == 0:
+            temp_result[i][0] = start[0] + (i + 1) * x - distance * cos(theta)
+            temp_result[i][1] = start[1] + (i + 1) * y - distance * sin(theta)
+        else:
+            temp_result[i][0] = start[0] + (i + 1) * x + distance * cos(theta)
+            temp_result[i][1] = start[1] + (i + 1) * y + distance * sin(theta)
+        temp_result[i][2] = start[2] + (i + 1) * z
+
+    wp_list = []
+
+    alt_range = wp[1].alt - wp[0].alt
+    alt_step = alt_range / numbers
+
+    # print(temp_result)
+    for i in range(numbers):
+        result = XYtoGPS(temp_result[i][0], temp_result[i][1], start_GPS[0], start_GPS[1])
+        alt = wp[0] + i * alt_step
+        wp_list.append(Waypoint(result[0], result[1], alt))
+    wp_list.append(wp[1])
+    return wp_list
+
+
 # 驱动电机执行投弹动作
 def bomb_drop(the_connection):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
@@ -490,7 +567,8 @@ def initiate_bomb_drop(the_connection, angle):
     theta = 360 - angle
     while True:
         heading = gain_heading(the_connection)
-        if heading > theta - 45 and heading < theta + 100:
+        # 在理想的航向范围内
+        if theta - 45 < heading < theta + 100:
             break
 
 
@@ -500,11 +578,39 @@ def initiate_bomb_drop(the_connection, angle):
 def return_to_launch(the_connection):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0, 0, 0, 0, 0, 0)
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                         0,  # confirmation
+                                         77,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
+    msg = rec_match_received(the_connection, "COMMAND_ACK")
+    if msg.result == 0:
+        print("return to home")
+    else:
+        print("RTL failed")
+
 
 
 def loiter_at_present(the_connection, alt):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, -30, 0, 0, 0, alt)
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                         0,  # confirmation
+                                         77,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
     msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
     result = msg.result
     if result == 0:
@@ -520,8 +626,22 @@ def loiter(the_connection, position):
     print(position.lat, position.lon)
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, -30, 0, position.lat, position.lon, position.alt)
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                         0,  # confirmation
+                                         77,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
     msg = rec_match_received(the_connection, "COMMAND_ACK")
-    print(msg)
+    if msg.result == 0:
+        print("loiter")
+    else:
+        print("loiter failed")
 
 
 # 环形飞行航线（仅测试用）
@@ -582,7 +702,7 @@ def detect_completed(dict):
     key.sort(key=dict.get, reverse=True)
     if len(key) >= 3:
         target1, target2, target3 = key[0:3]
-        if dict[target1] + dict[target2] + dict[target3] > 0.7 * LEN_OF_TARGET_LIST:
+        if dict[target1] + dict[target2] + dict[target3] > DETECT_CONFIDENCE * LEN_OF_TARGET_LIST:
             print("vision detection result:   ", target1, "   ", target2, "   ", target3)
             for n in range(len(key)):
                 print("result: ", key[n], "count: ", dict[key[n]])
@@ -682,7 +802,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
     '''
     point_list = []
     for j in range(len(target_list)):
-        point_list[i] = (target_list[j].lat, target_list[j].lon)
+        point_list[j] = (target_list[j].lat, target_list[j].lon)
 
     def distance(a, b):
         return math.sqrt((a[1] - b[1]) ** 2 + (a[0] - b[0]) ** 2)
