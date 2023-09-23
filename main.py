@@ -16,6 +16,8 @@ from pymavlink import mavutil
 LEN_OF_TARGET_LIST = 100
 TIME_DELAY_MS = 180
 APPROACH_ANGLE = 180
+DETECT_TIME_LIMIT = int(3.5 * 60 * 1000)
+DETECT_ACC = 6  # m
 wp_detect = Waypoint(22.8027223, 114.2960957, 30)
 wp_home = Waypoint(22.8027619, 114.2959589, 0)
 final_target_position = Waypoint(22.8027619, 114.2959589, 0)
@@ -52,7 +54,8 @@ def get_attitude_data(track_queue, detect_result):
         if track.alt < 0:
             track.alt = last_alt
         # 高度出现不正常的快速变化，取200ms内变化20m
-        if abs((track.alt - last_alt) / (track.time + time_gap - last_time)) > 0.1:
+        if ((track.time + time_gap - last_time) != 0 and
+                abs((track.alt - last_alt) / (track.time + time_gap - last_time)) > 0.1):
             track.alt = 0.7 * last_alt + 0.3 * track.alt
 
         last_alt = track.alt
@@ -93,7 +96,7 @@ def process_image_and_pose(track_queue, detect_result):
         current_time = int(round(time.time() * 1000))
 
         # 时间保护，若时间到3分半还为得到识别结果，则直接进入投弹
-        if current_time - mission_start_time > 210000:
+        if current_time - mission_start_time > DETECT_TIME_LIMIT:
             result = 1
 
         # 图像处理
@@ -106,7 +109,7 @@ def process_image_and_pose(track_queue, detect_result):
         vision_position_list = vis.run()
 
         # 检测到靶标
-        if len(vision_position_list) != 0 and track_queue.qsize():
+        if len(vision_position_list) != 0:
 
             for n in range(len(vision_position_list)):
 
@@ -155,8 +158,8 @@ def process_image_and_pose(track_queue, detect_result):
     '''
     # 提取时间戳和对应的姿态数据
     timestamps, tracks = zip(*list(track_queue.queue))
+    # 存储的视觉识别世界戳
     target_time = list(time_target_dict.keys())
-
     # 存储的视觉信息
     vision_inform = list(time_target_dict.values())
 
@@ -194,13 +197,13 @@ def process_image_and_pose(track_queue, detect_result):
                                                      (target3.lat, target3.lon)]
 
             # 若两个靶标的最终结果差距小于6米，且数字具有相似性
-            if geodesic(point1, point2).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+            if wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point1, point2).meters < DETECT_ACC:
                 print("可能出现数字识别错误")
                 error = [0, 1, 2]  # num2为错误结果，第三位为正常数字
-            elif geodesic(point1, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+            elif wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point1, point3).meters < DETECT_ACC:
                 print("可能出现数字识别错误")
                 error = [0, 2, 1]  # num3为错误结果
-            elif geodesic(point2, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+            elif wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point2, point3).meters < DETECT_ACC:
                 print("可能出现数字识别错误")
                 error = [1, 2, 0]  # num3为错误结果
             else:
@@ -208,9 +211,9 @@ def process_image_and_pose(track_queue, detect_result):
 
             # 顺延出现次数较多的数字，处理错误结果
             while error[1] > 0:
-                for q in range(3, len(target_result)):
+                for n in range(3, len(target_result)):
                     # 顺延下一个数字进行替补
-                    alter_num = target_result[q]
+                    alter_num = target_result[n]
                     alter_target = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
                                                    timestamps=timestamps, tracks=tracks, vision_inform=vision_inform,
                                                    num=alter_num, delay=TIME_DELAY_MS)
