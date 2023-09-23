@@ -1,7 +1,8 @@
 from pymavlink import mavutil
 import math
 from .class_list import Waypoint, track_point
-from .get_para import gain_mission, waypoint_reached, gain_position_now, mission_current, gain_track_of_time, gain_ground_speed, gain_posture_para
+from .get_para import (gain_mission, waypoint_reached, gain_position_now, mission_current,
+                       gain_track_of_time, gain_ground_speed, gain_posture_para, gain_heading)
 from .preflight import mode_set
 from .error_process import error_process, rec_match_received
 from .transfer import coordinate_transfer
@@ -484,9 +485,23 @@ def bomb_drop(the_connection):
     print("bomb away!")
 
 
+def initiate_bomb_drop(the_connection, angle):
+    # 因为顺逆不同进行转换
+    theta = 360 - angle
+    while True:
+        heading = gain_heading(the_connection)
+        if heading > theta - 45 and heading < theta + 100:
+            break
+
+
 '''
 飞机动作控制函数
 '''
+def return_to_launch(the_connection):
+    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0, 0, 0, 0, 0, 0)
+
+
 def loiter_at_present(the_connection, alt):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, -30, 0, 0, 0, alt)
@@ -663,3 +678,9 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
         记录target并使用迭代算法得到最终结果
         '''
         return target
+
+
+# 识别是否可能有近似识别错误
+def wrong_number(num_list):
+    result = [-1, -1]
+    return result

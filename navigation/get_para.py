@@ -154,3 +154,19 @@ def gain_transform_frequency(the_connection):
             fre = (frequency + fre * count) / (count+1)
             count += 1
     return fre
+
+
+def gain_heading(the_connection):
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         512,  # command
+                                         0,  # confirmation
+                                         33,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
+    msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
+    return msg.hdg
