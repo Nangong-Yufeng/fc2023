@@ -2,20 +2,23 @@ from utils import title
 import threading
 import queue
 import time
-from scipy.interpolate import interp1d, UnivariateSpline
-import bisect
+from geopy.distance import geodesic
+import numpy
 from vision.vision_class import Vision
-from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
-                        rec_match_received, gain_transform_frequency, gain_track_of_time, wp_detect_course,
-                        loiter_at_present, delay_eliminate, coordinate_transfer, gain_track_point,
-                        length_of_dict, detect_completed, eliminate_error_target, command_retry,
-                        gain_position_now, set_ground_speed, target_transfer)
+from navigation import (Waypoint, set_home, mode_set, arm, mission_upload,
+                        wp_detect_course, loiter_at_present, gain_track_point,
+                        detect_completed, eliminate_error_target, command_retry,
+                        gain_position_now, set_ground_speed, target_transfer,
+                        wrong_number, wp_bombing_course, mission_current, bomb_drop,
+                        loiter, return_to_launch, initiate_bomb_drop)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 100
 TIME_DELAY_MS = 180
+APPROACH_ANGLE = 180
 wp_detect = Waypoint(22.8027223, 114.2960957, 30)
 wp_home = Waypoint(22.8027619, 114.2959589, 0)
+final_target_position = Waypoint(22.8027619, 114.2959589, 0)
 
 
 '''
@@ -143,7 +146,7 @@ def process_image_and_pose(track_queue, detect_result):
     '''
     侦察完成 进行数据后处理
     '''
-    [num1, num2, num3] = target_result
+    [num1, num2, num3] = target_result[0:3]
 
     # 提取时间戳和对应的姿态数据
     timestamps, tracks = zip(*list(track_queue.queue))
@@ -152,11 +155,37 @@ def process_image_and_pose(track_queue, detect_result):
     # 存储的视觉信息
     vision_inform = list(time_target_dict.values())
 
+    # 解算出三个识别结果对应处理后的坐标
     target1 = target_transfer(time_target_dict=time_target_dict, target_time=target_time, timestamps=timestamps,
                               tracks=tracks, vision_inform=vision_inform, num=num1, delay=TIME_DELAY_MS)
+    target2 = target_transfer(time_target_dict=time_target_dict, target_time=target_time, timestamps=timestamps,
+                              tracks=tracks, vision_inform=vision_inform, num=num2, delay=TIME_DELAY_MS)
+    target3 = target_transfer(time_target_dict=time_target_dict, target_time=target_time, timestamps=timestamps,
+                              tracks=tracks, vision_inform=vision_inform, num=num3, delay=TIME_DELAY_MS)
     '''
     基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
     '''
+    # 若识别到结果多于三个，可以尝试判断有无错误数据
+    if len(target_result > 3):
+        point1 = (target1.lat, target1.lon)
+        point2 = (target2.lat, target2.lon)
+        point3 = (target3.lat, target3.lon)
+        if geodesic(point1, point2).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+            print("可能出现数字识别错误")
+
+    # 对确定后的三个靶标取中位数
+    number_list = numpy.array([target1.number, target2.number, target3.number])
+    final_target_number = numpy.median(number_list)
+
+    if target1.number == final_target_number:
+        target = target1
+    elif target2.number == final_target_number:
+        target = target2
+    else:
+        target = target3
+
+    global final_target_position
+    final_target_position = target
 
 
 '''
@@ -197,7 +226,6 @@ if __name__ == "__main__":
     连接并上传侦察任务
     '''
     the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
-    print(the_connection.target_system, the_connection.target_component)
 
     # 生成并上传任务
     detect_course = wp_detect_course(wp_detect, 16, 'north')
@@ -226,6 +254,23 @@ if __name__ == "__main__":
     '''
     进行投弹
     '''
+    # 盘旋等待任务上传
+    loiter(the_connection, final_target_position)
+    wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE)
+    mission_upload(the_connection, wp_list, wp_home)
 
+    # 盘旋等待任务角度合适
+    initiate_bomb_drop(the_connection, APPROACH_ANGLE)
 
+    # 切换为自动模式，进入投弹航线
+    mode_set(the_connection, 10)
 
+    while mission_current(the_connection) < len(wp_list) - 13:
+        pass
+        print(mission_current(the_connection))
+    bomb_drop(the_connection)
+
+    '''
+    任务结束
+    '''
+    return_to_launch(the_connection)
