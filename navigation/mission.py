@@ -625,6 +625,7 @@ def eliminate_error_target(dict):
 
 # 完整解算，传入靶标数字和各项记录消息，返回一个坐标
 def target_transfer(time_target_dict, vision_inform, num, timestamps, target_time, tracks, delay):
+    target_list = []
     # 记录到的每一个侦察数据
     for i in range(len(time_target_dict)):
         # 识别到的数字不是正确数字
@@ -674,10 +675,12 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
             f.write("靶标坐标 lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.num)
                     + " delay: " + str(delay))
 
-        '''
-        记录target并使用迭代算法得到最终结果
-        '''
-        return target
+        target_list.append(target)
+
+    '''
+    记录target并使用迭代算法得到最终结果
+    '''
+    return target_list
 
 
 # 识别是否可能有近似识别错误
