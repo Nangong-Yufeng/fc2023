@@ -156,33 +156,72 @@ def process_image_and_pose(track_queue, detect_result):
     vision_inform = list(time_target_dict.values())
 
     # 解算出三个识别结果对应处理后的坐标
-    target1 = target_transfer(time_target_dict=time_target_dict, target_time=target_time, timestamps=timestamps,
-                              tracks=tracks, vision_inform=vision_inform, num=num1, delay=TIME_DELAY_MS)
-    target2 = target_transfer(time_target_dict=time_target_dict, target_time=target_time, timestamps=timestamps,
-                              tracks=tracks, vision_inform=vision_inform, num=num2, delay=TIME_DELAY_MS)
-    target3 = target_transfer(time_target_dict=time_target_dict, target_time=target_time, timestamps=timestamps,
-                              tracks=tracks, vision_inform=vision_inform, num=num3, delay=TIME_DELAY_MS)
+    target_list = [target1, target2, target3] = [target_transfer(time_target_dict=time_target_dict,
+                                                                 target_time=target_time, timestamps=timestamps,
+                                                                 tracks=tracks, vision_inform=vision_inform,
+                                                                 num=num1, delay=TIME_DELAY_MS),
+                                                 target_transfer(time_target_dict=time_target_dict,
+                                                                 target_time=target_time, timestamps=timestamps,
+                                                                 tracks=tracks, vision_inform=vision_inform,
+                                                                 num=num2, delay=TIME_DELAY_MS),
+                                                 target_transfer(time_target_dict=time_target_dict,
+                                                                 target_time=target_time, timestamps=timestamps,
+                                                                 tracks=tracks, vision_inform=vision_inform,
+                                                                 num=num3, delay=TIME_DELAY_MS)]
     '''
     基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
     '''
     # 若识别到结果多于三个，可以尝试判断有无错误数据
     if len(target_result > 3):
-        point1 = (target1.lat, target1.lon)
-        point2 = (target2.lat, target2.lon)
-        point3 = (target3.lat, target3.lon)
+        point_list = [point1, point2, point3] = [(target1.lat, target1.lon), (target2.lat, target2.lon),
+                                                 (target3.lat, target3.lon)]
+
+        # 若两个靶标的最终结果差距小于6米，且数字具有相似性
         if geodesic(point1, point2).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
             print("可能出现数字识别错误")
+            error = [0, 1]  # num2为错误结果
+        elif geodesic(point1, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+            print("可能出现数字识别错误")
+            error = [0, 2]  # num3为错误结果
+        elif geodesic(point2, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+            print("可能出现数字识别错误")
+            error = [1, 2]  # num3为错误结果
+        else:
+            error = [-1, -1]  # 未有错误结果
+
+        # 顺延出现次数较多的数字，处理错误结果
+        while error[1] > 0:
+            for q in range(3, len(target_result)):
+                # 顺延下一个数字进行替补
+                alter_num = target_result[q]
+                alter_target = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
+                                               timestamps=timestamps, tracks=tracks, vision_inform=vision_inform,
+                                               num=alter_num, delay=TIME_DELAY_MS)
+                alter_point = (alter_target.lat, alter_target.lon)
+
+                # 判断替补数据和原错误数据是否相似和位置邻近
+                if (geodesic(point_list[error[0]], alter_point).meters < 6 and
+                        wrong_number([target1.number, target2.number])[0] < 0):
+                    print("可能出现数字识别错误")
+                    # 继续顺延下一个数字
+                    continue
+                # 新的数字认为正确
+                else:
+                    # 替换错误数据
+                    target_list[error[1]] = alter_target
+                    break
+                # 若循环结束都相似，则使用原数据
 
     # 对确定后的三个靶标取中位数
-    number_list = numpy.array([target1.number, target2.number, target3.number])
+    number_list = numpy.array([target_list[0].number, target_list[1].number, target_list[2].number])
     final_target_number = numpy.median(number_list)
 
-    if target1.number == final_target_number:
-        target = target1
-    elif target2.number == final_target_number:
-        target = target2
+    if target_list[0].number == final_target_number:
+        target = target_list[0]
+    elif target_list[1].number == final_target_number:
+        target = target_list[1]
     else:
-        target = target3
+        target = target_list[2]
 
     global final_target_position
     final_target_position = target
@@ -192,7 +231,7 @@ def process_image_and_pose(track_queue, detect_result):
 线程3：航点任务循环
 '''
 def detect_mission_circling(the_connection, detect_result):
-    #set_home(the_connection, wp_home)
+    # set_home(the_connection, wp_home)
 
     # 设置模式为纯手动
     command_retry(the_connection, 'mode_set', 0)

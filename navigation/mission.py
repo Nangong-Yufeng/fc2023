@@ -680,10 +680,69 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
     '''
     记录target并使用迭代算法得到最终结果
     '''
-    return target_list
+    point_list = []
+    for j in range(len(target_list)):
+        point_list[i] = (target_list[j].lat, target_list[j].lon)
+
+    def distance(a, b):
+        return math.sqrt((a[1] - b[1]) ** 2 + (a[0] - b[0]) ** 2)
+
+    def mean(points, length):
+        x = y = 0
+        for k in range(length):
+            x += points[i][0]
+            y += points[i][1]
+        return x / length, y / length
+
+    def center(points, iteration=1000):
+        """
+            points (list of tuples)
+        """
+        if not points:
+            return None
+        old_center = points[0]
+        length = math.ceil(len(points) * 2 / 3)
+        while iteration > 0:
+            iteration -= 1
+            points.sort(key=lambda p: distance(p, old_center))
+            new_center = mean(points, length)
+            if old_center == new_center:
+                return new_center
+            old_center = new_center
+
+    target_point = center(point_list)
+
+    return Waypoint(target_point[0], target_point[1], 0)
 
 
-# 识别是否可能有近似识别错误
+# 从数据近似上识别是否可能有识别错误
 def wrong_number(num_list):
-    result = [-1, -1]
-    return result
+    def is_same_or_similar(nums_lis):  # list[int]):
+        confusing_digits = [[1, 7], [5, 6], [2, 7], [3, 8], [7, 9]]
+        index_dict = {12: [False, False], 13: [False, False], 23: [False, False]}  # :dict[int, list[bool]]
+        num_digits = [divmod(num, 10) for num in num_list]
+        for i in range(3):
+            for j in range(i + 1, 3):
+                if num_digits[i][0] == num_digits[j][0] and num_digits[i][1] == num_digits[j][1]:
+                    index_dict[(i + 1) * 10 + (j + 1)][0] = True
+                tens_digits_pair = [num_digits[i][0], num_digits[j][0]]
+                ones_digits_pair = [num_digits[i][1], num_digits[j][1]]
+                # confusion表是升序
+                tens_digits_pair.sort()
+                ones_digits_pair.sort()
+                if (tens_digits_pair in confusing_digits or tens_digits_pair[0] == tens_digits_pair[1]) \
+                        and (ones_digits_pair in confusing_digits or ones_digits_pair[0] == ones_digits_pair[1]):
+                    index_dict[(i + 1) * 10 + (j + 1)][1] = True
+        # key为下标关系，第一个bool判是否相同， 第二个判是否相似
+        return index_dict
+
+    result1, result2, result3 = list(is_same_or_similar(num_list).values())
+
+    if not result1[0] and result1[1]:
+        return [0, 1]
+    elif not result2[0] and result2[1]:
+        return [0, 2]
+    elif not result3[0] and result3[1]:
+        return [1, 2]
+    else:
+        return [-1, -1]
