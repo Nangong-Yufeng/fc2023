@@ -19,6 +19,7 @@ APPROACH_ANGLE = 180
 wp_detect = Waypoint(22.8027223, 114.2960957, 30)
 wp_home = Waypoint(22.8027619, 114.2959589, 0)
 final_target_position = Waypoint(22.8027619, 114.2959589, 0)
+mission_start_time = 0
 
 
 '''
@@ -52,7 +53,7 @@ def get_attitude_data(track_queue, detect_result):
             track.alt = last_alt
         # 高度出现不正常的快速变化，取200ms内变化20m
         if abs((track.alt - last_alt) / (track.time + time_gap - last_time)) > 0.1:
-            track.alt = last_alt
+            track.alt = 0.7 * last_alt + 0.3 * track.alt
 
         last_alt = track.alt
         # print("线程1运行： ", track.time)
@@ -89,6 +90,12 @@ def process_image_and_pose(track_queue, detect_result):
 
     result = -1
     while result < 0:
+        current_time = int(round(time.time() * 1000))
+
+        # 时间保护，若时间到3分半还为得到识别结果，则直接进入投弹
+        if current_time - mission_start_time > 210000:
+            result = 1
+
         # 图像处理
         vis.shot()
         if vis.im0 is None:
@@ -146,8 +153,6 @@ def process_image_and_pose(track_queue, detect_result):
     '''
     侦察完成 进行数据后处理
     '''
-    [num1, num2, num3] = target_result[0:3]
-
     # 提取时间戳和对应的姿态数据
     timestamps, tracks = zip(*list(track_queue.queue))
     target_time = list(time_target_dict.keys())
@@ -155,76 +160,93 @@ def process_image_and_pose(track_queue, detect_result):
     # 存储的视觉信息
     vision_inform = list(time_target_dict.values())
 
-    # 解算出三个识别结果对应处理后的坐标
-    target_list = [target1, target2, target3] = [target_transfer(time_target_dict=time_target_dict,
-                                                                 target_time=target_time, timestamps=timestamps,
-                                                                 tracks=tracks, vision_inform=vision_inform,
-                                                                 num=num1, delay=TIME_DELAY_MS),
-                                                 target_transfer(time_target_dict=time_target_dict,
-                                                                 target_time=target_time, timestamps=timestamps,
-                                                                 tracks=tracks, vision_inform=vision_inform,
-                                                                 num=num2, delay=TIME_DELAY_MS),
-                                                 target_transfer(time_target_dict=time_target_dict,
-                                                                 target_time=target_time, timestamps=timestamps,
-                                                                 tracks=tracks, vision_inform=vision_inform,
-                                                                 num=num3, delay=TIME_DELAY_MS)]
-    '''
-    基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
-    '''
-    # 若识别到结果多于三个，可以尝试判断有无错误数据
-    if len(target_result > 3):
-        point_list = [point1, point2, point3] = [(target1.lat, target1.lon), (target2.lat, target2.lon),
-                                                 (target3.lat, target3.lon)]
-
-        # 若两个靶标的最终结果差距小于6米，且数字具有相似性
-        if geodesic(point1, point2).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
-            print("可能出现数字识别错误")
-            error = [0, 1]  # num2为错误结果
-        elif geodesic(point1, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
-            print("可能出现数字识别错误")
-            error = [0, 2]  # num3为错误结果
-        elif geodesic(point2, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
-            print("可能出现数字识别错误")
-            error = [1, 2]  # num3为错误结果
-        else:
-            error = [-1, -1]  # 未有错误结果
-
-        # 顺延出现次数较多的数字，处理错误结果
-        while error[1] > 0:
-            for q in range(3, len(target_result)):
-                # 顺延下一个数字进行替补
-                alter_num = target_result[q]
-                alter_target = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
-                                               timestamps=timestamps, tracks=tracks, vision_inform=vision_inform,
-                                               num=alter_num, delay=TIME_DELAY_MS)
-                alter_point = (alter_target.lat, alter_target.lon)
-
-                # 判断替补数据和原错误数据是否相似和位置邻近
-                if (geodesic(point_list[error[0]], alter_point).meters < 6 and
-                        wrong_number([target1.number, target2.number])[0] < 0):
-                    print("可能出现数字识别错误")
-                    # 继续顺延下一个数字
-                    continue
-                # 新的数字认为正确
-                else:
-                    # 替换错误数据
-                    target_list[error[1]] = alter_target
-                    break
-                # 若循环结束都相似，则使用原数据
-
-    # 对确定后的三个靶标取中位数
-    number_list = numpy.array([target_list[0].number, target_list[1].number, target_list[2].number])
-    final_target_number = numpy.median(number_list)
-
-    if target_list[0].number == final_target_number:
-        target = target_list[0]
-    elif target_list[1].number == final_target_number:
-        target = target_list[1]
+    # 若没有检测到任何数字
+    if len(time_target_dict) == 0:
+        pass
+    # 若视觉只检查到一个或两个数字
+    elif len(target_result) == 1 or len(target_result) == 2:
+        final_target_position = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
+                                                timestamps=timestamps,
+                                                tracks=tracks, vision_inform=vision_inform,
+                                                num=target_result[0], delay=TIME_DELAY_MS)
     else:
-        target = target_list[2]
+        [num1, num2, num3] = target_result[0:3]
 
-    global final_target_position
-    final_target_position = target
+        # 解算出三个识别结果对应处理后的坐标
+        target_list = [target1, target2, target3] = [target_transfer(time_target_dict=time_target_dict,
+                                                                     target_time=target_time, timestamps=timestamps,
+                                                                     tracks=tracks, vision_inform=vision_inform,
+                                                                     num=num1, delay=TIME_DELAY_MS),
+                                                     target_transfer(time_target_dict=time_target_dict,
+                                                                     target_time=target_time, timestamps=timestamps,
+                                                                     tracks=tracks, vision_inform=vision_inform,
+                                                                     num=num2, delay=TIME_DELAY_MS),
+                                                     target_transfer(time_target_dict=time_target_dict,
+                                                                     target_time=target_time, timestamps=timestamps,
+                                                                     tracks=tracks, vision_inform=vision_inform,
+                                                                     num=num3, delay=TIME_DELAY_MS)]
+        '''
+        基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
+        '''
+        # 若识别到结果多于三个，可以尝试判断有无错误数据
+        if len(target_result > 3):
+            point_list = [point1, point2, point3] = [(target1.lat, target1.lon), (target2.lat, target2.lon),
+                                                     (target3.lat, target3.lon)]
+
+            # 若两个靶标的最终结果差距小于6米，且数字具有相似性
+            if geodesic(point1, point2).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+                print("可能出现数字识别错误")
+                error = [0, 1, 2]  # num2为错误结果，第三位为正常数字
+            elif geodesic(point1, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+                print("可能出现数字识别错误")
+                error = [0, 2, 1]  # num3为错误结果
+            elif geodesic(point2, point3).meters < 6 and wrong_number([target1.number, target2.number])[0] < 0:
+                print("可能出现数字识别错误")
+                error = [1, 2, 0]  # num3为错误结果
+            else:
+                error = [-1, -1, -1]  # 未有错误结果
+
+            # 顺延出现次数较多的数字，处理错误结果
+            while error[1] > 0:
+                for q in range(3, len(target_result)):
+                    # 顺延下一个数字进行替补
+                    alter_num = target_result[q]
+                    alter_target = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
+                                                   timestamps=timestamps, tracks=tracks, vision_inform=vision_inform,
+                                                   num=alter_num, delay=TIME_DELAY_MS)
+                    alter_point = (alter_target.lat, alter_target.lon)
+
+                    # 判断替补数据和原错误数据是否相似和位置邻近
+                    if (geodesic(point_list[error[0]], alter_point).meters < 6 and
+                            wrong_number([target1.number, target2.number])[0] < 0):
+                        print("替补数字可能出现识别错误")
+                        # 继续顺延下一个数字
+                        continue
+                    # 防止是另一个确定数据的错误答案
+                    elif (geodesic(point_list[error[2]], alter_point).meters < 6 and
+                            wrong_number([target1.number, target2.number])[0] < 0):
+                        print("替补数字可能出现识别错误")
+                        continue
+                    # 新的数字认为正确
+                    else:
+                        # 替换错误数据
+                        target_list[error[1]] = alter_target
+                        break
+                    # 若循环结束都相似，则使用原数据
+
+        # 对确定后的三个靶标取中位数
+        number_list = numpy.array([target_list[0].number, target_list[1].number, target_list[2].number])
+        final_target_number = numpy.median(number_list)
+
+        if target_list[0].number == final_target_number:
+            target = target_list[0]
+        elif target_list[1].number == final_target_number:
+            target = target_list[1]
+        else:
+            target = target_list[2]
+
+        global final_target_position
+        final_target_position = target
 
 
 '''
@@ -239,6 +261,10 @@ def detect_mission_circling(the_connection, detect_result):
     # 解锁飞机
 
     arm(the_connection)
+
+    # 任务开始时间
+    global mission_start_time
+    mission_start_time = int(round(time.time() * 1000))
 
     # 切换自动飞行
     if input("输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
