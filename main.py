@@ -13,7 +13,7 @@ from navigation import (Waypoint, mode_set, mission_upload,
                         loiter, return_to_launch, initiate_bomb_drop, preflight_command)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
-LEN_OF_TARGET_LIST = 100
+LEN_OF_TARGET_LIST = 30
 TIME_DELAY_MS = 180
 APPROACH_ANGLE = 180
 DETECT_TIME_LIMIT = int(3.5 * 60 * 1000)
@@ -89,7 +89,7 @@ def process_image_and_pose(track_queue, detect_result):
     target_result = [-1, -1, -1]
 
     # 图传信号初始化
-    vis = Vision(source=0, device='0', conf_thres=0.7)# "D:/ngyf/videos/DJI_0001.MP4"
+    vis = Vision(source="D:/ngyf/videos/DJI_0001.MP4", device='0', conf_thres=0.7)#
 
     result = -1
     while result < 0:
@@ -118,12 +118,12 @@ def process_image_and_pose(track_queue, detect_result):
                     continue
                 # 数字识别得到结果
                 else:
-                    print("检测到靶标数字： ", vision_position_list[n].number)
+                    print("检测到靶标数字： ", vision_position_list[n].num)
                     detect_time = int(round(time.time() * 1000)) - TIME_DELAY_MS
 
                     # 记录识别到靶标的时间和靶标数字
                     time_target_dict[detect_time] = [vision_position_list[n].num,
-                                                     vision_position_list[n].x, vision_position_list.y]
+                                                     vision_position_list[n].x, vision_position_list[n].y]
 
                     # 对靶标数据进行过程淘汰
                     target_number = vision_position_list[n].num
@@ -162,6 +162,8 @@ def process_image_and_pose(track_queue, detect_result):
     target_time = list(time_target_dict.keys())
     # 存储的视觉信息
     vision_inform = list(time_target_dict.values())
+
+    global final_target_position
 
     # 若没有检测到任何数字
     if len(time_target_dict) == 0:
@@ -248,7 +250,6 @@ def process_image_and_pose(track_queue, detect_result):
         else:
             target = target_list[2]
 
-        global final_target_position
         final_target_position = target
 
 
@@ -282,14 +283,14 @@ if __name__ == "__main__":
     '''
     连接并上传侦察任务
     '''
-    the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
+    the_connection = mavutil.mavlink_connection('/COM8', baud=57600)
 
     # 起飞前准备
-    preflight_command(the_connection, wp_home)
+    # preflight_command(the_connection, wp_home)
 
     # 生成并上传任务，比赛时不需要
     detect_course = wp_detect_course(wp_detect, 16, 'north')
-    mission_upload(the_connection, detect_course, wp_home)
+    # mission_upload(the_connection, detect_course, wp_home)
 
     '''
     侦察过程中多线程运行
