@@ -800,9 +800,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
     '''
     记录target并使用迭代算法得到最终结果
     '''
-    point_list = []
-    for j in range(len(target_list)):
-        point_list[j] = (target_list[j].lat, target_list[j].lon)
+    point_list = [(t.lat, t.lon) for t in target_list]
 
     def distance(a, b):
         return math.sqrt((a[1] - b[1]) ** 2 + (a[0] - b[0]) ** 2)
@@ -810,8 +808,8 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
     def mean(points, length):
         x = y = 0
         for k in range(length):
-            x += points[i][0]
-            y += points[i][1]
+            x += points[k][0]
+            y += points[k][1]
         return x / length, y / length
 
     def center(points, iteration=1000):
