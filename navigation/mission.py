@@ -11,19 +11,17 @@ import bisect
 from scipy.interpolate import UnivariateSpline
 import numpy as np
 CONSTANTS_RADIUS_OF_EARTH = 6371000
-LEN_OF_TARGET_LIST = 100
-DETECT_CONFIDENCE = 0.7
+LEN_OF_TARGET_LIST = 30
+DETECT_CONFIDENCE = 0.5
 
 '''
 通用任务函数
 '''
 
 def send_mission_list(the_connection, wp):
-    print(the_connection.target_system, the_connection.target_component, len(wp), mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
     args = (the_connection.target_system,
            the_connection.target_component,
            len(wp))#, mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
-    print(args)
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(*args)
     the_connection.mav.send(wp_list)
 
@@ -229,6 +227,7 @@ def GPStoDISTANCE(wp1, wp2):
     Distance = CONSTANTS_RADIUS_OF_EARTH * math.acos(C) * math.pi / 180
     return Distance
 
+
 # 根据上传的两个坐标点，通过自动设置更多的坐标点，生成一个两坐标之间的直线航线
 def wp_straight_course(wp, precision):
 
@@ -246,7 +245,7 @@ def wp_straight_course(wp, precision):
         wp_new = Waypoint(wp_list[i].lat+lat_len, wp_list[i].lon+lon_len, wp_list[i].alt+alt_len)
         #wp_new.show()
         wp_list.append(wp_new)
-        i+=1
+        i += 1
 
     wp_list.append(wp[1])
     return wp_list
@@ -278,9 +277,10 @@ def wp_circle_course(wp, precision, angle, direction=1):
         theta_start += math.pi
 
     # 计算半径和角度步长
-    radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.45 / math.sin(angle*0.5)#非常粗略
-    #r_2 = math.asin(math.sqrt(pow(math.sin(lat_len / 2), 2) + math.cos(wp[1].lat * math.pi / 180) * math.cos(wp[0].lat * math.pi / 180)*pow(lon_len, 2))) * CONSTANTS_RADIUS_OF_EARTH
-    #r_2 = GPStoDISTANCE(wp[0], wp[1])
+    radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.45 / math.sin(angle*0.5)  # 非常粗略
+    # r_2 = math.asin(math.sqrt(pow(math.sin(lat_len / 2), 2) + math.cos(wp[1].lat * math.pi / 180) *
+    # math.cos(wp[0].lat * math.pi / 180)*pow(lon_len, 2))) * CONSTANTS_RADIUS_OF_EARTH
+    # r_2 = GPStoDISTANCE(wp[0], wp[1])
     theta_step = angle / precision
 
     # 判断圆心位置
@@ -311,9 +311,9 @@ def wp_circle_course(wp, precision, angle, direction=1):
     wp_list = [wp[0]]
     for i in range(0, precision):
         if direction >= 0:
-           theta = (+theta_start - math.pi*0.5 - angle*0.5) + theta_step * (i+1)# 顺时针适用
+           theta = (+theta_start - math.pi*0.5 - angle*0.5) + theta_step * (i+1)  # 顺时针适用
         else:
-           theta = (+theta_start + math.pi*0.5 + angle*0.5) - theta_step * (i+1)# 逆时针适用
+           theta = (+theta_start + math.pi*0.5 + angle*0.5) - theta_step * (i+1)  # 逆时针适用
         lat_new = center.lat + radius * math.sin(theta)
         lon_new = center.lon + radius * math.cos(theta)
 
@@ -382,8 +382,7 @@ def wp_detect_course(wp, alt, approach_angle='east'):
 '''
 # 已弃用，见wp_bombing_course
 def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, direction=1):
-
-# 自动生成航路点集
+    # 自动生成航路点集
     wp_now.alt = 35
     lat_len = wp_now.lat - wp_target.lat
     lon_len = wp_now.lon - wp_target.lon
@@ -412,7 +411,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
     wp_end = Waypoint(wp_target.lat+flyby_lat, wp_target.lon+flyby_lon, 30)
     wp_far = Waypoint(wp_now.lat+2*s_lat, wp_now.lon+2*s_lon, wp_now.alt)
 
-    half_chord_len = 0.6*radius*1e-5 # 转向处的半弦长
+    half_chord_len = 0.6*radius*1e-5  # 转向处的半弦长
 
     wp1 = Waypoint(wp_mid.lat+half_chord_len*math.sin(-direction*math.pi*0.5+theta+math.pi*0.05),
                    wp_mid.lon+half_chord_len*math.cos(-direction*math.pi*0.5+theta+math.pi*0.05),
@@ -430,7 +429,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
     # 转过270度对准航线
     wp_circle_list = wp_circle_course(wp_circle1, 2*precision,180, -direction)
     wp_circle_list.pop(0)
-    wp_circle_list.pop(-1) # 取出重复的航点
+    wp_circle_list.pop(-1)  # 取出重复的航点
     wp_circle_list.extend(wp_circle_course(wp_circle2, precision-1, 150, -direction))
     wp_circle_list.pop(-1)
     wp_circle_list.extend(wp_circle_course(wp_circle3, precision, 30, direction))
@@ -749,7 +748,8 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
     # 记录到的每一个侦察数据
     for i in range(len(time_target_dict)):
         # 识别到的数字不是正确数字
-        if vision_inform[i] != num:
+        if (vision_inform[i])[0] != num:
+            print(i)
             continue
 
         # 使用二分法查找检测目标在位姿点集中的位置
@@ -771,7 +771,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
             continue
 
         # 筛选拟合点范围
-        selected_indices = timestamps[fit_start:fit_end + 1]
+        selected_indices = range(fit_start, fit_end+1)
 
         # 提取选定的数据点
         selected_tracks = [tracks[j] for j in selected_indices]
@@ -796,6 +796,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
                     + " delay: " + str(delay))
 
         target_list.append(target)
+        print("new")
 
     '''
     记录target并使用迭代算法得到最终结果
