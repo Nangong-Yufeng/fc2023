@@ -29,6 +29,7 @@ def system_check(the_connection):
                                              0)  # param7
         msg = the_connection.recv_match(type="HIGH_LATENCY2", blocking=True, timeout=5)
         if msg is None:
+            print("none")
             continue
         failure_flags = msg.failure_flags
 
