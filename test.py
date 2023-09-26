@@ -8,12 +8,12 @@ from navigation import (Waypoint, set_home, mode_set, arm, mission_upload,
                         preflight_command)
 from pymavlink import mavutil
 
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=115200)
+
+print("start")
 
 wp_home = Waypoint(22.8027619, 114.2959589, 0)
 preflight_command(the_connection, wp_home)
-
-reboot(the_connection)
 
 while True:
     msg = gain_position_now(the_connection)
