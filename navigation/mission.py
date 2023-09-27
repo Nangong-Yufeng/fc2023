@@ -1,7 +1,7 @@
 from pymavlink import mavutil
 from math import *
 import math
-from .class_list import Waypoint
+from .class_list import Waypoint, target_point
 from .get_para import (gain_mission, gain_position_now,
                        gain_track_of_time, gain_heading)
 from .preflight import mode_set
@@ -853,7 +853,7 @@ def detect_completed(dict):
                 target4, target5, target6 = key[3:6]
                 return [target1, target2, target3, target4, target5, target6]
             elif len(key) >= 5:
-                target4, target5= key[3:5]
+                target4, target5 = key[3:5]
                 return [target1, target2, target3, target4, target5]
             elif len(key) >= 4:
                 target4 = key[3:4]
@@ -921,26 +921,31 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
         selected_tracks = [tracks[j] for j in selected_indices]
         selected_timestamps = [timestamps[j] for j in selected_indices]
 
+        print('time', selected_timestamps)
+        print('\t', [data.roll for data in selected_tracks])
+        print('\t', [data.pitch for data in selected_tracks])
+        print('\t', [data.yaw for data in selected_tracks])
+        print('\t', [data.lat for data in selected_tracks])
         # 三次拟合插值
-        roll_interp = UnivariateSpline(selected_timestamps, [data.roll for data in selected_tracks], s=0)
-        pitch_interp = UnivariateSpline(selected_timestamps, [data.pitch for data in selected_tracks], s=0)
-        yaw_interp = UnivariateSpline(selected_timestamps, [data.yaw for data in selected_tracks], s=0)
-        lat_interp = UnivariateSpline(selected_timestamps, [data.lat for data in selected_tracks], s=0)
-        lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=0)
-        alt_interp = UnivariateSpline(selected_timestamps, [data.alt for data in selected_tracks], s=0)
-
+        roll_interp = UnivariateSpline(selected_timestamps, [data.roll for data in selected_tracks], s=2)
+        pitch_interp = UnivariateSpline(selected_timestamps, [data.pitch for data in selected_tracks], s=2)
+        yaw_interp = UnivariateSpline(selected_timestamps, [data.yaw for data in selected_tracks], s=2)
+        lat_interp = UnivariateSpline(selected_timestamps, [data.lat for data in selected_tracks], s=2)
+        lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=2)
+        alt_interp = UnivariateSpline(selected_timestamps, [data.alt for data in selected_tracks], s=2)
+        print('type:', type(vision_inform[1]), '!!!!!!!')
+        print(vision_inform[1])
         target = coordinate_transfer(lat_interp(current_time), lon_interp(current_time), alt_interp(current_time),
                                      yaw_interp(current_time),
-                                     pitch_interp(current_time), roll_interp(current_time), vision_inform[1],
-                                     vision_inform[2], vision_inform[0])
+                                     pitch_interp(current_time), roll_interp(current_time), vision_inform[i][1],
+                                     vision_inform[i][2], vision_inform[i][0])
 
         # 记录解算结果
         with open(file='C:/Users/35032/Desktop/transfer_result.txt', mode='a') as f:
-            f.write("靶标坐标 lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.num)
+            f.write("靶标坐标 lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.number)
                     + " delay: " + str(delay))
 
         target_list.append(target)
-        print("new")
 
     '''
     记录target并使用迭代算法得到最终结果
@@ -973,9 +978,10 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
                 return new_center
             old_center = new_center
 
-    target_point = center(point_list)
+    target_poin = center(point_list)
 
-    return Waypoint(target_point[0], target_point[1], 0)
+    # return Waypoint(target_point[0], target_point[1], 0)
+    return target_point(target_poin[0], target_poin[1], num)
 
 
 # 从数据近似上识别是否可能有识别错误

@@ -2,6 +2,7 @@ from utils import title
 import threading
 import queue
 import time
+import numpy as np
 from scipy.interpolate import interp1d, UnivariateSpline
 from vision.vision_class import Vision
 from navigation import (Waypoint, set_home, mode_set, arm, wp_circle_course,wp_straight_course, mission_upload,
@@ -46,7 +47,7 @@ def get_attitude_data(track_queue, detect_result):
 def process_image_and_pose(track_queue, detect_result):
     target_list = []
     target_dict = {}
-    vis = Vision(source=0, device='0', conf_thres=0.7)#"D:/ngyf/videos/DJI_0001.MP4"
+    vis = Vision(source="D:/ngyf/videos/DJI_0001.MP4", device='0', conf_thres=0.7)#
     result = -1
     while result < 0:
         # 图像处理
@@ -103,6 +104,8 @@ def process_image_and_pose(track_queue, detect_result):
                 lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=0)
                 alt_interp = UnivariateSpline(selected_timestamps, [data.alt for data in selected_tracks], s=0)
 
+                print('type:', type(vision_position_list[n].x), '!!!!!!!')
+                print(vision_position_list[n].x)
                 # 获取插值后的姿态数据
                 target = coordinate_transfer(lat_interp(current_time), lon_interp(current_time), alt_interp(current_time), yaw_interp(current_time),
                                                 pitch_interp(current_time), roll_interp(current_time), vision_position_list[n].x,
@@ -174,7 +177,7 @@ if __name__ == "__main__":
     '''
     title.printTitle()
 
-    the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
+    the_connection = mavutil.mavlink_connection('/COM8', baud=57600)
     print(the_connection.target_system, the_connection.target_component)
 
     with open(file='C:/Users/35032/Desktop/transfer.txt', mode='a') as f:
