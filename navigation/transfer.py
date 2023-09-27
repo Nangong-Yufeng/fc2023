@@ -113,7 +113,7 @@ def coordinate_transfer(lat, lon, alt, yaw, pitch, roll, vision_x, vision_y, vis
     undistortedPoint = \
     cv2.fisheye.undistortPoints(distortedPoint, cameraMatrix, distCoeffs, np.eye(3), newCameraarray)[0][0]
     # print(f'undistortedPoint: {undistortedPoint}')
-    with open(file='C:/Users/35032/Desktop/transfer.txt', mode='a') as f:
+    with open(file='C:/Users/35032/Desktop/transfer9.27.txt', mode='a') as f:
         f.write("lat: " + str(lat) + " lon: " + str(lon) + " alt: " + str(alt) + " num: " + str(vision_num))
         f.write('\n')
         f.write(" pitch: " + str(pitch) + " roll: " + str(roll) + " yaw: " + str(yaw))
