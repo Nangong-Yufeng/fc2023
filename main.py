@@ -194,7 +194,7 @@ def process_image_and_pose(track_queue, detect_result):
         基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
         '''
         # 若识别到结果多于三个，可以尝试判断有无错误数据
-        if len(target_result > 3):
+        if len(target_result) > 3:
             point_list = [point1, point2, point3] = [(target1.lat, target1.lon), (target2.lat, target2.lon),
                                                      (target3.lat, target3.lon)]
 
