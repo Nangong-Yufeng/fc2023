@@ -331,6 +331,151 @@ def wp_circle_course(wp, precision, angle, direction=1):
     return wp_list
 
 
+# 角度为北为起点、顺时针方向
+def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=0.0003):
+    if group == '60':  # 航向60
+        angle = pi / 6
+        right_angle = pi * 0.5
+        [wp1, wp2, wp3, wp4] = [Waypoint(wp_center.lat+radius*sin(angle), wp_center.lon+radius*cos(angle), alt),
+                                Waypoint(wp_center.lat+radius*sin(angle-right_angle),
+                                         wp_center.lon+radius*cos(angle-right_angle), alt),
+                                Waypoint(wp_center.lat+radius*sin(angle+right_angle),
+                                         wp_center.lon+radius*cos(angle+right_angle), alt),
+                                Waypoint(wp_center.lat+radius*sin(angle+pi),
+                                         wp_center.lon+radius*cos(angle+pi), alt)]
+        [wp1L, wp1LL, wp1R, wp1RR] = [Waypoint(wp1.lat+interval*sin(angle + right_angle),
+                                               wp1.lon+interval*cos(angle + right_angle), alt),
+                                      Waypoint(wp1.lat + 2*interval * sin(angle + right_angle),
+                                               wp1.lon + 2*interval * cos(angle + right_angle), alt),
+                                      Waypoint(wp1.lat + interval * sin(angle - right_angle),
+                                               wp1.lon + interval * cos(angle - right_angle), alt),
+                                      Waypoint(wp1.lat + 2*interval * sin(angle + right_angle),
+                                               wp1.lon + 2*interval * cos(angle + right_angle), alt)]
+        angle2 = angle - right_angle
+        [wp2L, wp2LL, wp2R, wp2RR] = [Waypoint(wp2.lat + interval * sin(angle2 + right_angle),
+                                               wp2.lon + interval * cos(angle2 + right_angle), alt),
+                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 + right_angle),
+                                               wp2.lon + 2 * interval * cos(angle2 + right_angle), alt),
+                                      Waypoint(wp2.lat + interval * sin(angle2 - right_angle),
+                                               wp2.lon + interval * cos(angle2 - right_angle), alt),
+                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 + right_angle),
+                                               wp2.lon + 2 * interval * cos(angle2 + right_angle), alt)]
+        angle3 = angle + right_angle
+        [wp3L, wp3LL, wp3R, wp3RR] = [Waypoint(wp3.lat + interval * sin(angle3 + right_angle),
+                                               wp3.lon + interval * cos(angle3 + right_angle), alt),
+                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 + right_angle),
+                                               wp3.lon + 2 * interval * cos(angle3 + right_angle), alt),
+                                      Waypoint(wp3.lat + interval * sin(angle3 - right_angle),
+                                               wp3.lon + interval * cos(angle3 - right_angle), alt),
+                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 + right_angle),
+                                               wp3.lon + 2 * interval * cos(angle3 + right_angle), alt)]
+        angle4 = angle + pi
+        [wp4L, wp4LL, wp4R, wp4RR] = [Waypoint(wp4.lat + interval * sin(angle4 + right_angle),
+                                               wp4.lon + interval * cos(angle4 + right_angle), alt),
+                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 + right_angle),
+                                               wp4.lon + 2 * interval * cos(angle4 + right_angle), alt),
+                                      Waypoint(wp4.lat + interval * sin(angle4 - right_angle),
+                                               wp4.lon + interval * cos(angle4 - right_angle), alt),
+                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 + right_angle),
+                                               wp4.lon + 2 * interval * cos(angle4 + right_angle), alt)]
+    else:  # 航向240
+        angle = 7 * pi / 6
+        right_angle = pi * 0.5
+        [wp1, wp2, wp3, wp4] = [Waypoint(wp_center.lat + radius * sin(angle), wp_center.lon + radius * cos(angle), alt),
+                                Waypoint(wp_center.lat + radius * sin(angle - right_angle),
+                                         wp_center.lon + radius * cos(angle - right_angle), alt),
+                                Waypoint(wp_center.lat + radius * sin(angle + right_angle),
+                                         wp_center.lon + radius * cos(angle + right_angle), alt),
+                                Waypoint(wp_center.lat + radius * sin(angle + pi),
+                                         wp_center.lon + radius * cos(angle + pi), alt)]
+        [wp1L, wp1LL, wp1R, wp1RR] = [Waypoint(wp1.lat + interval * sin(angle + right_angle),
+                                               wp1.lon + interval * cos(angle + right_angle), alt),
+                                      Waypoint(wp1.lat + 2 * interval * sin(angle + right_angle),
+                                               wp1.lon + 2 * interval * cos(angle + right_angle), alt),
+                                      Waypoint(wp1.lat + interval * sin(angle - right_angle),
+                                               wp1.lon + interval * cos(angle - right_angle), alt),
+                                      Waypoint(wp1.lat + 2 * interval * sin(angle + right_angle),
+                                               wp1.lon + 2 * interval * cos(angle + right_angle), alt)]
+        angle2 = angle - right_angle
+        [wp2L, wp2LL, wp2R, wp2RR] = [Waypoint(wp2.lat + interval * sin(angle2 + right_angle),
+                                               wp2.lon + interval * cos(angle2 + right_angle), alt),
+                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 + right_angle),
+                                               wp2.lon + 2 * interval * cos(angle2 + right_angle), alt),
+                                      Waypoint(wp2.lat + interval * sin(angle2 - right_angle),
+                                               wp2.lon + interval * cos(angle2 - right_angle), alt),
+                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 + right_angle),
+                                               wp2.lon + 2 * interval * cos(angle2 + right_angle), alt)]
+        angle3 = angle + right_angle
+        [wp3L, wp3LL, wp3R, wp3RR] = [Waypoint(wp3.lat + interval * sin(angle3 + right_angle),
+                                               wp3.lon + interval * cos(angle3 + right_angle), alt),
+                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 + right_angle),
+                                               wp3.lon + 2 * interval * cos(angle3 + right_angle), alt),
+                                      Waypoint(wp3.lat + interval * sin(angle3 - right_angle),
+                                               wp3.lon + interval * cos(angle3 - right_angle), alt),
+                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 + right_angle),
+                                               wp3.lon + 2 * interval * cos(angle3 + right_angle), alt)]
+        angle4 = angle + pi
+        [wp4L, wp4LL, wp4R, wp4RR] = [Waypoint(wp4.lat + interval * sin(angle4 + right_angle),
+                                               wp4.lon + interval * cos(angle4 + right_angle), alt),
+                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 + right_angle),
+                                               wp4.lon + 2 * interval * cos(angle4 + right_angle), alt),
+                                      Waypoint(wp4.lat + interval * sin(angle4 - right_angle),
+                                               wp4.lon + interval * cos(angle4 - right_angle), alt),
+                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 + right_angle),
+                                               wp4.lon + 2 * interval * cos(angle4 + right_angle), alt)]
+
+    line4l1l = wp_straight_course([wp4R, wp1L], 2)
+    circle1l2r = wp_circle_course([wp1L, wp2R], 3, 270, direction=-1)
+    line2r3l = wp_straight_course([wp2R, wp3L], 2)
+    circle3l1r = wp_circle_course([wp3L, wp1R], 3, 270, direction=-1)
+    line1r4l = wp_straight_course([wp1R, wp4L], 2)
+    circle4l3r = wp_circle_course([wp4L, wp3R], 3, 270, direction=-1)
+    line3r2l = wp_straight_course([wp3R, wp2L], 2)
+    circle2l4rr = wp_circle_course([wp2L, wp4RR], 3, 270, direction=-1)
+    line4l1l_2 = wp_straight_course([wp4RR, wp1LL], 2)
+    circle1l2r_2 = wp_circle_course([wp1LL, wp2RR], 3, 270, direction=-1)
+    line2r3l_2 = wp_straight_course([wp2RR, wp3LL], 2)
+    circle3l1r_2 = wp_circle_course([wp3LL, wp1RR], 3, 270, direction=-1)
+    line1r4l_2 = wp_straight_course([wp1RR, wp4LL], 2)
+    circle4l3r_2 = wp_circle_course([wp4LL, wp3RR], 3, 270, direction=-1)
+    line3r2l_2 = wp_straight_course([wp3RR, wp2LL], 2)
+    circle2l4rr_2 = wp_circle_course([wp2LL, wp4R], 3, 270, direction=-1)
+
+    detect_course = line4l1l
+    detect_course.pop(-1)
+    detect_course.extend(circle1l2r)
+    detect_course.pop(-1)
+    detect_course.extend(line2r3l)
+    detect_course.pop(-1)
+    detect_course.extend(circle3l1r)
+    detect_course.pop(-1)
+    detect_course.extend(line1r4l)
+    detect_course.pop(-1)
+    detect_course.extend(circle4l3r)
+    detect_course.pop(-1)
+    detect_course.extend(line3r2l)
+    detect_course.pop(-1)
+    detect_course.extend(circle2l4rr)
+    detect_course.pop(-1)
+    detect_course.extend(line4l1l_2)
+    detect_course.pop(-1)
+    detect_course.extend(circle1l2r_2)
+    detect_course.pop(-1)
+    detect_course.extend(line2r3l_2)
+    detect_course.pop(-1)
+    detect_course.extend(circle3l1r_2)
+    detect_course.pop(-1)
+    detect_course.extend(line1r4l_2)
+    detect_course.pop(-1)
+    detect_course.extend(circle4l3r_2)
+    detect_course.pop(-1)
+    detect_course.extend(line3r2l_2)
+    detect_course.pop(-1)
+    detect_course.extend(circle2l4rr_2)
+
+    return detect_course
+
+
 # 根据两个航点，在其中生成四瓣型侦察航线（视解算正确率进行航线形状修改），根据靶标与起飞区的相对方向对航点顺序进行调整
 def wp_detect_course(wp, alt, approach_angle='east'):
     # 生成侦察区四邻域顶点，距中心30米
@@ -593,7 +738,6 @@ def return_to_launch(the_connection):
         print("return to home")
     else:
         print("RTL failed")
-
 
 
 def loiter_at_present(the_connection, alt):
