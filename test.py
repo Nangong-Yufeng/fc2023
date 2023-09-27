@@ -16,8 +16,6 @@ wp_home = Waypoint(22.8027619, 114.2959589, 0)
 
 mission_upload(the_connection, wp_detect_course_HeBei(wp_home, 20), wp_home)
 
-# preflight_command(the_connection, wp_home)
-
 while True:
     msg = gain_position_now(the_connection)
     print(msg.alt)
