@@ -11,8 +11,8 @@ import bisect
 from scipy.interpolate import UnivariateSpline
 import numpy as np
 CONSTANTS_RADIUS_OF_EARTH = 6371000
-LEN_OF_TARGET_LIST = 30
-DETECT_CONFIDENCE = 0.5
+LEN_OF_TARGET_LIST = 50
+DETECT_CONFIDENCE = 0.6
 
 '''
 通用任务函数
@@ -332,9 +332,9 @@ def wp_circle_course(wp, precision, angle, direction=1):
 
 
 # 角度为北为起点、顺时针方向
-def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=0.0003):
+def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=0.00035):
     if group == '60':  # 航向60
-        angle = pi / 6
+        angle = pi
         right_angle = pi * 0.5
         [wp1, wp2, wp3, wp4] = [Waypoint(wp_center.lat+radius*sin(angle), wp_center.lon+radius*cos(angle), alt),
                                 Waypoint(wp_center.lat+radius*sin(angle-right_angle),
@@ -595,8 +595,8 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 # 投弹航线生成，以进场航线指向为主要参数, 角度以正北为零点，逆时针增加0-360
 def wp_bombing_course(wp_target, approach_angle,
                       length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
-                      precision_circle=4, precision_approach=3, precision_bomb=10, precision_enter=2,
-                      alt_target=7, alt_bomb_start=10, alt_approach=14, alt_left=15, length_side_points=10):
+                      precision_circle=4, precision_approach=6, precision_bomb=10, precision_enter=2,
+                      alt_target=15, alt_bomb_start=20, alt_approach=30, alt_left=20, length_side_points=5):
     # 转为弧度制
     approach_angle = (approach_angle - 90) * math.pi / 180
 
@@ -608,7 +608,7 @@ def wp_bombing_course(wp_target, approach_angle,
     [lat1, lon1] = XYtoGPS(len_north1, len_east1, ref_lat=wp_target.lat, ref_lon=wp_target.lon)
     wp_bomb = Waypoint(lat=lat1, lon=lon1, alt=alt_bomb_start)
     # 生成投弹部分航线
-    bomb_line = wp_bombing_insert_course([wp_bomb, wp_target], precision_bomb, length_side_points)
+    bomb_line = wp_bombing_insert_course([wp_bomb, wp_target], precision_bomb, length_side_points, approach_angle)
 
     # 生成直线进近航线
     len_north2 = length_approach * math.sin(approach_angle)
@@ -651,7 +651,7 @@ def wp_bombing_course(wp_target, approach_angle,
 
 
 # 投弹左右插点航线
-def wp_bombing_insert_course(wp, numbers, distance):
+def wp_bombing_insert_course(wp, numbers, distance, angle):
 
     start_GPS = [wp[0].lat, wp[0].lon, wp[0].alt]
     end_GPS = [wp[1].lat, wp[1].lon, wp[1].alt]
@@ -671,7 +671,7 @@ def wp_bombing_insert_course(wp, numbers, distance):
         k = x / y
 
         # 求出斜率
-        theta = atan(-1 / k)
+        theta = (angle * pi / 180)
 
     temp_result = np.zeros((numbers, 3))
     result = np.zeros((numbers, 3))
@@ -693,7 +693,7 @@ def wp_bombing_insert_course(wp, numbers, distance):
     # print(temp_result)
     for i in range(numbers):
         result = XYtoGPS(temp_result[i][0], temp_result[i][1], start_GPS[0], start_GPS[1])
-        alt = wp[0] + i * alt_step
+        alt = wp[0].alt + i * alt_step
         wp_list.append(Waypoint(result[0], result[1], alt))
     wp_list.append(wp[1])
     return wp_list
@@ -708,11 +708,12 @@ def bomb_drop(the_connection):
 
 def initiate_bomb_drop(the_connection, angle):
     # 因为顺逆不同进行转换
-    theta = 360 - angle
+    theta = 100 * (360 - angle)
     while True:
         heading = gain_heading(the_connection)
+        print("heading", heading)
         # 在理想的航向范围内
-        if theta - 45 < heading < theta + 100:
+        if theta - 3000 < heading < theta + 6000:
             break
 
 
@@ -734,10 +735,15 @@ def return_to_launch(the_connection):
                                          0,  # param6
                                          0)  # param7
     msg = rec_match_received(the_connection, "COMMAND_ACK")
+    if msg is None:
+        print("no message receive, RTL failed")
+        return False
     if msg.result == 0:
         print("return to home")
+        return True
     else:
         print("RTL failed")
+        return False
 
 
 def loiter_at_present(the_connection, alt):
@@ -754,15 +760,19 @@ def loiter_at_present(the_connection, alt):
                                          0,  # param5
                                          0,  # param6
                                          0)  # param7
-    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True)
+    msg = the_connection.recv_match(type="COMMAND_ACK", blocking=True, time_out=5)
+    if msg is None:
+        print("no message receive, failed to loiter")
+        return False
     result = msg.result
     if result == 0:
         lat = gain_position_now(the_connection).lat
         lon = gain_position_now(the_connection).lon
         print("loiter at present of lat: ", lat, "lon: ", lon, "alt: ", alt)
+        return True
     else:
        print("loiter failed")
-       error_process(the_connection)
+    return False
 
 
 def loiter(the_connection, position):
@@ -840,7 +850,7 @@ def length_of_dict(dict):
 
 
 # 判定是否完成了识别目标
-def detect_completed(dict):
+def detect_completed(dict, is_time_out):
     key = list(dict.keys())
     key.sort(key=dict.get, reverse=True)
     if len(key) >= 3:
@@ -860,6 +870,8 @@ def detect_completed(dict):
                 return [target1, target2, target3, target4]
             else:
                 return [target1, target2, target3]
+        elif is_time_out:
+            return [target1, target2, target3]
         else:
             return [-1, -1, -1]
     return [-1, -1, -1]
@@ -893,7 +905,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
     for i in range(len(time_target_dict)):
         # 识别到的数字不是正确数字
         if (vision_inform[i])[0] != num:
-            print(i)
+            print(vision_inform[i][0], " != ", num)
             continue
 
         # 使用二分法查找检测目标在位姿点集中的位置
@@ -933,8 +945,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
         lat_interp = UnivariateSpline(selected_timestamps, [data.lat for data in selected_tracks], s=2)
         lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=2)
         alt_interp = UnivariateSpline(selected_timestamps, [data.alt for data in selected_tracks], s=2)
-        print('type:', type(vision_inform[1]), '!!!!!!!')
-        print(vision_inform[1])
+
         target = coordinate_transfer(lat_interp(current_time), lon_interp(current_time), alt_interp(current_time),
                                      yaw_interp(current_time),
                                      pitch_interp(current_time), roll_interp(current_time), vision_inform[i][1],
@@ -943,7 +954,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
         # 记录解算结果
         with open(file='C:/Users/35032/Desktop/transfer_result.txt', mode='a') as f:
             f.write("靶标坐标 lat: " + str(target.lat) + " lon: " + str(target.lon) + " num: " + str(target.number)
-                    + " delay: " + str(delay))
+                    + " delay: " + str(delay) + "\n")
 
         target_list.append(target)
 

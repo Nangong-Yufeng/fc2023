@@ -2,6 +2,7 @@ from utils import title
 import threading
 import queue
 import time
+
 from geopy.distance import geodesic
 import numpy
 from vision.vision_class import Vision
@@ -10,17 +11,18 @@ from navigation import (Waypoint, mode_set, mission_upload,
                         detect_completed, eliminate_error_target, command_retry,
                         gain_position_now, target_transfer,
                         wrong_number, wp_bombing_course, mission_current, bomb_drop,
-                        loiter, return_to_launch, initiate_bomb_drop, preflight_command)
+                        loiter, return_to_launch, initiate_bomb_drop, preflight_command
+                        ,wp_detect_course_HeBei)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
-LEN_OF_TARGET_LIST = 30
-TIME_DELAY_MS = 180
-APPROACH_ANGLE = 180
-DETECT_TIME_LIMIT = int(3.5 * 60 * 1000)
+LEN_OF_TARGET_LIST = 50
+TIME_DELAY_MS = 150
+APPROACH_ANGLE = 260
+DETECT_TIME_LIMIT = int(2 * 60 * 1000)
 DETECT_ACC = 6  # m
-wp_detect = Waypoint(22.8027223, 114.2960957, 30)
-wp_home = Waypoint(22.8027619, 114.2959589, 0)
-final_target_position = Waypoint(22.8027619, 114.2959589, 0)
+wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)
+wp_home = Waypoint(38.543056, 115.040833, 0)
+final_target_position = Waypoint(38.5431345, 115.04109799999999, 0)
 mission_start_time = 0
 
 
@@ -42,10 +44,11 @@ def get_attitude_data(track_queue, detect_result):
 
         # 记录下原始位姿数据，观察错误率
         with open(file='C:/Users/35032/Desktop/raw_posture_gps.txt', mode='a') as f:
+            f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon))
             f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon)
                     + " alt " + str(track.alt) + " time " + str(track.time)
                     + " pitch " + str(track.pitch) + " roll " + str(track.roll)
-                    + "yaw " + str(track.yaw))
+                    + "yaw " + str(track.yaw) + "\n" + "relay " + str(TIME_DELAY_MS))
 
         '''
         对获取的位姿信息进行不正常值筛选
@@ -67,7 +70,7 @@ def get_attitude_data(track_queue, detect_result):
         track_queue.put((timestamp, track))
 
         '''
-        # 清除过时的数据点
+        # 清除过时的数据点C
         current_time = int(round(time.time() * 1000))
         while not track_queue.empty():
             data = track_queue.get()
@@ -89,15 +92,21 @@ def process_image_and_pose(track_queue, detect_result):
     target_result = [-1, -1, -1]
 
     # 图传信号初始化
-    vis = Vision(source="D:/ngyf/videos/DJI_0001.MP4", device='0', conf_thres=0.7)#
+    vis = Vision(source=0, device='0', conf_thres=0.7)#"D:/ngyf/videos/DJI_0001.MP4"
 
     result = -1
+    last_show_time = 0
     while result < 0:
         current_time = int(round(time.time() * 1000))
 
         # 时间保护，若时间到3分半还为得到识别结果，则直接进入投弹
+        if (current_time - mission_start_time) * 1e-3 - last_show_time > 60:
+            print("运行时间：", (current_time - mission_start_time) * 1e-3, "秒")
+            last_show_time = (current_time - mission_start_time) * 1e-3
         if current_time - mission_start_time > DETECT_TIME_LIMIT:
+            print("time up!")
             result = 1
+            break
 
         # 图像处理
         vis.shot()
@@ -140,8 +149,9 @@ def process_image_and_pose(track_queue, detect_result):
                     eliminate_error_target(target_dict)
 
                     # 判定侦察任务是否完成， 若得到探测结果，传入target列表，长度为3
-                    target_result = detect_completed(target_dict)
+                    target_result = detect_completed(target_dict, is_time_out=False)
                     result = target_result[0]
+                    break
 
         # 未检测到靶标
         else:
@@ -151,7 +161,8 @@ def process_image_and_pose(track_queue, detect_result):
     detect_result.get()
 
     print("侦察任务完成！")
-    loiter_at_present(the_connection, 50)
+    while not mode_set(the_connection, 12):
+        continue
 
     '''
     侦察完成 进行数据后处理
@@ -176,6 +187,7 @@ def process_image_and_pose(track_queue, detect_result):
                                                 num=target_result[0], delay=TIME_DELAY_MS)
     else:
         [num1, num2, num3] = target_result[0:3]
+        print(num1, num2, num3)
 
         # 解算出三个识别结果对应处理后的坐标
         target_list = [target1, target2, target3] = [target_transfer(time_target_dict=time_target_dict,
@@ -192,6 +204,7 @@ def process_image_and_pose(track_queue, detect_result):
                                                                      num=num3, delay=TIME_DELAY_MS)]
         '''
         基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
+        '''
         '''
         # 若识别到结果多于三个，可以尝试判断有无错误数据
         if len(target_result) > 3:
@@ -238,6 +251,7 @@ def process_image_and_pose(track_queue, detect_result):
                         target_list[error[1]] = alter_target
                         break
                     # 若循环结束都相似，则使用原数据
+        '''
 
         # 对确定后的三个靶标取中位数
         number_list = numpy.array([target_list[0].number, target_list[1].number, target_list[2].number])
@@ -250,6 +264,7 @@ def process_image_and_pose(track_queue, detect_result):
         else:
             target = target_list[2]
 
+        print("靶标信息计算完成")
         final_target_position = target
 
 
@@ -267,10 +282,11 @@ def detect_mission_circling(the_connection, detect_result):
 
     # 侦察部分航线
     while not detect_result.empty():
-        '''if rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(detect_course):
+        if the_connection.recv_match(type='MISSION_CURRENT',blocking=True).seq < len(detect_course):
             continue
-        '''
-        command_retry(the_connection, 'mode_set', 10)
+        while True:
+            if mode_set(the_connection, 10):
+                break
         print("next detect circle")
 
 
@@ -283,15 +299,14 @@ if __name__ == "__main__":
     '''
     连接并上传侦察任务
     '''
-    the_connection = mavutil.mavlink_connection('/COM8', baud=57600)
-
-    # 起飞前准备
-    # preflight_command(the_connection, wp_home)
+    the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
     # 生成并上传任务，比赛时不需要
-    detect_course = wp_detect_course(wp_detect, 16, 'north')
-    # mission_upload(the_connection, detect_course, wp_home)
+    detect_course = wp_detect_course_HeBei(wp_detect, 16)
+    mission_upload(the_connection, detect_course, wp_home)
 
+    # 起飞前准备
+    preflight_command(the_connection, wp_home)
     '''
     侦察过程中多线程运行
     '''
@@ -316,7 +331,6 @@ if __name__ == "__main__":
     进行投弹
     '''
     # 盘旋等待任务上传
-    loiter(the_connection, final_target_position)
     wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE)
     mission_upload(the_connection, wp_list, wp_home)
 
@@ -324,13 +338,16 @@ if __name__ == "__main__":
     initiate_bomb_drop(the_connection, APPROACH_ANGLE)
 
     # 切换为自动模式，进入投弹航线
-    mode_set(the_connection, 10)
+    while not mode_set(the_connection, 10):
+        continue
 
     # 到达预设投弹位置前，设置时间检查防止因为信号中断不投弹
-    while (mission_current(the_connection) < len(wp_list) - 13 and
-           (int(round(time.time() * 1000)) - mission_start_time) < int(5 * 60 * 1000)):
-        pass
+    while (mission_current(the_connection) < len(wp_list) - 13):
+        if (int(round(time.time() * 1000)) - mission_start_time) > int(5.2 * 60 * 1000):
+            print("time out!")
+            break
         print(mission_current(the_connection))
+
     bomb_drop(the_connection)
 
     '''
