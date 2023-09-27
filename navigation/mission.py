@@ -349,8 +349,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp1.lon + 2*interval * cos(angle + right_angle), alt),
                                       Waypoint(wp1.lat + interval * sin(angle - right_angle),
                                                wp1.lon + interval * cos(angle - right_angle), alt),
-                                      Waypoint(wp1.lat + 2*interval * sin(angle + right_angle),
-                                               wp1.lon + 2*interval * cos(angle + right_angle), alt)]
+                                      Waypoint(wp1.lat + 2*interval * sin(angle - right_angle),
+                                               wp1.lon + 2*interval * cos(angle - right_angle), alt)]
         angle2 = angle - right_angle
         [wp2L, wp2LL, wp2R, wp2RR] = [Waypoint(wp2.lat + interval * sin(angle2 + right_angle),
                                                wp2.lon + interval * cos(angle2 + right_angle), alt),
@@ -358,8 +358,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp2.lon + 2 * interval * cos(angle2 + right_angle), alt),
                                       Waypoint(wp2.lat + interval * sin(angle2 - right_angle),
                                                wp2.lon + interval * cos(angle2 - right_angle), alt),
-                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 + right_angle),
-                                               wp2.lon + 2 * interval * cos(angle2 + right_angle), alt)]
+                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 - right_angle),
+                                               wp2.lon + 2 * interval * cos(angle2 - right_angle), alt)]
         angle3 = angle + right_angle
         [wp3L, wp3LL, wp3R, wp3RR] = [Waypoint(wp3.lat + interval * sin(angle3 + right_angle),
                                                wp3.lon + interval * cos(angle3 + right_angle), alt),
@@ -367,8 +367,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp3.lon + 2 * interval * cos(angle3 + right_angle), alt),
                                       Waypoint(wp3.lat + interval * sin(angle3 - right_angle),
                                                wp3.lon + interval * cos(angle3 - right_angle), alt),
-                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 + right_angle),
-                                               wp3.lon + 2 * interval * cos(angle3 + right_angle), alt)]
+                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 - right_angle),
+                                               wp3.lon + 2 * interval * cos(angle3 - right_angle), alt)]
         angle4 = angle + pi
         [wp4L, wp4LL, wp4R, wp4RR] = [Waypoint(wp4.lat + interval * sin(angle4 + right_angle),
                                                wp4.lon + interval * cos(angle4 + right_angle), alt),
@@ -376,8 +376,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp4.lon + 2 * interval * cos(angle4 + right_angle), alt),
                                       Waypoint(wp4.lat + interval * sin(angle4 - right_angle),
                                                wp4.lon + interval * cos(angle4 - right_angle), alt),
-                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 + right_angle),
-                                               wp4.lon + 2 * interval * cos(angle4 + right_angle), alt)]
+                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 - right_angle),
+                                               wp4.lon + 2 * interval * cos(angle4 - right_angle), alt)]
     else:  # 航向240
         angle = 7 * pi / 6
         right_angle = pi * 0.5
@@ -394,8 +394,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp1.lon + 2 * interval * cos(angle + right_angle), alt),
                                       Waypoint(wp1.lat + interval * sin(angle - right_angle),
                                                wp1.lon + interval * cos(angle - right_angle), alt),
-                                      Waypoint(wp1.lat + 2 * interval * sin(angle + right_angle),
-                                               wp1.lon + 2 * interval * cos(angle + right_angle), alt)]
+                                      Waypoint(wp1.lat + 2 * interval * sin(angle - right_angle),
+                                               wp1.lon + 2 * interval * cos(angle - right_angle), alt)]
         angle2 = angle - right_angle
         [wp2L, wp2LL, wp2R, wp2RR] = [Waypoint(wp2.lat + interval * sin(angle2 + right_angle),
                                                wp2.lon + interval * cos(angle2 + right_angle), alt),
@@ -403,8 +403,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp2.lon + 2 * interval * cos(angle2 + right_angle), alt),
                                       Waypoint(wp2.lat + interval * sin(angle2 - right_angle),
                                                wp2.lon + interval * cos(angle2 - right_angle), alt),
-                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 + right_angle),
-                                               wp2.lon + 2 * interval * cos(angle2 + right_angle), alt)]
+                                      Waypoint(wp2.lat + 2 * interval * sin(angle2 - right_angle),
+                                               wp2.lon + 2 * interval * cos(angle2 - right_angle), alt)]
         angle3 = angle + right_angle
         [wp3L, wp3LL, wp3R, wp3RR] = [Waypoint(wp3.lat + interval * sin(angle3 + right_angle),
                                                wp3.lon + interval * cos(angle3 + right_angle), alt),
@@ -412,8 +412,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp3.lon + 2 * interval * cos(angle3 + right_angle), alt),
                                       Waypoint(wp3.lat + interval * sin(angle3 - right_angle),
                                                wp3.lon + interval * cos(angle3 - right_angle), alt),
-                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 + right_angle),
-                                               wp3.lon + 2 * interval * cos(angle3 + right_angle), alt)]
+                                      Waypoint(wp3.lat + 2 * interval * sin(angle3 - right_angle),
+                                               wp3.lon + 2 * interval * cos(angle3 - right_angle), alt)]
         angle4 = angle + pi
         [wp4L, wp4LL, wp4R, wp4RR] = [Waypoint(wp4.lat + interval * sin(angle4 + right_angle),
                                                wp4.lon + interval * cos(angle4 + right_angle), alt),
@@ -421,8 +421,8 @@ def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=
                                                wp4.lon + 2 * interval * cos(angle4 + right_angle), alt),
                                       Waypoint(wp4.lat + interval * sin(angle4 - right_angle),
                                                wp4.lon + interval * cos(angle4 - right_angle), alt),
-                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 + right_angle),
-                                               wp4.lon + 2 * interval * cos(angle4 + right_angle), alt)]
+                                      Waypoint(wp4.lat + 2 * interval * sin(angle4 - right_angle),
+                                               wp4.lon + 2 * interval * cos(angle4 - right_angle), alt)]
 
     line4l1l = wp_straight_course([wp4R, wp1L], 2)
     circle1l2r = wp_circle_course([wp1L, wp2R], 3, 270, direction=-1)
