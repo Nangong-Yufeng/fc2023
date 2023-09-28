@@ -839,7 +839,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 def wp_bombing_course(wp_target, approach_angle, turn_direction='anti_clock',
                       length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
                       precision_circle=4, precision_approach=6, precision_bomb=10, precision_enter=2,
-                      alt_target=15, alt_bomb_start=20, alt_approach=30, alt_left=20, length_side_points=3):
+                      alt_target=8, alt_bomb_start=14, alt_approach=25, alt_left=16, length_side_points=3):
     # 转为弧度制
     approach_angle = (approach_angle - 90) * math.pi / 180
 

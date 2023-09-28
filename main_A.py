@@ -20,8 +20,8 @@ APPROACH_ANGLE = 309  # 投弹时的进近航向，北起点逆时针
 DETECT_TIME_LIMIT = int(3 * 60 * 1000)
 DETECT_ACC = 6  # m
 wp_home = Waypoint(38.543938, 115.04040769999999, 0)
-wp_start = Waypoint(38.5569480, 115.1389195, 15)  # A组，顺时针侦察
-final_target_position = Waypoint(38.5569207, 115.1385990, 0)
+wp_start = Waypoint(38.5590428, 115.1420812, 15)  # A组，顺时针侦察
+final_target_position = Waypoint(38.5592552, 115.1421690, 0)
 mission_start_time = 0
 
 
@@ -291,7 +291,7 @@ if __name__ == "__main__":
 
     while True:
         msg = mission_current(the_connection)
-        if (msg >= len(wp_list) - 16):
+        if (msg >= len(wp_list) - 15):
             print("reaching waypoint", msg)
             break
         if (int(round(time.time() * 1000)) - mission_start_time) > int(5.2 * 60 * 1000):
