@@ -10,23 +10,27 @@ from navigation import (Waypoint, set_home, mode_set, arm, mission_upload,
 from pymavlink import mavutil
 LEN_OF_TARGET_LIST = 50
 TIME_DELAY_MS = 150
-APPROACH_ANGLE = 260
+APPROACH_ANGLE = 309
 DETECT_TIME_LIMIT = int(2 * 60 * 1000)
 DETECT_ACC = 6  # m
 wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)
 final_target_position = Waypoint(38.543192999999995, 115.0409772, 30)
+wp_start = Waypoint(38.5574343, 115.1392092, 30)
 
 
 wp_home = Waypoint(38.543056, 115.040833, 0)
 wp1 = Waypoint(38.5428056, 115.0395423, 30)
 wp2 = Waypoint(38.5435167, 115.0400761, 30)
 
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+
+msg = gain_position_now(the_connection)
+print(msg.lat, msg.lon)
 
 # 盘旋等待任务上传
 #wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE, 'clock')
 #wp_list = wp_circle_course_detect_specify([wp_detect, final_target_position], 10, 270, 50)
-wp_list = wp_detect_course_HeBei_2g(0, wp1, wp2)
+wp_list = wp_bombing_course(wp_start, APPROACH_ANGLE, 'clock')
 mission_upload(the_connection, wp_list, wp_home)
 
 preflight_command(the_connection, wp_home)
