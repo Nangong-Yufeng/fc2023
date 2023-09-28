@@ -15,7 +15,7 @@ from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 50
 TIME_DELAY_MS = 150
-APPROACH_ANGLE = 309  # 投弹时的进近航向，北起点逆时针
+APPROACH_ANGLE = 100  # 投弹时的进近航向，北起点逆时针
 DETECT_TIME_LIMIT = int(3 * 60 * 1000)
 DETECT_ACC = 6  # m
 wp_home = Waypoint(38.543938, 115.04040769999999, 0)
