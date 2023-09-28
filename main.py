@@ -20,7 +20,7 @@ TIME_DELAY_MS = 150
 APPROACH_ANGLE = 260
 DETECT_TIME_LIMIT = int(2 * 60 * 1000)
 DETECT_ACC = 6  # m
-wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)
+wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)  # 羊粪场
 wp_home = Waypoint(38.543056, 115.040833, 0)
 final_target_position = Waypoint(38.5431345, 115.04109799999999, 0)
 mission_start_time = 0
@@ -105,7 +105,7 @@ def process_image_and_pose(track_queue, detect_result):
             last_show_time = (current_time - mission_start_time) * 1e-3
         if current_time - mission_start_time > DETECT_TIME_LIMIT:
             print("time up!")
-            result = 1
+            target_result = detect_completed(target_dict, is_time_out=True)
             break
 
         # 图像处理
@@ -342,15 +342,22 @@ if __name__ == "__main__":
         continue
 
     # 到达预设投弹位置前，设置时间检查防止因为信号中断不投弹
-    while (mission_current(the_connection) < len(wp_list) - 13):
+    last_wp = 0
+    while True:
+        msg = mission_current(the_connection)
+        if (msg >= len(wp_list) - 15):
+            break
         if (int(round(time.time() * 1000)) - mission_start_time) > int(5.2 * 60 * 1000):
             print("time out!")
             break
-        print(mission_current(the_connection))
+        if msg != last_wp:
+            print("reaching ", msg)
+            last_wp = msg
+            continue
 
     bomb_drop(the_connection)
 
     '''
     任务结束
     '''
-    return_to_launch(the_connection)
+    #return_to_launch(the_connection)

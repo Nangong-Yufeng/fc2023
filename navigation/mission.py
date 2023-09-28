@@ -331,6 +331,166 @@ def wp_circle_course(wp, precision, angle, direction=1):
     return wp_list
 
 
+# 针对侦察航线需要进行的改写，可以更改弧线中心处的高度，其余部分不变； 使用时两端高度应该应该相等
+def wp_circle_course_detect_specify(wp, precision, angle, alt_mid, direction=1):
+    lat_len = wp[1].lat - wp[0].lat
+    lon_len = wp[1].lon - wp[0].lon
+    alt_len = wp[1].alt - wp[0].alt
+
+    # 半圆因为角度计算关系不能直接用下面的方法，但我懒得加一个专门的半圆航线了
+    if angle == 180:
+        angle = 179.9
+    # 转为弧度制
+    angle = angle * math.pi / 180
+
+    # 精度差为零时需要单独计算
+    # 注意使用弧度制
+    if lon_len == 0 and lat_len > 0:
+        theta_start = math.pi * 0.5
+    elif lon_len == 0 and lat_len < 0:
+        theta_start = math.pi * 1.5
+    else:
+        theta_start = math.atan(lat_len/lon_len)
+    if lon_len >= 0: #一四象限
+        pass
+    else: #二三象限
+        theta_start += math.pi
+
+    # 计算半径和角度步长
+    radius = math.sqrt(lat_len*lat_len + lon_len*lon_len*1.2) * 0.45 / math.sin(angle*0.5)  # 非常粗略
+    theta_step = angle / precision
+
+    # 判断圆心位置
+    if (direction >= 0 and angle < 180) or (direction < 0 and angle > 180):
+        center = Waypoint(wp[0].lat+radius*math.sin(0.5*math.pi+theta_start-0.5*angle),
+                          wp[0].lon+radius*math.cos(0.5*math.pi+theta_start-0.5*angle),
+                          wp[0].alt+0.5*alt_len)
+
+    else:
+        center = Waypoint(wp[0].lat+radius*math.sin(-0.5*math.pi+theta_start+0.5*angle),
+                          wp[0].lon+radius*math.cos(-0.5*math.pi+theta_start+0.5*angle),
+                          wp[0].alt+0.5*alt_len)
+
+    wp_list = [wp[0]]
+    mid = int(0.5 * precision)
+    alt_between = alt_mid - wp[0].alt
+    for i in range(0, mid):
+        if direction >= 0:
+           theta = (+theta_start - math.pi*0.5 - angle*0.5) + theta_step * (i+1)  # 顺时针适用
+        else:
+           theta = (+theta_start + math.pi*0.5 + angle*0.5) - theta_step * (i+1)  # 逆时针适用
+        lat_new = center.lat + radius * math.sin(theta)
+        lon_new = center.lon + radius * math.cos(theta)
+
+        alt_new = wp[0].alt + alt_between / (0.5 * precision) * (i+1)
+
+        wp_new = Waypoint(lat_new, lon_new, alt_new)
+        wp_list.append(wp_new)
+        i += 1
+    for i in range(mid, precision):
+        if direction >= 0:
+            theta = (+theta_start - math.pi * 0.5 - angle * 0.5) + theta_step * (i + 1)  # 顺时针适用
+        else:
+            theta = (+theta_start + math.pi * 0.5 + angle * 0.5) - theta_step * (i + 1)  # 逆时针适用
+        lat_new = center.lat + radius * math.sin(theta)
+        lon_new = center.lon + radius * math.cos(theta)
+
+        alt_new = wp[0].alt + alt_between / (0.5 * precision) * (precision - i - 1)
+
+        wp_new = Waypoint(lat_new, lon_new, alt_new)
+        wp_list.append(wp_new)
+        i += 1
+
+    wp_list.pop(-1)
+    wp_list.append(wp[1])
+    return wp_list
+
+
+# 使用简单直线大圆方式的侦察航线, approaching为指南针标准
+def wp_detect_course_HeBei_2g(wp_center, wp_start, wp_end, alt_detect=16, alt_circle=35, approaching=240,
+                              differ_length=0.00005, turn_angle=270, diameter=0.0007):
+    angle = pi * ((360 - approaching) + 90) / 180
+    right_angle = 0.5 * pi
+    wp_start1 = Waypoint(wp_start.lat,
+                         wp_start.lon, alt_detect)
+    wp_end1 = Waypoint(wp_end.lat,
+                       wp_end.lon, alt_detect)
+    wp_turn11 = Waypoint(wp_end1.lat + diameter * sin(angle - right_angle),
+                         wp_end1.lon + diameter * cos(angle - right_angle), alt_circle)
+    wp_turn12 = Waypoint(wp_start1.lat + diameter*sin(angle-right_angle),
+                         wp_start1.lon + diameter*cos(angle-right_angle), alt_circle)
+
+    wp_start2 = Waypoint(wp_start.lat + differ_length*sin(angle+right_angle),
+                         wp_start.lon + differ_length*cos(angle+right_angle), alt_detect)
+    wp_end2 = Waypoint(wp_end.lat + differ_length * sin(angle + right_angle),
+                       wp_end.lon + differ_length * cos(angle + right_angle), alt_detect)
+    wp_start3 = Waypoint(wp_start.lat + 2 * differ_length * sin(angle + right_angle),
+                         wp_start.lon + 2 * differ_length * cos(angle + right_angle), alt_detect)
+    wp_end3 = Waypoint(wp_end.lat + 2 * differ_length * sin(angle + right_angle),
+                       wp_end.lon + 2 * differ_length * cos(angle + right_angle), alt_detect)
+
+    wp_start4 = Waypoint(wp_start.lat + 3 * differ_length * sin(angle + right_angle),
+                         wp_start.lon + 3 * differ_length * cos(angle + right_angle), alt_detect)
+    wp_end4 = Waypoint(wp_end.lat + 3 * differ_length * sin(angle + right_angle),
+                       wp_end.lon + 3 * differ_length * cos(angle + right_angle), alt_detect)
+    wp_start5 = Waypoint(wp_start.lat + 4 * differ_length * sin(angle + right_angle),
+                         wp_start.lon + 4 * differ_length * cos(angle + right_angle), alt_detect)
+    wp_end5 = Waypoint(wp_end.lat + 4 * differ_length * sin(angle + right_angle),
+                       wp_end.lon + 4 * differ_length * cos(angle + right_angle), alt_detect)
+    wp_start6 = Waypoint(wp_start.lat + 5 * differ_length * sin(angle + right_angle),
+                         wp_start.lon + 5 * differ_length * cos(angle + right_angle), alt_detect)
+    wp_end6 = Waypoint(wp_end.lat + 5 * differ_length * sin(angle + right_angle),
+                       wp_end.lon + 5 * differ_length * cos(angle + right_angle), alt_detect)
+
+    line11 = wp_straight_course([wp_start1, wp_end1], 3)
+    circle11 = wp_circle_course([wp_end1, wp_turn11], 3, 180)
+    line12 = [wp_turn11, wp_turn12]
+    circle12 = wp_circle_course([wp_turn12, wp_start2], 3, 180)
+    '''
+    line2 = wp_straight_course([wp_start2, wp_end2], 3)
+    circle2 = wp_circle_course_detect_specify([wp_end2, wp_start3], 5, turn_angle, alt_mid=alt_circle)
+    line3 = wp_straight_course([wp_start3, wp_end3], 3)
+    circle3 = wp_circle_course_detect_specify([wp_end3, wp_start4], 5, turn_angle, alt_mid=alt_circle)
+    line4 = wp_straight_course([wp_start4, wp_end4], 3)
+    circle4 = wp_circle_course_detect_specify([wp_end4, wp_start5], 5, turn_angle, alt_mid=alt_circle)
+    line5 = wp_straight_course([wp_start5, wp_end5], 3)
+    circle5 = wp_circle_course_detect_specify([wp_end5, wp_start6], 5, turn_angle, alt_mid=alt_circle)
+    line6 = wp_straight_course([wp_start6, wp_end6], 3)
+    circle6 = wp_circle_course_detect_specify([wp_end6, wp_start1], 5, turn_angle, alt_mid=alt_circle)
+    '''
+
+    detect_course = line11
+    detect_course.pop(-1)
+    detect_course.extend(circle11)
+    detect_course.pop(-1)
+    detect_course.extend(circle12)
+
+    '''
+    detect_course.pop(-1)
+    detect_course.extend(line2)
+    detect_course.pop(-1)
+    detect_course.extend(circle2)
+    detect_course.pop(-1)
+    detect_course.extend(line3)
+    detect_course.pop(-1)
+    detect_course.extend(circle3)
+    detect_course.pop(-1)
+    detect_course.extend(line4)
+    detect_course.pop(-1)
+    detect_course.extend(circle4)
+    detect_course.pop(-1)
+    detect_course.extend(line5)
+    detect_course.pop(-1)
+    detect_course.extend(circle5)
+    detect_course.pop(-1)
+    detect_course.extend(line6)
+    detect_course.pop(-1)
+    detect_course.extend(circle6)
+    '''
+
+    return detect_course
+
+
 # 角度为北为起点、顺时针方向
 def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00005, radius=0.00035):
     if group == '60':  # 航向60
@@ -533,9 +693,9 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
     lon_len = wp_now.lon - wp_target.lon
 
     theta = math.atan(lat_len / lon_len)
-    if lon_len >= 0: # 一四象限
+    if lon_len >= 0:  # 一四象限
         pass
-    else: # 二三象限
+    else:  # 二三象限
         theta += math.pi
 
     #theta = theta * math.pi / 180
@@ -593,7 +753,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 
 
 # 投弹航线生成，以进场航线指向为主要参数, 角度以正北为零点，逆时针增加0-360
-def wp_bombing_course(wp_target, approach_angle,
+def wp_bombing_course(wp_target, approach_angle, turn_direction='anti_clock',
                       length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
                       precision_circle=4, precision_approach=6, precision_bomb=10, precision_enter=2,
                       alt_target=15, alt_bomb_start=20, alt_approach=30, alt_left=20, length_side_points=5):
@@ -618,11 +778,19 @@ def wp_bombing_course(wp_target, approach_angle,
     approach_line = wp_straight_course([wp_approach, wp_bomb], precision_approach)
 
     # 生成掉头对准航线
-    len_north3 = 2 * radius * math.sin(approach_angle - 0.5 * math.pi)
-    len_east3 = 2 * radius * math.cos(approach_angle - 0.5 * math.pi)
-    [lat3, lon3] = XYtoGPS(len_north3, len_east3, ref_lat=wp_approach.lat, ref_lon=wp_approach.lon)
-    wp_turn_start = Waypoint(lat=lat3, lon=lon3, alt=alt_approach)
-    turn_circle = wp_circle_course([wp_turn_start, wp_approach], precision_circle, 180)
+    if turn_direction == 'anti_clock':
+        len_north3 = 2 * radius * math.sin(approach_angle - 0.5 * math.pi)
+        len_east3 = 2 * radius * math.cos(approach_angle - 0.5 * math.pi)
+        [lat3, lon3] = XYtoGPS(len_north3, len_east3, ref_lat=wp_approach.lat, ref_lon=wp_approach.lon)
+        wp_turn_start = Waypoint(lat=lat3, lon=lon3, alt=alt_approach)
+        turn_circle = wp_circle_course([wp_turn_start, wp_approach], precision_circle, 180)
+    else:
+        len_north3 = 2 * radius * math.sin(approach_angle + 0.5 * math.pi)
+        len_east3 = 2 * radius * math.cos(approach_angle + 0.5 * math.pi)
+        [lat3, lon3] = XYtoGPS(len_north3, len_east3, ref_lat=wp_approach.lat, ref_lon=wp_approach.lon)
+        wp_turn_start = Waypoint(lat=lat3, lon=lon3, alt=alt_approach)
+        turn_circle = wp_circle_course([wp_turn_start, wp_approach], precision_circle, 180, direction=-1)
+
 
     # 生成几个航点使飞机更好地进入掉头航线
     len_north4 = length_enter * math.sin(approach_angle + math.pi)
@@ -708,12 +876,12 @@ def bomb_drop(the_connection):
 
 def initiate_bomb_drop(the_connection, angle):
     # 因为顺逆不同进行转换
-    theta = 100 * (360 - angle)
+    expect_angle = 100 * (360 - angle)
     while True:
         heading = gain_heading(the_connection)
         print("heading", heading)
         # 在理想的航向范围内
-        if theta - 3000 < heading < theta + 6000:
+        if expect_angle - 3000 < heading < expect_angle + 3000:
             break
 
 
@@ -853,27 +1021,31 @@ def length_of_dict(dict):
 def detect_completed(dict, is_time_out):
     key = list(dict.keys())
     key.sort(key=dict.get, reverse=True)
-    if len(key) >= 3:
-        target1, target2, target3 = key[0:3]
-        if dict[target1] + dict[target2] + dict[target3] > DETECT_CONFIDENCE * LEN_OF_TARGET_LIST:
-            print("vision detection result:   ", target1, "   ", target2, "   ", target3)
-            for n in range(len(key)):
-                print("result: ", key[n], "count: ", dict[key[n]])
-            if len(key) >= 6:
-                target4, target5, target6 = key[3:6]
-                return [target1, target2, target3, target4, target5, target6]
-            elif len(key) >= 5:
-                target4, target5 = key[3:5]
-                return [target1, target2, target3, target4, target5]
-            elif len(key) >= 4:
-                target4 = key[3:4]
-                return [target1, target2, target3, target4]
+    if is_time_out:
+        target_list = []
+        for k in key:
+            target_list.append(k)
+        return target_list
+    else:
+        if len(key) >= 3:
+            target1, target2, target3 = key[0:3]
+            if dict[target1] + dict[target2] + dict[target3] > DETECT_CONFIDENCE * LEN_OF_TARGET_LIST:
+                print("vision detection result:   ", target1, "   ", target2, "   ", target3)
+                for n in range(len(key)):
+                    print("result: ", key[n], "count: ", dict[key[n]])
+                if len(key) >= 6:
+                    target4, target5, target6 = key[3:6]
+                    return [target1, target2, target3, target4, target5, target6]
+                elif len(key) >= 5:
+                    target4, target5 = key[3:5]
+                    return [target1, target2, target3, target4, target5]
+                elif len(key) >= 4:
+                    target4 = key[3:4]
+                    return [target1, target2, target3, target4]
+                else:
+                    return [target1, target2, target3]
             else:
-                return [target1, target2, target3]
-        elif is_time_out:
-            return [target1, target2, target3]
-        else:
-            return [-1, -1, -1]
+                return [-1, -1, -1]
     return [-1, -1, -1]
 
 
@@ -997,7 +1169,7 @@ def target_transfer(time_target_dict, vision_inform, num, timestamps, target_tim
 
 # 从数据近似上识别是否可能有识别错误
 def wrong_number(num_list):
-    def is_same_or_similar(nums_lis):  # list[int]):
+    def is_same_or_similar(num_list):  # list[int]):
         confusing_digits = [[1, 7], [5, 6], [2, 7], [3, 8], [7, 9]]
         index_dict = {12: [False, False], 13: [False, False], 23: [False, False]}  # :dict[int, list[bool]]
         num_digits = [divmod(num, 10) for num in num_list]
