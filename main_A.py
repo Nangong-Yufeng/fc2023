@@ -19,12 +19,9 @@ TIME_DELAY_MS = 150
 APPROACH_ANGLE = 255  # 投弹时的进近航向，北起点逆时针
 DETECT_TIME_LIMIT = int(3 * 60 * 1000)
 DETECT_ACC = 6  # m
-wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)  # 羊粪场
-# wp_home = Waypoint(38.543056, 115.040833, 0)
 wp_home = Waypoint(38.543938, 115.04040769999999, 0)
-# wp_start = Waypoint(38.5574343, 115.1392092, 30)  # 比赛场地，跑道右侧航向
-wp_start = Waypoint(38.5428931, 115.04135629999999, 15) # 野场，9.28
-final_target_position =  wp_start  # Waypoint(38.5431345, 115.04109799999999, 0)
+wp_start = Waypoint(38.5569480, 115.1389195, 15)  # A组，顺时针侦察
+final_target_position = Waypoint(38.5569207, 115.1385990, 0)
 mission_start_time = 0
 
 
