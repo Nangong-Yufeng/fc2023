@@ -30,4 +30,4 @@ detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=DETECT_ANG
 mission_upload(the_connection, detect_course, wp_home)
 
 wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE, 'clock')
-# mission_upload(the_connection, wp_list, wp_home)
+mission_upload(the_connection, wp_list, wp_home)
