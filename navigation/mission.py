@@ -400,6 +400,7 @@ def wp_circle_course_detect_specify(wp, precision, angle, alt_mid, direction=1):
         wp_new = Waypoint(lat_new, lon_new, alt_new)
         wp_list.append(wp_new)
         i += 1
+
     wp_list.pop(-1)
     wp_list.append(wp[1])
     return wp_list
