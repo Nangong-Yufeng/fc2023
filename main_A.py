@@ -41,14 +41,6 @@ def get_attitude_data(track_queue, detect_result):
         # 获取位姿态数据
         track = gain_track_point(the_connection)
 
-        # 记录下原始位姿数据，观察错误率
-        with open(file='C:/Users/35032/Desktop/raw_posture_gps.txt', mode='a') as f:
-            f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon))
-            f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon)
-                    + " alt " + str(track.alt) + " time " + str(track.time)
-                    + " pitch " + str(track.pitch) + " roll " + str(track.roll)
-                    + "yaw " + str(track.yaw) + "\n" + "relay " + str(TIME_DELAY_MS))
-
         '''
         对获取的位姿信息进行不正常值筛选
         '''
@@ -247,7 +239,9 @@ if __name__ == "__main__":
     '''
     连接并上传侦察任务
     '''
-    the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+    the_connection = mavutil.mavlink_connection('/COM6', baud=57600)
+    # 备用
+    # the_connection = mavutil.mavlink_connection('/COM9', baud=57600)
 
     # 生成并上传任务，比赛时不需要
     detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=DETECT_ANGLE, direction=-1)
