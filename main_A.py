@@ -2,21 +2,21 @@ from utils import title
 import threading
 import queue
 import time
-from geopy.distance import geodesic
 import numpy
 from vision.vision_class import Vision
 from navigation import (Waypoint, mode_set, mission_upload,
-                        wp_detect_course, loiter_at_present, gain_track_point,
-                        detect_completed, eliminate_error_target, command_retry,
+                        gain_track_point,
+                        detect_completed, eliminate_error_target,
                         gain_position_now, target_transfer,
-                        wrong_number, wp_bombing_course, mission_current, bomb_drop,
-                        loiter, return_to_launch, initiate_bomb_drop, preflight_command
-                        ,wp_detect_course_HeBei, wp_detect_course_HeBei_2g)
+                        wp_bombing_course, mission_current, bomb_drop,
+                        initiate_bomb_drop, preflight_command,
+                        wp_detect_course_HeBei_2g)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 50
 TIME_DELAY_MS = 150
-APPROACH_ANGLE = 255  # 投弹时的进近航向，北起点逆时针
+DETECT_ANGLE = 231
+APPROACH_ANGLE = 309  # 投弹时的进近航向，北起点逆时针
 DETECT_TIME_LIMIT = int(3 * 60 * 1000)
 DETECT_ACC = 6  # m
 wp_home = Waypoint(38.543938, 115.04040769999999, 0)
@@ -201,56 +201,6 @@ def process_image_and_pose(track_queue, detect_result):
                                                                      target_time=target_time, timestamps=timestamps,
                                                                      tracks=tracks, vision_inform=vision_inform,
                                                                      num=num3, delay=TIME_DELAY_MS)]
-        '''
-        基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
-        '''
-        '''
-        # 若识别到结果多于三个，可以尝试判断有无错误数据
-        if len(target_result) > 3:
-            point_list = [point1, point2, point3] = [(target1.lat, target1.lon), (target2.lat, target2.lon),
-                                                     (target3.lat, target3.lon)]
-
-            # 若两个靶标的最终结果差距小于6米，且数字具有相似性
-            if wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point1, point2).meters < DETECT_ACC:
-                print("可能出现数字识别错误")
-                error = [0, 1, 2]  # num2为错误结果，第三位为正常数字
-            elif wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point1, point3).meters < DETECT_ACC:
-                print("可能出现数字识别错误")
-                error = [0, 2, 1]  # num3为错误结果
-            elif wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point2, point3).meters < DETECT_ACC:
-                print("可能出现数字识别错误")
-                error = [1, 2, 0]  # num3为错误结果
-            else:
-                error = [-1, -1, -1]  # 未有错误结果
-
-            # 顺延出现次数较多的数字，处理错误结果
-            while error[1] > 0:
-                for n in range(3, len(target_result)):
-                    # 顺延下一个数字进行替补
-                    alter_num = target_result[n]
-                    alter_target = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
-                                                   timestamps=timestamps, tracks=tracks, vision_inform=vision_inform,
-                                                   num=alter_num, delay=TIME_DELAY_MS)
-                    alter_point = (alter_target.lat, alter_target.lon)
-
-                    # 判断替补数据和原错误数据是否相似和位置邻近
-                    if (geodesic(point_list[error[0]], alter_point).meters < 6 and
-                            wrong_number([target1.number, target2.number])[0] < 0):
-                        print("替补数字可能出现识别错误")
-                        # 继续顺延下一个数字
-                        continue
-                    # 防止是另一个确定数据的错误答案
-                    elif (geodesic(point_list[error[2]], alter_point).meters < 6 and
-                            wrong_number([target1.number, target2.number])[0] < 0):
-                        print("替补数字可能出现识别错误")
-                        continue
-                    # 新的数字认为正确
-                    else:
-                        # 替换错误数据
-                        target_list[error[1]] = alter_target
-                        break
-                    # 若循环结束都相似，则使用原数据
-        '''
 
         # 对确定后的三个靶标取中位数
         number_list = numpy.array([target_list[0].number, target_list[1].number, target_list[2].number])
@@ -280,7 +230,7 @@ def detect_mission_circling(the_connection, detect_result):
 
     # 侦察部分航线
     while not detect_result.empty():
-        if the_connection.recv_match(type='MISSION_CURRENT',blocking=True).seq < len(detect_course) - 2:
+        if the_connection.recv_match(type='MISSION_CURRENT', blocking=True).seq < len(detect_course) - 2:
             continue
         while True:
             if mode_set(the_connection, 10):
@@ -300,7 +250,7 @@ if __name__ == "__main__":
     the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
     # 生成并上传任务，比赛时不需要
-    detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=140)# wp_detect_course_HeBei(wp_detect, 16)
+    detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=DETECT_ANGLE, direction=-1)
     mission_upload(the_connection, detect_course, wp_home)
 
     # 起飞前准备
@@ -330,7 +280,7 @@ if __name__ == "__main__":
     '''
     # 盘旋等待任务上传
     wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE)
-    # mission_upload(the_connection, wp_list, wp_home)
+    mission_upload(the_connection, wp_list, wp_home)
 
     # 盘旋等待任务角度合适
     initiate_bomb_drop(the_connection, APPROACH_ANGLE)

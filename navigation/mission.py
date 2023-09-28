@@ -406,9 +406,9 @@ def wp_circle_course_detect_specify(wp, precision, angle, alt_mid, direction=1):
     return wp_list
 
 
-# 使用简单直线大圆方式的侦察航线, approaching为指南针标准
+# 使用简单直线大圆方式的侦察航线, approaching为指南针标准, direction取1为逆时针
 def wp_detect_course_HeBei_2g(wp_center, wp_start, alt_detect=12, alt_circle=25, approaching=140,
-                              differ_length=0.00012, turn_angle=270, diameter=0.0009, detect_length=0.0006):
+                              differ_length=0.00012, diameter=0.0009, detect_length=0.0006, direction=1):
     angle = pi * ((360 - approaching) + 90) / 180
     wp_end = Waypoint(wp_start.lat + detect_length * sin(angle),
                       wp_start.lon + detect_length * cos(angle), wp_start.alt)
@@ -417,46 +417,46 @@ def wp_detect_course_HeBei_2g(wp_center, wp_start, alt_detect=12, alt_circle=25,
                          wp_start.lon, alt_detect)
     wp_end1 = Waypoint(wp_end.lat,
                        wp_end.lon, alt_detect)
-    wp_turn11 = Waypoint(wp_end1.lat + diameter * sin(angle + right_angle),
-                         wp_end1.lon + diameter * cos(angle + right_angle), alt_circle)
-    wp_turn12 = Waypoint(wp_start1.lat + diameter*sin(angle+right_angle),
-                         wp_start1.lon + diameter*cos(angle+right_angle), alt_circle)
+    wp_turn11 = Waypoint(wp_end1.lat + diameter * sin(angle + direction*right_angle),
+                         wp_end1.lon + diameter * cos(angle + direction*right_angle), alt_circle)
+    wp_turn12 = Waypoint(wp_start1.lat + diameter*sin(angle+direction*right_angle),
+                         wp_start1.lon + diameter*cos(angle+direction*right_angle), alt_circle)
 
-    wp_start2 = Waypoint(wp_start.lat + differ_length*sin(angle+right_angle),
-                         wp_start.lon + differ_length*cos(angle+right_angle), alt_detect)
-    wp_end2 = Waypoint(wp_end.lat + differ_length * sin(angle + right_angle),
-                       wp_end.lon + differ_length * cos(angle + right_angle), alt_detect)
-    wp_turn21 = Waypoint(wp_end2.lat + diameter * sin(angle + right_angle),
-                         wp_end2.lon + diameter * cos(angle + right_angle), alt_circle)
-    wp_turn22 = Waypoint(wp_start2.lat + diameter * sin(angle + right_angle),
-                         wp_start2.lon + diameter * cos(angle + right_angle), alt_circle)
+    wp_start2 = Waypoint(wp_start.lat + differ_length*sin(angle+direction*right_angle),
+                         wp_start.lon + differ_length*cos(angle+direction*right_angle), alt_detect)
+    wp_end2 = Waypoint(wp_end.lat + differ_length * sin(angle + direction*right_angle),
+                       wp_end.lon + differ_length * cos(angle + direction*right_angle), alt_detect)
+    wp_turn21 = Waypoint(wp_end2.lat + diameter * sin(angle + direction*right_angle),
+                         wp_end2.lon + diameter * cos(angle + direction*right_angle), alt_circle)
+    wp_turn22 = Waypoint(wp_start2.lat + diameter * sin(angle + direction*right_angle),
+                         wp_start2.lon + diameter * cos(angle + direction*right_angle), alt_circle)
 
-    wp_start3 = Waypoint(wp_start.lat + 2 * differ_length * sin(angle + right_angle),
-                         wp_start.lon + 2 * differ_length * cos(angle + right_angle), alt_detect)
-    wp_end3 = Waypoint(wp_end.lat + 2 * differ_length * sin(angle + right_angle),
-                       wp_end.lon + 2 * differ_length * cos(angle + right_angle), alt_detect)
-    wp_turn31 = Waypoint(wp_end3.lat + diameter * sin(angle + right_angle),
-                         wp_end3.lon + diameter * cos(angle + right_angle), alt_circle)
-    wp_turn32 = Waypoint(wp_start3.lat + diameter * sin(angle + right_angle),
-                         wp_start3.lon + diameter * cos(angle + right_angle), alt_circle)
+    wp_start3 = Waypoint(wp_start.lat + 2 * differ_length * sin(angle + direction*right_angle),
+                         wp_start.lon + 2 * differ_length * cos(angle + direction*right_angle), alt_detect)
+    wp_end3 = Waypoint(wp_end.lat + 2 * differ_length * sin(angle + direction*right_angle),
+                       wp_end.lon + 2 * differ_length * cos(angle + direction*right_angle), alt_detect)
+    wp_turn31 = Waypoint(wp_end3.lat + diameter * sin(angle + direction*right_angle),
+                         wp_end3.lon + diameter * cos(angle + direction*right_angle), alt_circle)
+    wp_turn32 = Waypoint(wp_start3.lat + diameter * sin(angle + direction*right_angle),
+                         wp_start3.lon + diameter * cos(angle + direction*right_angle), alt_circle)
 
-    wp_start4 = Waypoint(wp_start.lat + 3 * differ_length * sin(angle + right_angle),
-                         wp_start.lon + 3 * differ_length * cos(angle + right_angle), alt_detect)
-    wp_end4 = Waypoint(wp_end.lat + 3 * differ_length * sin(angle + right_angle),
-                       wp_end.lon + 3 * differ_length * cos(angle + right_angle), alt_detect)
-    wp_turn41 = Waypoint(wp_end4.lat + diameter * sin(angle + right_angle),
-                         wp_end4.lon + diameter * cos(angle + right_angle), alt_circle)
-    wp_turn42 = Waypoint(wp_start4.lat + diameter * sin(angle + right_angle),
-                         wp_start4.lon + diameter * cos(angle + right_angle), alt_circle)
+    wp_start4 = Waypoint(wp_start.lat + 3 * differ_length * sin(angle + direction*right_angle),
+                         wp_start.lon + 3 * differ_length * cos(angle + direction*right_angle), alt_detect)
+    wp_end4 = Waypoint(wp_end.lat + 3 * differ_length * sin(angle + direction*right_angle),
+                       wp_end.lon + 3 * differ_length * cos(angle + direction*right_angle), alt_detect)
+    wp_turn41 = Waypoint(wp_end4.lat + diameter * sin(angle + direction*right_angle),
+                         wp_end4.lon + diameter * cos(angle + direction*right_angle), alt_circle)
+    wp_turn42 = Waypoint(wp_start4.lat + diameter * sin(angle + direction*right_angle),
+                         wp_start4.lon + diameter * cos(angle + direction*right_angle), alt_circle)
 
-    wp_start5 = Waypoint(wp_start.lat + 4 * differ_length * sin(angle + right_angle),
-                         wp_start.lon + 4 * differ_length * cos(angle + right_angle), alt_detect)
-    wp_end5 = Waypoint(wp_end.lat + 4 * differ_length * sin(angle + right_angle),
-                       wp_end.lon + 4 * differ_length * cos(angle + right_angle), alt_detect)
-    wp_turn51 = Waypoint(wp_end5.lat + diameter * sin(angle + right_angle),
-                         wp_end5.lon + diameter * cos(angle + right_angle), alt_circle)
-    wp_turn52 = Waypoint(wp_start5.lat + diameter * sin(angle + right_angle),
-                         wp_start5.lon + diameter * cos(angle + right_angle), alt_circle)
+    wp_start5 = Waypoint(wp_start.lat + 4 * differ_length * sin(angle + direction*right_angle),
+                         wp_start.lon + 4 * differ_length * cos(angle + direction*right_angle), alt_detect)
+    wp_end5 = Waypoint(wp_end.lat + 4 * differ_length * sin(angle + direction*right_angle),
+                       wp_end.lon + 4 * differ_length * cos(angle + direction*right_angle), alt_detect)
+    wp_turn51 = Waypoint(wp_end5.lat + diameter * sin(angle + direction*right_angle),
+                         wp_end5.lon + diameter * cos(angle + direction*right_angle), alt_circle)
+    wp_turn52 = Waypoint(wp_start5.lat + diameter * sin(angle + direction*right_angle),
+                         wp_start5.lon + diameter * cos(angle + direction*right_angle), alt_circle)
 
     wp_start6 = Waypoint(wp_start.lat + 5 * differ_length * sin(angle + right_angle),
                          wp_start.lon + 5 * differ_length * cos(angle + right_angle), alt_detect)
@@ -468,24 +468,24 @@ def wp_detect_course_HeBei_2g(wp_center, wp_start, alt_detect=12, alt_circle=25,
                          wp_start6.lon + diameter * cos(angle + right_angle), alt_circle)
 
     line11 = wp_straight_course([wp_start1, wp_end1], 3)
-    circle11 = wp_circle_course([wp_end1, wp_turn11], 3, 180)
+    circle11 = wp_circle_course([wp_end1, wp_turn11], 3, 180, direction=direction)
     line12 = [wp_turn11, wp_turn12]
-    circle12 = wp_circle_course([wp_turn12, wp_start2], 3, 180)
+    circle12 = wp_circle_course([wp_turn12, wp_start2], 3, 180, direction=direction)
 
     line21 = wp_straight_course([wp_start2, wp_end2], 3)
-    circle21 = wp_circle_course([wp_end2, wp_turn21], 3, 180)
+    circle21 = wp_circle_course([wp_end2, wp_turn21], 3, 180, direction=direction)
     line22 = [wp_turn21, wp_turn22]
-    circle22 = wp_circle_course([wp_turn22, wp_start3], 3, 180)
+    circle22 = wp_circle_course([wp_turn22, wp_start3], 3, 180, direction=direction)
 
     line31 = wp_straight_course([wp_start3, wp_end3], 3)
-    circle31 = wp_circle_course([wp_end3, wp_turn31], 3, 180)
+    circle31 = wp_circle_course([wp_end3, wp_turn31], 3, 180, direction=direction)
     line32 = [wp_turn31, wp_turn32]
-    circle32 = wp_circle_course([wp_turn32, wp_start4], 3, 180)
+    circle32 = wp_circle_course([wp_turn32, wp_start4], 3, 180, direction=direction)
 
     line41 = wp_straight_course([wp_start4, wp_end4], 3)
-    circle41 = wp_circle_course([wp_end4, wp_turn41], 3, 180)
+    circle41 = wp_circle_course([wp_end4, wp_turn41], 3, 180, direction=direction)
     line42 = [wp_turn41, wp_turn42]
-    circle42 = wp_circle_course([wp_turn42, wp_start5], 3, 180)
+    circle42 = wp_circle_course([wp_turn42, wp_start1], 3, 180, direction=direction)
 
     line51 = wp_straight_course([wp_start5, wp_end5], 3)
     circle51 = wp_circle_course([wp_end5, wp_turn51], 3, 180)
