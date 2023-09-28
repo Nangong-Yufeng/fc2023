@@ -27,7 +27,7 @@ mission_start_time = 0
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
 detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=DETECT_ANGLE, direction=1)
-# mission_upload(the_connection, detect_course, wp_home)
+mission_upload(the_connection, detect_course, wp_home)
 
 wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE, 'clock')
 mission_upload(the_connection, wp_list, wp_home)
