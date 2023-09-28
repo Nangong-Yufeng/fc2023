@@ -55,7 +55,7 @@ class Vision:
         self.im0 = None
         self.cap = cv2.VideoCapture(source, cv2.CAP_DSHOW)#
         print("视觉：设置视频格式")
-        self.cap.set(cv2.CAP_PROP_FPS, 30)
+        self.cap.set(cv2.CAP_PROP_FPS, 60)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         print("视觉：设置完成")
