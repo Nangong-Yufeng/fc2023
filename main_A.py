@@ -20,8 +20,8 @@ APPROACH_ANGLE = 309  # 投弹时的进近航向，北起点逆时针
 DETECT_TIME_LIMIT = int(3 * 60 * 1000)
 DETECT_ACC = 6  # m
 wp_home = Waypoint(38.543938, 115.04040769999999, 0)
-wp_start = Waypoint(38.5569480, 115.1389195, 15)  # A组，顺时针侦察
-final_target_position = Waypoint(38.5569207, 115.1385990, 0)
+wp_start = Waypoint(38.5590428, 115.1420812, 15)  # A组，顺时针侦察
+final_target_position = Waypoint(38.5592552, 115.1421690, 0)
 mission_start_time = 0
 
 
@@ -40,14 +40,6 @@ def get_attitude_data(track_queue, detect_result):
     while not detect_result.empty():
         # 获取位姿态数据
         track = gain_track_point(the_connection)
-
-        # 记录下原始位姿数据，观察错误率
-        with open(file='C:/Users/35032/Desktop/raw_posture_gps.txt', mode='a') as f:
-            f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon))
-            f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon)
-                    + " alt " + str(track.alt) + " time " + str(track.time)
-                    + " pitch " + str(track.pitch) + " roll " + str(track.roll)
-                    + "yaw " + str(track.yaw) + "\n" + "relay " + str(TIME_DELAY_MS))
 
         '''
         对获取的位姿信息进行不正常值筛选
@@ -247,7 +239,9 @@ if __name__ == "__main__":
     '''
     连接并上传侦察任务
     '''
-    the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+    the_connection = mavutil.mavlink_connection('/COM6', baud=57600)
+    # 备用
+    # the_connection = mavutil.mavlink_connection('/COM9', baud=57600)
 
     # 生成并上传任务，比赛时不需要
     detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=DETECT_ANGLE, direction=-1)
@@ -297,7 +291,7 @@ if __name__ == "__main__":
 
     while True:
         msg = mission_current(the_connection)
-        if (msg >= len(wp_list) - 16):
+        if (msg >= len(wp_list) - 15):
             print("reaching waypoint", msg)
             break
         if (int(round(time.time() * 1000)) - mission_start_time) > int(5.2 * 60 * 1000):
