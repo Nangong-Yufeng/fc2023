@@ -152,6 +152,8 @@ def process_image_and_pose(track_queue, detect_result):
     detect_result.get()
 
     print("侦察任务完成！")
+    while gain_position_now(the_connection) is not None and gain_position_now(the_connection).alt < 16:
+        continue
     while not mode_set(the_connection, 12):
         continue
 
