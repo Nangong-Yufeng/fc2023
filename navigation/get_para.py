@@ -139,17 +139,17 @@ def gain_transform_frequency(the_connection):
     time_list = []
     count = 0
     fre = 0
-    while count < 3:
-        #msg = gain_position_now(the_connection)
-        #msg = gain_posture_para(the_connection)
+    while count < 10:
+        # msg = gain_position_now(the_connection)
+        # msg = gain_posture_para(the_connection)
         print(mission_current(the_connection))
-        #msg = gain_track_point(the_connection)
-        #print(int(time.time()*1000))
+        # gain_track_point(the_connection)
+        # print(int(time.time()*1000))
         if len(time_list) <= 50:
             time_list.append(int(time.time()*1000))
         else:
             frequency = 50 / (time_list[50] - time_list[0]) * 1000
-            print("frequency: ", frequency, "\n")
+            print("数传参数传递频率: ", frequency, "\n")
             time_list = []
             fre = (frequency + fre * count) / (count+1)
             count += 1
