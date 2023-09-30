@@ -14,10 +14,10 @@ CONSTANTS_RADIUS_OF_EARTH = 6371000
 LEN_OF_TARGET_LIST = 50
 DETECT_CONFIDENCE = 0.6
 
+
 '''
 通用任务函数
 '''
-
 def send_mission_list(the_connection, wp):
     args = (the_connection.target_system,
            the_connection.target_component,
