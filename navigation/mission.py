@@ -79,7 +79,7 @@ def mission_upload(the_connection, wp, home_position):
             if message["mission_type"] == mavutil.mavlink.MAV_MISSION_TYPE_MISSION and \
                     message["type"] == mavutil.mavlink.MAV_MISSION_ACCEPTED:
 
-                print("Mission uploaded successfully")
+                print("任务上传成功")
                 break
 
 
