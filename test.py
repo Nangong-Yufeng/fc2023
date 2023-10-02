@@ -25,7 +25,7 @@ wp_start = Waypoint(38.5590428, 115.1420812, 15)  # A组，顺时针侦察
 final_target_position = Waypoint(38.5592552, 115.1421690, 0)
 mission_start_time = 0
 
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=921600)
 
 # force_arm(the_connection)
 

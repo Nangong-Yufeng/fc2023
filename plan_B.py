@@ -1,13 +1,9 @@
 from pymavlink import mavutil
 from utils import title
-from navigation import (Waypoint, mode_set, mission_upload,
-                        wp_detect_course, loiter_at_present, gain_track_point,
-                        detect_completed, eliminate_error_target, command_retry,
-                        gain_position_now, target_transfer,
-                        wrong_number, wp_bombing_course, mission_current, bomb_drop,
-                        loiter, return_to_launch, initiate_bomb_drop, preflight_command,
-                        wp_detect_course_HeBei, wp_detect_course_HeBei_2g, force_arm,
-                        gain_transform_frequency, wp_circle_course, wp_straight_course)
+from navigation import (Waypoint, mission_upload,
+                        wp_bombing_course, mission_current, bomb_drop,
+                        preflight_command,
+                        wp_circle_course, wp_straight_course)
 from math import *
 
 '''                                         
@@ -24,7 +20,12 @@ B_target2 = Waypoint(38.559315, 115.142202, 0)
 B_target3 = Waypoint(38.559314, 115.141904, 0)
 B_target4 = Waypoint(38.559445, 115.142059, 0)
 
-wp_home = Waypoint(38.559180, 115.142050, 0)
+T_target1 = Waypoint(38.543141, 115.041150, 0)
+T_target3 = Waypoint(38.543231, 115.041392, 0)
+T_target2 = Waypoint(38.542958, 115.041341, 0)
+T_target4 = Waypoint(38.543087, 115.041528, 0)
+
+wp_home = Waypoint(38.543087, 115.041528, 0)
 
 '''                                         
 参数表
@@ -32,22 +33,27 @@ wp_home = Waypoint(38.559180, 115.142050, 0)
 # 投票选择朝哪个靶标投弹
 TARGET_CHOOSE_A = 0
 TARGET_CHOOSE_B = 0
+TARGET_CHOOSE_T = 0
 # 侦察进近方向，指南针标准
 DETECT_APPROACH_A = 231
 DETECT_APPROACH_B = 51
+DETECT_APPROACH_T = 155
+
 # 投弹进近航向，北向起点逆时针标准
 BOMB_APPROACH_A = 309
 BOMB_APPROACH_B = 129
+BOMB_APPROACH_T = 25
 # 盘旋直径
-Diameter = 0.0008
+Diameter = 0.0007
 # 飞掠靶标区和绕圈处的高度设置
 Alt_detect = 15
-Alt_circle = 35
+Alt_circle = 40
 # 在靶标坐标前后拓展的距离
-Length_expend = 0.0003
+Length_expend = 0.00015
 # 侦察旋转方向（投弹相反）
 Direction_A = -1
 Direction_B = 1
+Direction_T = 1
 
 
 # detect_angle为进入侦察区的进场角度，按照指南针标准
@@ -137,8 +143,8 @@ if __name__ == "__main__":
     '''                                         
     初始化
     '''
-    the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
-    # the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
+    # the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
+    the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
     course_final = []
 
@@ -155,14 +161,30 @@ if __name__ == "__main__":
                               bomb_approach=BOMB_APPROACH_B, direction=Direction_B)
         print("上传B组航线信息")
         mission_upload(the_connection, course_final, wp_home)
+    elif choice == 'test' or choice == 'TEST':
+        course_final = course([T_target1, T_target2, T_target3, T_target4],
+                              detect_angle=DETECT_APPROACH_T, target_choice=TARGET_CHOOSE_T,
+                              bomb_approach=BOMB_APPROACH_T, direction=Direction_T)
+        print("上传测试航线信息")
+        mission_upload(the_connection, course_final, wp_home)
     else:
-        print("输入错误 建议remake")
+        print("输入错误 可以跳过或建议remake")
+        course_final = course([T_target1, T_target2, T_target3, T_target4],
+                              detect_angle=DETECT_APPROACH_T, target_choice=TARGET_CHOOSE_T,
+                              bomb_approach=BOMB_APPROACH_T, direction=Direction_T)
 
     print("进行飞行前初始化和检测")
     preflight_command(the_connection, wp_home)
 
+    last_wp = 0
     while True:
         msg = mission_current(the_connection)
-        if msg >= len(course_final) - 16:
-            print("到达航路点", msg)
+        if msg >= len(course_final) - 14:
+            print("到达投弹点", msg)
             break
+        if msg != last_wp:
+            print("到达航路点 ", msg)
+            last_wp = msg
+            continue
+
+    bomb_drop(the_connection)

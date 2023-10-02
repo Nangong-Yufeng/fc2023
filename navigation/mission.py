@@ -837,9 +837,9 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 
 # 投弹航线生成，以进场航线指向为主要参数, 角度以正北为零点，逆时针增加0-360
 def wp_bombing_course(wp_target, approach_angle, turn_direction='anti_clock',
-                      length_enter=30,  radius=50, length_approach=80, length_bomb=20, length_left=40,
+                      length_enter=20,  radius=50, length_approach=100, length_bomb=20, length_left=40,
                       precision_circle=4, precision_approach=6, precision_bomb=10, precision_enter=2,
-                      alt_target=8, alt_bomb_start=14, alt_approach=25, alt_left=16, length_side_points=3):
+                      alt_target=15, alt_bomb_start=9, alt_approach=15, alt_left=18, length_side_points=3):
     # 转为弧度制
     approach_angle = (approach_angle - 90) * math.pi / 180
 
@@ -953,7 +953,7 @@ def wp_bombing_insert_course(wp, numbers, distance, angle):
 def bomb_drop(the_connection):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, 1000, 0, 0, 0, 0, 0)
-    print("bomb away!")
+    print("成功投弹!")
 
 
 def initiate_bomb_drop(the_connection, angle):
