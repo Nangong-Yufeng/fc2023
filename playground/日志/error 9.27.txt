@@ -1,0 +1,65 @@
+D:\MiniConda3\envs\ngyf3\python.exe D:\ngyf\fc2023\main.py 
+
+         _   _    ____  __   __  _____ 
+        | \ | |  / ___| \ \ / / |  ___|
+        |  \| | | |  _   \ V /  | |_   
+        | |\  | | |_| |   | |   |  _|  
+        |_| \_|  \____|   |_|   |_|    
+    
+Mission uploaded successfully
+输入0以设置home点：
+输入0以设置模式为手动：
+输入0解锁，输入1强制解锁，输入其他跳过解锁：1
+force arm successfully
+视觉：加载权重文件
+输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： YOLOv5  2023-7-27 Python-3.9.16 torch-1.13.0+cu116 CUDA:0 (NVIDIA GeForce RTX 3060 Laptop GPU, 6144MiB)
+
+Fusing layers... 
+视觉：进行模型热身
+YOLOv5m summary: 291 layers, 20875359 parameters, 0 gradients, 48.2 GFLOPs
+视觉：加载摄像头
+视觉：设置视频格式
+视觉：设置完成
+帧率30.00003000003
+高度1080.0
+宽度1920.0
+视觉：加载数字识别ocr
+0
+set mode AUTO successfully
+运行时间： 60.095 秒
+检测到数字: 31
+检测到靶标数字：  31
+识别到目标总数：  1
+检测到数字: 46
+检测到靶标数字：  46
+识别到目标总数：  2
+检测到数字: 31
+检测到靶标数字：  31
+识别到目标总数：  3
+time up!
+侦察任务完成！
+set mode LOITER successfully
+0
+1
+2
+Exception in thread Thread-2:
+Traceback (most recent call last):
+  File "D:\MiniConda3\envs\ngyf3\lib\threading.py", line 980, in _bootstrap_inner
+    self.run()
+  File "D:\MiniConda3\envs\ngyf3\lib\threading.py", line 917, in run
+    self._target(*self._args, **self._kwargs)
+  File "D:\ngyf\fc2023\main.py", line 192, in process_image_and_pose
+    target_list = [target1, target2, target3] = [target_transfer(time_target_dict=time_target_dict,
+  File "D:\ngyf\fc2023\navigation\mission.py", line 993, in target_transfer
+    return target_point(target_poin[0], target_poin[1], num)
+TypeError: 'NoneType' object is not subscriptable
+Traceback (most recent call last):
+  File "D:\ngyf\fc2023\main.py", line 333, in <module>
+    wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE)
+  File "D:\ngyf\fc2023\navigation\mission.py", line 611, in wp_bombing_course
+    bomb_line = wp_bombing_insert_course([wp_bomb, wp_target], precision_bomb, length_side_points)
+  File "D:\ngyf\fc2023\navigation\mission.py", line 696, in wp_bombing_insert_course
+    alt = wp[0] + i * alt_step
+TypeError: unsupported operand type(s) for +: 'Waypoint' and 'float'
+
+进程已结束,退出代码1
