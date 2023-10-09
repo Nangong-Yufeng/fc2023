@@ -1,0 +1,4098 @@
+循环时间：  420
+数字识别时间：  71
+视觉时间：  271
+pixel_coords: [1834.0, 668.5]
+rc: [[   -0.99469     0.10161    0.016284]
+ [   -0.10092    -0.99414    0.038763]
+ [   0.020128    0.036914     0.99912]]
+undistortedPoint: [     1562.7      628.18]
+标靶坐标：lat =  22.591689392022896 , lon =  113.96192084761533 , num =  -1
+坐标和姿态：lat =  22.590704  lon:  113.9618864  alt:  -12.435  pitch:  -0.020128894597291946  yaw:  -3.0404834747314453  roll:  0.03693004325032234
+循环时间：  140
+视觉时间：  124
+none target detected
+循环时间：  120
+视觉时间：  191
+none target detected
+循环时间：  79
+视觉时间：  204
+none target detected
+循环时间：  283
+视觉时间：  187
+none target detected
+循环时间：  118
+视觉时间：  209
+none target detected
+循环时间：  82
+视觉时间：  189
+none target detected
+循环时间：  138
+视觉时间：  205
+none target detected
+循环时间：  141
+视觉时间：  240
+none target detected
+循环时间：  99
+视觉时间：  201
+none target detected
+循环时间：  222
+视觉时间：  142
+none target detected
+循环时间：  98
+视觉时间：  206
+none target detected
+循环时间：  220
+视觉时间：  187
+none target detected
+循环时间：  960
+视觉时间：  208
+none target detected
+循环时间：  40
+视觉时间：  188
+none target detected
+循环时间：  360
+视觉时间：  205
+none target detected
+循环时间：  40
+视觉时间：  189
+none target detected
+循环时间：  240
+视觉时间：  204
+none target detected
+循环时间：  120
+视觉时间：  190
+none target detected
+循环时间：  280
+视觉时间：  254
+none target detected
+循环时间：  140
+视觉时间：  187
+none target detected
+循环时间：  102
+视觉时间：  156
+none target detected
+循环时间：  278
+视觉时间：  190
+none target detected
+循环时间：  122
+视觉时间：  187
+none target detected
+循环时间：  138
+视觉时间：  209
+none target detected
+循环时间：  140
+视觉时间：  189
+none target detected
+循环时间：  1000
+视觉时间：  207
+none target detected
+循环时间：  122
+视觉时间：  190
+none target detected
+循环时间：  98
+视觉时间：  206
+none target detected
+循环时间：  80
+视觉时间：  187
+none target detected
+循环时间：  222
+视觉时间：  253
+none target detected
+循环时间：  98
+视觉时间：  188
+none target detected
+循环时间：  220
+视觉时间：  158
+none target detected
+循环时间：  82
+视觉时间：  190
+none target detected
+循环时间：  200
+视觉时间：  204
+none target detected
+循环时间：  278
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  242
+视觉时间：  189
+none target detected
+循环时间：  200
+视觉时间：  206
+none target detected
+循环时间：  118
+视觉时间：  191
+none target detected
+循环时间：  82
+视觉时间：  204
+none target detected
+循环时间：  200
+视觉时间：  255
+none target detected
+循环时间：  778
+视觉时间：  195
+none target detected
+循环时间：  422
+视觉时间：  132
+none target detected
+循环时间：  118
+视觉时间：  203
+none target detected
+循环时间：  160
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  204
+none target detected
+循环时间：  120
+视觉时间：  191
+none target detected
+循环时间：  122
+视觉时间：  203
+none target detected
+循环时间：  178
+视觉时间：  199
+none target detected
+循环时间：  140
+视觉时间：  200
+none target detected
+循环时间：  82
+视觉时间：  184
+none target detected
+循环时间：  498
+视觉时间：  255
+none target detected
+循环时间：  102
+视觉时间：  186
+none target detected
+循环时间：  118
+视觉时间：  160
+none target detected
+循环时间：  82
+视觉时间：  190
+none target detected
+循环时间：  1118
+视觉时间：  205
+none target detected
+循环时间：  82
+视觉时间：  190
+none target detected
+循环时间：  200
+视觉时间：  204
+none target detected
+循环时间：  118
+视觉时间：  189
+none target detected
+循环时间：  180
+视觉时间：  206
+none target detected
+循环时间：  102
+视觉时间：  190
+none target detected
+循环时间：  118
+视觉时间：  205
+none target detected
+循环时间：  82
+视觉时间：  241
+none target detected
+循环时间：  118
+视觉时间：  202
+none target detected
+循环时间：  82
+视觉时间：  144
+none target detected
+循环时间：  138
+视觉时间：  205
+none target detected
+循环时间：  140
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  205
+none target detected
+循环时间：  42
+视觉时间：  190
+none target detected
+循环时间：  118
+视觉时间：  204
+none target detected
+循环时间：  160
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  209
+none target detected
+循环时间：  120
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  253
+none target detected
+循环时间：  920
+视觉时间：  186
+none target detected
+循环时间：  80
+视觉时间：  166
+none target detected
+循环时间：  160
+视觉时间：  192
+none target detected
+循环时间：  82
+视觉时间：  206
+none target detected
+循环时间：  98
+视觉时间：  190
+none target detected
+循环时间：  102
+视觉时间：  203
+none target detected
+循环时间：  118
+视觉时间：  188
+none target detected
+循环时间：  200
+视觉时间：  208
+none target detected
+循环时间：  82
+视觉时间：  180
+none target detected
+循环时间：  118
+视觉时间：  206
+none target detected
+循环时间：  160
+视觉时间：  240
+none target detected
+循环时间：  40
+视觉时间：  204
+none target detected
+循环时间：  82
+视觉时间：  143
+none target detected
+循环时间：  278
+视觉时间：  204
+none target detected
+循环时间：  40
+视觉时间：  189
+none target detected
+循环时间：  82
+视觉时间：  206
+none target detected
+循环时间：  138
+视觉时间：  190
+none target detected
+循环时间：  140
+视觉时间：  202
+none target detected
+循环时间：  1200
+视觉时间：  186
+none target detected
+循环时间：  122
+视觉时间：  207
+none target detected
+循环时间：  158
+视觉时间：  189
+none target detected
+循环时间：  120
+视觉时间：  259
+none target detected
+循环时间：  180
+视觉时间：  184
+none target detected
+循环时间：  60
+视觉时间：  160
+none target detected
+循环时间：  161
+视觉时间：  190
+none target detected
+循环时间：  99
+视觉时间：  206
+none target detected
+循环时间：  140
+视觉时间：  192
+none target detected
+循环时间：  82
+视觉时间：  204
+none target detected
+循环时间：  98
+视觉时间：  190
+none target detected
+循环时间：  102
+视觉时间：  205
+none target detected
+循环时间：  118
+视觉时间：  190
+none target detected
+循环时间：  82
+视觉时间：  207
+none target detected
+循环时间：  98
+视觉时间：  239
+none target detected
+循环时间：  102
+视觉时间：  202
+none target detected
+循环时间：  118
+视觉时间：  145
+none target detected
+循环时间：  160
+视觉时间：  207
+none target detected
+循环时间：  801
+视觉时间：  188
+none target detected
+循环时间：  239
+视觉时间：  207
+none target detected
+循环时间：  82
+视觉时间：  189
+none target detected
+循环时间：  78
+视觉时间：  206
+none target detected
+循环时间：  80
+视觉时间：  188
+none target detected
+循环时间：  160
+视觉时间：  208
+none target detected
+循环时间：  82
+视觉时间：  187
+none target detected
+循环时间：  278
+视觉时间：  256
+none target detected
+循环时间：  41
+视觉时间：  187
+none target detected
+循环时间：  80
+视觉时间：  161
+none target detected
+循环时间：  120
+视觉时间：  187
+none target detected
+循环时间：  159
+视觉时间：  207
+none target detected
+循环时间：  200
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  120
+视觉时间：  187
+none target detected
+循环时间：  280
+数字识别时间：  64
+视觉时间：  276
+pixel_coords: [1383.0, 788.5]
+rc: [[      0.878    -0.12834    -0.46114]
+ [   -0.17685     0.80825    -0.56166]
+ [     0.4448     0.57469     0.68694]]
+undistortedPoint: [     1192.6      676.41]
+标靶坐标：lat =  22.591709412775018 , lon =  113.96215386147753 , num =  -1
+坐标和姿态：lat =  22.5907134  lon:  113.9619297  alt:  -10.212  pitch:  -0.4609483480453491  yaw:  -0.19876886904239655  roll:  0.6966594457626343
+循环时间：  120
+视觉时间：  119
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  160
+视觉时间：  236
+none target detected
+循环时间：  980
+视觉时间：  204
+none target detected
+循环时间：  101
+视觉时间：  143
+none target detected
+循环时间：  119
+视觉时间：  207
+none target detected
+循环时间：  82
+视觉时间：  186
+none target detected
+循环时间：  319
+视觉时间：  206
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  200
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  190
+none target detected
+循环时间：  159
+视觉时间：  207
+none target detected
+循环时间：  200
+视觉时间：  188
+none target detected
+循环时间：  80
+视觉时间：  251
+none target detected
+循环时间：  200
+视觉时间：  187
+none target detected
+循环时间：  120
+视觉时间：  161
+none target detected
+循环时间：  80
+视觉时间：  184
+none target detected
+循环时间：  1183
+视觉时间：  207
+none target detected
+循环时间：  357
+视觉时间：  187
+none target detected
+循环时间：  102
+视觉时间：  206
+none target detected
+循环时间：  98
+视觉时间：  191
+none target detected
+循环时间：  102
+视觉时间：  203
+none target detected
+循环时间：  119
+视觉时间：  190
+none target detected
+循环时间：  179
+视觉时间：  206
+none target detected
+循环时间：  61
+视觉时间：  237
+none target detected
+循环时间：  160
+视觉时间：  205
+none target detected
+循环时间：  81
+视觉时间：  141
+none target detected
+循环时间：  200
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  191
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  118
+视觉时间：  190
+none target detected
+循环时间：  82
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  191
+none target detected
+循环时间：  800
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  187
+none target detected
+循环时间：  221
+视觉时间：  256
+none target detected
+循环时间：  81
+视觉时间：  185
+none target detected
+循环时间：  98
+视觉时间：  161
+none target detected
+循环时间：  200
+视觉时间：  186
+none target detected
+循环时间：  302
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  191
+none target detected
+循环时间：  179
+视觉时间：  202
+none target detected
+循环时间：  400
+视觉时间：  197
+none target detected
+循环时间：  102
+视觉时间：  203
+none target detected
+循环时间：  1098
+视觉时间：  183
+none target detected
+循环时间：  302
+视觉时间：  208
+none target detected
+循环时间：  98
+视觉时间：  231
+none target detected
+循环时间：  800
+视觉时间：  203
+none target detected
+循环时间：  302
+视觉时间：  143
+none target detected
+循环时间：  98
+视觉时间：  205
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  207
+none target detected
+循环时间：  159
+视觉时间：  188
+none target detected
+循环时间：  880
+视觉时间：  207
+none target detected
+循环时间：  160
+视觉时间：  181
+none target detected
+循环时间：  282
+视觉时间：  201
+none target detected
+循环时间：  298
+视觉时间：  190
+none target detected
+循环时间：  61
+视觉时间：  253
+none target detected
+循环时间：  241
+视觉时间：  186
+none target detected
+循环时间：  200
+视觉时间：  160
+none target detected
+循环时间：  119
+视觉时间：  188
+none target detected
+循环时间：  179
+视觉时间：  208
+none target detected
+循环时间：  61
+视觉时间：  188
+none target detected
+循环时间：  160
+视觉时间：  205
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  118
+视觉时间：  206
+none target detected
+循环时间：  201
+视觉时间：  189
+none target detected
+循环时间：  979
+视觉时间：  206
+none target detected
+循环时间：  61
+视觉时间：  238
+none target detected
+循环时间：  160
+视觉时间：  207
+none target detected
+循环时间：  179
+视觉时间：  137
+none target detected
+循环时间：  302
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  188
+none target detected
+循环时间：  200
+视觉时间：  204
+none target detected
+循环时间：  481
+视觉时间：  189
+none target detected
+循环时间：  98
+视觉时间：  203
+none target detected
+循环时间：  1200
+视觉时间：  190
+none target detected
+循环时间：  302
+视觉时间：  204
+none target detected
+循环时间：  98
+视觉时间：  190
+none target detected
+循环时间：  221
+视觉时间：  250
+none target detected
+循环时间：  481
+视觉时间：  185
+none target detected
+循环时间：  98
+视觉时间：  164
+none target detected
+循环时间：  461
+视觉时间：  183
+none target detected
+循环时间：  160
+视觉时间：  208
+none target detected
+循环时间：  81
+视觉时间：  188
+none target detected
+循环时间：  1119
+视觉时间：  200
+none target detected
+循环时间：  179
+视觉时间：  190
+none target detected
+循环时间：  61
+视觉时间：  206
+none target detected
+循环时间：  241
+视觉时间：  182
+none target detected
+循环时间：  600
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  239
+none target detected
+循环时间：  179
+视觉时间：  200
+none target detected
+循环时间：  302
+视觉时间：  144
+none target detected
+循环时间：  98
+视觉时间：  208
+none target detected
+循环时间：  102
+视觉时间：  190
+none target detected
+循环时间：  145
+视觉时间：  202
+none target detected
+循环时间：  1014
+视觉时间：  188
+none target detected
+循环时间：  241
+视觉时间：  205
+none target detected
+循环时间：  98
+视觉时间：  191
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  210
+none target detected
+循环时间：  81
+视觉时间：  236
+none target detected
+循环时间：  118
+视觉时间：  204
+none target detected
+循环时间：  82
+视觉时间：  145
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  185
+none target detected
+循环时间：  400
+视觉时间：  208
+none target detected
+循环时间：  61
+视觉时间：  190
+none target detected
+循环时间：  241
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  192
+none target detected
+循环时间：  81
+视觉时间：  200
+none target detected
+循环时间：  298
+视觉时间：  190
+none target detected
+循环时间：  800
+视觉时间：  252
+none target detected
+循环时间：  220
+视觉时间：  184
+none target detected
+循环时间：  180
+视觉时间：  161
+none target detected
+循环时间：  102
+视觉时间：  191
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  188
+none target detected
+循环时间：  221
+视觉时间：  208
+none target detected
+循环时间：  81
+视觉时间：  188
+none target detected
+循环时间：  98
+视觉时间：  208
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  243
+none target detected
+循环时间：  61
+视觉时间：  199
+none target detected
+循环时间：  159
+视觉时间：  144
+none target detected
+循环时间：  40
+视觉时间：  208
+none target detected
+循环时间：  140
+视觉时间：  190
+none target detected
+循环时间：  102
+视觉时间：  205
+none target detected
+循环时间：  118
+视觉时间：  191
+none target detected
+循环时间：  82
+视觉时间：  206
+none target detected
+循环时间：  719
+视觉时间：  189
+none target detected
+循环时间：  179
+视觉时间：  208
+none target detected
+循环时间：  102
+视觉时间：  190
+none target detected
+循环时间：  119
+视觉时间：  255
+none target detected
+循环时间：  81
+视觉时间：  186
+none target detected
+循环时间：  118
+视觉时间：  161
+none target detected
+循环时间：  82
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  208
+none target detected
+循环时间：  20
+视觉时间：  188
+none target detected
+循环时间：  141
+视觉时间：  206
+none target detected
+循环时间：  179
+视觉时间：  190
+none target detected
+循环时间：  102
+视觉时间：  205
+none target detected
+循环时间：  298
+视觉时间：  243
+none target detected
+循环时间：  60
+视觉时间：  202
+none target detected
+循环时间：  160
+视觉时间：  145
+none target detected
+循环时间：  82
+视觉时间：  206
+none target detected
+循环时间：  98
+视觉时间：  191
+none target detected
+循环时间：  102
+视觉时间：  204
+none target detected
+循环时间：  119
+视觉时间：  191
+none target detected
+循环时间：  881
+视觉时间：  203
+none target detected
+循环时间：  118
+视觉时间：  184
+none target detected
+循环时间：  82
+视觉时间：  202
+none target detected
+循环时间：  298
+视觉时间：  187
+none target detected
+循环时间：  221
+视觉时间：  254
+none target detected
+循环时间：  400
+视觉时间：  186
+none target detected
+循环时间：  81
+视觉时间：  159
+none target detected
+循环时间：  319
+视觉时间：  185
+none target detected
+循环时间：  179
+视觉时间：  209
+none target detected
+循环时间：  60
+视觉时间：  190
+none target detected
+循环时间：  20
+视觉时间：  206
+none target detected
+循环时间：  141
+视觉时间：  188
+none target detected
+循环时间：  179
+视觉时间：  206
+none target detected
+循环时间：  102
+视觉时间：  193
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  826
+视觉时间：  240
+none target detected
+循环时间：  153
+视觉时间：  199
+none target detected
+循环时间：  102
+视觉时间：  144
+none target detected
+循环时间：  119
+视觉时间：  207
+none target detected
+循环时间：  81
+视觉时间：  190
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  81
+视觉时间：  190
+none target detected
+循环时间：  145
+视觉时间：  205
+none target detected
+循环时间：  153
+视觉时间：  190
+none target detected
+循环时间：  102
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  189
+none target detected
+循环时间：  159
+视觉时间：  256
+none target detected
+循环时间：  80
+视觉时间：  180
+none target detected
+循环时间：  340
+视觉时间：  162
+none target detected
+循环时间：  102
+视觉时间：  187
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  979
+视觉时间：  190
+none target detected
+循环时间：  60
+视觉时间：  207
+none target detected
+循环时间：  20
+视觉时间：  188
+none target detected
+循环时间：  180
+视觉时间：  206
+none target detected
+循环时间：  140
+视觉时间：  189
+none target detected
+循环时间：  102
+视觉时间：  205
+none target detected
+循环时间：  145
+视觉时间：  237
+none target detected
+循环时间：  153
+视觉时间：  205
+none target detected
+循环时间：  60
+视觉时间：  141
+none target detected
+循环时间：  140
+视觉时间：  216
+none target detected
+循环时间：  102
+视觉时间：  183
+none target detected
+循环时间：  98
+视觉时间：  206
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  207
+none target detected
+循环时间：  159
+视觉时间：  189
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  42
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  254
+none target detected
+循环时间：  179
+视觉时间：  189
+none target detected
+循环时间：  60
+视觉时间：  160
+none target detected
+循环时间：  20
+视觉时间：  185
+none target detected
+循环时间：  1120
+视觉时间：  204
+none target detected
+循环时间：  102
+视觉时间：  190
+none target detected
+循环时间：  119
+视觉时间：  206
+none target detected
+循环时间：  281
+视觉时间：  186
+none target detected
+循环时间：  119
+视觉时间：  208
+none target detected
+循环时间：  200
+视觉时间：  190
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  158
+视觉时间：  232
+none target detected
+循环时间：  540
+视觉时间：  202
+none target detected
+循环时间：  221
+视觉时间：  143
+none target detected
+循环时间：  1081
+视觉时间：  202
+none target detected
+循环时间：  278
+视觉时间：  187
+none target detected
+循环时间：  240
+视觉时间：  206
+none target detected
+循环时间：  82
+视觉时间：  187
+none target detected
+循环时间：  498
+视觉时间：  206
+none target detected
+循环时间：  60
+视觉时间：  189
+none target detected
+循环时间：  161
+视觉时间：  203
+none target detected
+循环时间：  426
+视觉时间：  189
+none target detected
+循环时间：  153
+视觉时间：  256
+none target detected
+循环时间：  102
+视觉时间：  184
+none target detected
+循环时间：  119
+视觉时间：  160
+none target detected
+循环时间：  979
+视觉时间：  187
+none target detected
+循环时间：  200
+视觉时间：  206
+none target detected
+循环时间：  102
+视觉时间：  187
+none target detected
+循环时间：  319
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  209
+none target detected
+循环时间：  20
+视觉时间：  185
+none target detected
+循环时间：  340
+视觉时间：  208
+none target detected
+循环时间：  82
+视觉时间：  234
+none target detected
+循环时间：  298
+视觉时间：  204
+none target detected
+循环时间：  102
+视觉时间：  143
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  159
+视觉时间：  189
+none target detected
+循环时间：  240
+视觉时间：  207
+none target detected
+循环时间：  27
+视觉时间：  186
+none target detected
+循环时间：  953
+视觉时间：  207
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  206
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  256
+none target detected
+循环时间：  42
+视觉时间：  184
+none target detected
+循环时间：  119
+视觉时间：  161
+none target detected
+循环时间：  179
+视觉时间：  194
+none target detected
+循环时间：  221
+视觉时间：  207
+none target detected
+循环时间：  81
+视觉时间：  185
+none target detected
+循环时间：  200
+视觉时间：  207
+none target detected
+循环时间：  119
+视觉时间：  183
+none target detected
+循环时间：  400
+视觉时间：  209
+none target detected
+循环时间：  826
+视觉时间：  180
+none target detected
+循环时间：  255
+视觉时间：  204
+none target detected
+循环时间：  319
+视觉时间：  236
+none target detected
+循环时间：  379
+视觉时间：  195
+none target detected
+循环时间：  221
+视觉时间：  148
+none target detected
+循环时间：  999
+视觉时间：  199
+none target detected
+循环时间：  201
+视觉时间：  190
+none target detected
+循环时间：  179
+视觉时间：  207
+none target detected
+循环时间：  60
+视觉时间：  188
+none target detected
+循环时间：  140
+视觉时间：  207
+none target detected
+循环时间：  47
+视觉时间：  188
+none target detected
+循环时间：  153
+视觉时间：  209
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  255
+none target detected
+循环时间：  179
+视觉时间：  188
+none target detected
+循环时间：  60
+视觉时间：  162
+none target detected
+循环时间：  42
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  102
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  189
+none target detected
+循环时间：  81
+视觉时间：  206
+none target detected
+循环时间：  118
+视觉时间：  191
+none target detected
+循环时间：  82
+视觉时间：  204
+none target detected
+循环时间：  919
+视觉时间：  239
+none target detected
+循环时间：  159
+视觉时间：  202
+none target detected
+循环时间：  80
+视觉时间：  141
+none target detected
+循环时间：  340
+视觉时间：  208
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  119
+视觉时间：  203
+none target detected
+循环时间：  281
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  189
+none target detected
+循环时间：  102
+视觉时间：  212
+none target detected
+循环时间：  119
+视觉时间：  184
+none target detected
+循环时间：  81
+视觉时间：  254
+none target detected
+循环时间：  119
+视觉时间：  187
+none target detected
+循环时间：  81
+视觉时间：  160
+none target detected
+循环时间：  158
+视觉时间：  185
+none target detected
+循环时间：  1161
+视觉时间：  205
+none target detected
+循环时间：  159
+视觉时间：  189
+none target detected
+循环时间：  80
+视觉时间：  208
+none target detected
+循环时间：  42
+视觉时间：  188
+none target detected
+循环时间：  145
+视觉时间：  213
+none target detected
+循环时间：  153
+视觉时间：  189
+none target detected
+循环时间：  102
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  238
+none target detected
+循环时间：  159
+视觉时间：  204
+none target detected
+循环时间：  80
+视觉时间：  137
+none target detected
+循环时间：  161
+视觉时间：  189
+none target detected
+循环时间：  81
+视觉时间：  206
+none target detected
+循环时间：  98
+视觉时间：  190
+none target detected
+循环时间：  102
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  190
+none target detected
+循环时间：  159
+视觉时间：  209
+none target detected
+循环时间：  80
+视觉时间：  191
+none target detected
+循环时间：  42
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  235
+none target detected
+循环时间：  999
+视觉时间：  203
+none target detected
+循环时间：  82
+视觉时间：  144
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  102
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  191
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  191
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  189
+none target detected
+循环时间：  179
+视觉时间：  256
+none target detected
+循环时间：  60
+视觉时间：  185
+none target detected
+循环时间：  161
+视觉时间：  161
+none target detected
+循环时间：  81
+视觉时间：  190
+none target detected
+循环时间：  118
+视觉时间：  205
+none target detected
+循环时间：  82
+视觉时间：  188
+none target detected
+循环时间：  298
+视觉时间：  208
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  118
+视觉时间：  207
+none target detected
+循环时间：  882
+视觉时间：  187
+none target detected
+循环时间：  118
+视觉时间：  207
+none target detected
+循环时间：  82
+视觉时间：  240
+none target detected
+循环时间：  119
+视觉时间：  201
+none target detected
+循环时间：  239
+视觉时间：  144
+none target detected
+循环时间：  161
+视觉时间：  207
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  81
+视觉时间：  191
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  207
+none target detected
+循环时间：  20
+视觉时间：  188
+none target detected
+循环时间：  141
+视觉时间：  254
+none target detected
+循环时间：  179
+视觉时间：  188
+none target detected
+循环时间：  60
+视觉时间：  162
+none target detected
+循环时间：  20
+视觉时间：  189
+none target detected
+循环时间：  141
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  197
+none target detected
+循环时间：  102
+视觉时间：  206
+none target detected
+循环时间：  119
+数字识别时间：  71
+视觉时间：  265
+pixel_coords: [238.5, 801.0]
+rc: [[    0.82559    -0.52623     0.20366]
+ [     0.5585     0.81353    -0.16199]
+ [   -0.08044     0.24748     0.96555]]
+undistortedPoint: [     508.33      702.71]
+标靶坐标：lat =  22.592093002808973 , lon =  113.96287490757341 , num =  -1
+坐标和姿态：lat =  22.590989699999998  lon:  113.9624724  alt:  21.028  pitch:  0.0805273950099945  yaw:  0.594771146774292  roll:  0.25091353058815
+循环时间：  800
+视觉时间：  128
+none target detected
+循环时间：  179
+视觉时间：  188
+none target detected
+循环时间：  221
+视觉时间：  191
+none target detected
+循环时间：  681
+视觉时间：  238
+none target detected
+循环时间：  119
+视觉时间：  203
+none target detected
+循环时间：  81
+视觉时间：  144
+none target detected
+循环时间：  118
+视觉时间：  205
+none target detected
+循环时间：  82
+视觉时间：  189
+none target detected
+循环时间：  919
+视觉时间：  204
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  207
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  145
+视觉时间：  204
+none target detected
+循环时间：  153
+视觉时间：  198
+none target detected
+循环时间：  102
+视觉时间：  247
+none target detected
+循环时间：  119
+视觉时间：  186
+none target detected
+循环时间：  159
+视觉时间：  161
+none target detected
+循环时间：  80
+视觉时间：  192
+none target detected
+循环时间：  42
+视觉时间：  211
+none target detected
+循环时间：  119
+视觉时间：  183
+none target detected
+循环时间：  179
+视觉时间：  206
+none target detected
+循环时间：  60
+视觉时间：  188
+none target detected
+循环时间：  161
+视觉时间：  208
+none target detected
+循环时间：  81
+视觉时间：  190
+none target detected
+循环时间：  98
+视觉时间：  206
+none target detected
+循环时间：  102
+视觉时间：  239
+none target detected
+循环时间：  119
+视觉时间：  198
+none target detected
+循环时间：  959
+视觉时间：  145
+none target detected
+循环时间：  80
+视觉时间：  207
+none target detected
+循环时间：  42
+视觉时间：  189
+none target detected
+循环时间：  158
+视觉时间：  205
+none target detected
+循环时间：  140
+视觉时间：  197
+none target detected
+循环时间：  221
+视觉时间：  207
+none target detected
+循环时间：  259
+视觉时间：  178
+none target detected
+循环时间：  141
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  190
+none target detected
+循环时间：  102
+视觉时间：  255
+none target detected
+循环时间：  119
+视觉时间：  186
+none target detected
+循环时间：  81
+视觉时间：  167
+none target detected
+循环时间：  119
+数字识别时间：  69
+视觉时间：  261
+pixel_coords: [1409.5, 211.5]
+rc: [[   -0.97091    0.016319     0.23889]
+ [  -0.031973    -0.99758   -0.061801]
+ [     0.2373   -0.067641     0.96908]]
+undistortedPoint: [     1212.3      354.75]
+标靶坐标：lat =  22.592013862626 , lon =  113.96241889483282 , num =  -1
+坐标和姿态：lat =  22.591027  lon:  113.9621557  alt:  11.78  pitch:  -0.23958924412727356  yaw:  -3.108673572540283  roll:  -0.06968633830547333
+循环时间：  81
+数字识别时间：  65
+视觉时间：  200
+pixel_coords: [1280.5, 339.5]
+rc: [[   -0.97327    0.029713     0.22773]
+ [  -0.034996     -0.9992   -0.019194]
+ [    0.22698   -0.026651     0.97353]]
+undistortedPoint: [     1131.7      431.79]
+标靶坐标：lat =  22.592000643919118 , lon =  113.96239948381773 , num =  -1
+坐标和姿态：lat =  22.590999999999998  lon:  113.9621552  alt:  11.372  pitch:  -0.22897666692733765  yaw:  -3.1056511402130127  roll:  -0.027368418872356415
+循环时间：  145
+数字识别时间：  65
+视觉时间：  186
+pixel_coords: [1165.0, 472.5]
+rc: [[   -0.97538    0.043617     0.21615]
+ [  -0.037774     -0.9988     0.03109]
+ [    0.21725     0.02216     0.97586]]
+undistortedPoint: [     1067.4      503.97]
+标靶坐标：lat =  22.591979060413184 , lon =  113.96238263027449 , num =  -1
+坐标和姿态：lat =  22.5909652  lon:  113.9621549  alt:  10.897  pitch:  -0.21899715065956116  yaw:  -3.1028847694396973  roll:  0.022704219445586205
+循环时间：  153
+数字识别时间：  68
+视觉时间：  208
+pixel_coords: [1175.5, 615.0]
+rc: [[   -0.97751    0.030825     0.20861]
+ [  -0.032082    -0.99948   -0.002641]
+ [    0.20842  -0.0092742       0.978]]
+undistortedPoint: [       1073      579.01]
+标靶坐标：lat =  22.591981950055587 , lon =  113.96238369145644 , num =  -1
+坐标和姿态：lat =  22.590946  lon:  113.96215459999999  alt:  10.653  pitch:  -0.2099604606628418  yaw:  -3.1087846755981445  roll:  -0.009482614696025848
+循环时间：  102
+数字识别时间：  65
+视觉时间：  183
+pixel_coords: [1225.0, 764.5]
+rc: [[   -0.97864    0.022512     0.20435]
+ [  -0.024824    -0.99965  -0.0087575]
+ [    0.20408   -0.013643     0.97886]]
+undistortedPoint: [     1101.1      659.49]
+标靶坐标：lat =  22.59197825147562 , lon =  113.96239038637087 , num =  -1
+坐标和姿态：lat =  22.590922799999998  lon:  113.96215439999999  alt:  10.362  pitch:  -0.20552682876586914  yaw:  -3.116231918334961  roll:  -0.013937100768089294
+循环时间：  945
+数字识别时间：  64
+视觉时间：  204
+pixel_coords: [1250.0, 899.0]
+rc: [[   -0.98145    -0.17636   -0.075142]
+ [    0.16538    -0.97718     0.13333]
+ [   -0.09694     0.11843     0.98822]]
+undistortedPoint: [     1118.1      735.79]
+标靶坐标：lat =  22.591843692301094 , lon =  113.96242601607248 , num =  -1
+坐标和姿态：lat =  22.5907929  lon:  113.9621536  alt:  9.139  pitch:  0.09709259867668152  yaw:  2.974656105041504  roll:  0.11927133053541183
+循环时间：  373
+数字识别时间：  64
+视觉时间：  188
+pixel_coords: [1282.5, 1023.0]
+rc: [[   -0.96008   -0.079495    -0.26821]
+ [   0.064151    -0.99579    0.065511]
+ [   -0.27228    0.045689     0.96113]]
+undistortedPoint: [     1142.5      813.52]
+标靶坐标：lat =  22.59170511820693 , lon =  113.96245450561942 , num =  -1
+坐标和姿态：lat =  22.590621499999997  lon:  113.96215509999999  alt:  8.68  pitch:  0.27576667070388794  yaw:  3.0748727321624756  roll:  0.04750126600265503
+循环时间：  82
+视觉时间：  131
+none target detected
+循环时间：  118
+视觉时间：  238
+none target detected
+循环时间：  360
+视觉时间：  199
+none target detected
+循环时间：  80
+视觉时间：  137
+none target detected
+循环时间：  442
+视觉时间：  204
+none target detected
+循环时间：  119
+视觉时间：  188
+none target detected
+循环时间：  239
+视觉时间：  208
+none target detected
+循环时间：  42
+视觉时间：  185
+none target detected
+循环时间：  919
+视觉时间：  206
+none target detected
+循环时间：  159
+视觉时间：  185
+none target detected
+循环时间：  420
+视觉时间：  207
+none target detected
+循环时间：  400
+视觉时间：  186
+none target detected
+循环时间：  60
+视觉时间：  253
+none target detected
+循环时间：  140
+视觉时间：  187
+none target detected
+循环时间：  200
+视觉时间：  162
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  200
+视觉时间：  204
+none target detected
+循环时间：  319
+视觉时间：  186
+none target detected
+循环时间：  159
+视觉时间：  203
+none target detected
+循环时间：  880
+视觉时间：  191
+none target detected
+循环时间：  160
+视觉时间：  203
+none target detected
+循环时间：  180
+视觉时间：  188
+none target detected
+循环时间：  221
+视觉时间：  208
+none target detected
+循环时间：  400
+视觉时间：  232
+none target detected
+循环时间：  179
+视觉时间：  203
+none target detected
+循环时间：  102
+视觉时间：  139
+none target detected
+循环时间：  519
+视觉时间：  199
+none target detected
+循环时间：  179
+视觉时间：  188
+none target detected
+循环时间：  221
+视觉时间：  208
+none target detected
+循环时间：  1200
+视觉时间：  185
+none target detected
+循环时间：  281
+视觉时间：  206
+none target detected
+循环时间：  119
+视觉时间：  187
+none target detected
+循环时间：  179
+视觉时间：  205
+none target detected
+循环时间：  80
+视觉时间：  192
+none target detected
+循环时间：  1200
+视觉时间：  247
+none target detected
+循环时间：  180
+视觉时间：  187
+none target detected
+循环时间：  161
+视觉时间：  161
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  198
+none target detected
+循环时间：  179
+视觉时间：  192
+none target detected
+循环时间：  60
+视觉时间：  205
+none target detected
+循环时间：  161
+视觉时间：  184
+none target detected
+循环时间：  281
+视觉时间：  203
+none target detected
+循环时间：  298
+视觉时间：  192
+none target detected
+循环时间：  60
+视觉时间：  206
+none target detected
+循环时间：  20
+视觉时间：  238
+none target detected
+循环时间：  141
+视觉时间：  200
+none target detected
+循环时间：  179
+视觉时间：  147
+none target detected
+循环时间：  102
+视觉时间：  206
+none target detected
+循环时间：  919
+视觉时间：  187
+none target detected
+循环时间：  81
+视觉时间：  203
+none target detected
+循环时间：  119
+视觉时间：  193
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  145
+视觉时间：  188
+none target detected
+循环时间：  173
+视觉时间：  206
+none target detected
+循环时间：  82
+视觉时间：  190
+none target detected
+循环时间：  145
+视觉时间：  253
+none target detected
+循环时间：  153
+视觉时间：  188
+none target detected
+循环时间：  60
+视觉时间：  162
+none target detected
+循环时间：  20
+视觉时间：  193
+none target detected
+循环时间：  180
+视觉时间：  194
+none target detected
+循环时间：  600
+视觉时间：  188
+none target detected
+循环时间：  187
+视觉时间：  210
+none target detected
+循环时间：  153
+视觉时间：  183
+none target detected
+循环时间：  820
+视觉时间：  207
+none target detected
+循环时间：  82
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  239
+视觉时间：  238
+none target detected
+循环时间：  140
+视觉时间：  202
+none target detected
+循环时间：  200
+视觉时间：  146
+none target detected
+循环时间：  102
+视觉时间：  202
+none target detected
+循环时间：  298
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  205
+none target detected
+循环时间：  320
+视觉时间：  185
+none target detected
+循环时间：  221
+视觉时间：  206
+none target detected
+循环时间：  81
+视觉时间：  190
+none target detected
+循环时间：  118
+视觉时间：  205
+none target detected
+循环时间：  82
+视觉时间：  189
+none target detected
+循环时间：  919
+视觉时间：  255
+none target detected
+循环时间：  81
+视觉时间：  187
+none target detected
+循环时间：  119
+视觉时间：  161
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  102
+视觉时间：  206
+none target detected
+循环时间：  298
+视觉时间：  192
+none target detected
+循环时间：  60
+视觉时间：  197
+none target detected
+循环时间：  200
+视觉时间：  194
+none target detected
+循环时间：  160
+视觉时间：  202
+none target detected
+循环时间：  82
+视觉时间：  239
+none target detected
+循环时间：  119
+视觉时间：  199
+none target detected
+循环时间：  179
+视觉时间：  147
+none target detected
+循环时间：  60
+视觉时间：  205
+none target detected
+循环时间：  20
+视觉时间：  190
+none target detected
+循环时间：  167
+视觉时间：  212
+none target detected
+循环时间：  153
+视觉时间：  191
+none target detected
+循环时间：  102
+数字识别时间：  64
+视觉时间：  270
+pixel_coords: [1096.0, 459.5]
+rc: [[   -0.62537    -0.30384    -0.71874]
+ [    0.72201    -0.57469    -0.38527]
+ [   -0.29599    -0.75988     0.57877]]
+undistortedPoint: [     1030.8       497.3]
+标靶坐标：lat =  22.59131479894155 , lon =  113.96256660960017 , num =  -1
+坐标和姿态：lat =  22.5902267  lon:  113.9620381  alt:  23.934  pitch:  0.3004909157752991  yaw:  2.2845940589904785  roll:  -0.9198697805404663
+循环时间：  800
+数字识别时间：  63
+视觉时间：  186
+pixel_coords: [1114.5, 652.5]
+rc: [[    0.36736    -0.44814      -0.815]
+ [    0.92999       0.189     0.31527]
+ [   0.012752    -0.87376      0.4862]]
+undistortedPoint: [     1040.7       598.6]
+标靶坐标：lat =  22.590831179891563 , lon =  113.96290749596145 , num =  -1
+坐标和姿态：lat =  22.5901818  lon:  113.9620932  alt:  26.359  pitch:  -0.012752238661050797  yaw:  1.1945972442626953  roll:  -1.0630162954330444
+循环时间：  119
+数字识别时间：  56
+视觉时间：  197
+pixel_coords: [1117.5, 828.0]
+rc: [[    0.46238    -0.36645    -0.80741]
+ [    0.88194     0.28409     0.37613]
+ [   0.091545    -0.88601     0.45454]]
+undistortedPoint: [     1043.4      692.99]
+标靶坐标：lat =  22.58954396899318 , lon =  113.9646094279147 , num =  -1
+坐标和姿态：lat =  22.5901817  lon:  113.9621803  alt:  27.757  pitch:  -0.09167298674583435  yaw:  1.0879169702529907  roll:  -1.0967822074890137
+循环时间：  81
+数字识别时间：  63
+视觉时间：  195
+pixel_coords: [1082.5, 1007.0]
+rc: [[    0.36736    -0.44814      -0.815]
+ [    0.92999       0.189     0.31527]
+ [   0.012752    -0.87376      0.4862]]
+undistortedPoint: [     1026.8      796.25]
+标靶坐标：lat =  22.59239602443678 , lon =  113.96010245980818 , num =  -1
+坐标和姿态：lat =  22.5901818  lon:  113.9620932  alt:  26.359  pitch:  -0.012752238661050797  yaw:  1.1945972442626953  roll:  -1.0630162954330444
+循环时间：  98
+视觉时间：  184
+none target detected
+循环时间：  102
+视觉时间：  185
+none target detected
+循环时间：  119
+视觉时间：  159
+none target detected
+循环时间：  179
+视觉时间：  192
+none target detected
+循环时间：  100
+视觉时间：  204
+none target detected
+循环时间：  121
+视觉时间：  190
+none target detected
+循环时间：  79
+视觉时间：  206
+none target detected
+循环时间：  120
+视觉时间：  189
+none target detected
+循环时间：  80
+视觉时间：  190
+none target detected
+循环时间：  121
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  192
+none target detected
+循环时间：  100
+视觉时间：  253
+none target detected
+循环时间：  121
+视觉时间：  187
+none target detected
+循环时间：  79
+视觉时间：  161
+none target detected
+循环时间：  120
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  121
+视觉时间：  188
+none target detected
+循环时间：  979
+视觉时间：  203
+none target detected
+循环时间：  100
+视觉时间：  191
+none target detected
+循环时间：  121
+视觉时间：  203
+none target detected
+循环时间：  159
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  22
+视觉时间：  236
+none target detected
+循环时间：  139
+视觉时间：  203
+none target detected
+循环时间：  179
+视觉时间：  145
+none target detected
+循环时间：  100
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  189
+none target detected
+循环时间：  179
+视觉时间：  213
+none target detected
+循环时间：  60
+视觉时间：  189
+none target detected
+循环时间：  161
+视觉时间：  204
+none target detected
+循环时间：  79
+视觉时间：  191
+none target detected
+循环时间：  100
+视觉时间：  211
+none target detected
+循环时间：  100
+视觉时间：  184
+none target detected
+循环时间：  121
+视觉时间：  254
+none target detected
+循环时间：  179
+视觉时间：  186
+none target detected
+循环时间：  60
+视觉时间：  156
+none target detected
+循环时间：  40
+视觉时间：  188
+none target detected
+循环时间：  121
+视觉时间：  207
+none target detected
+循环时间：  839
+视觉时间：  187
+none target detected
+循环时间：  160
+视觉时间：  206
+none target detected
+循环时间：  80
+视觉时间：  190
+none target detected
+循环时间：  121
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  100
+视觉时间：  204
+none target detected
+循环时间：  121
+视觉时间：  245
+none target detected
+循环时间：  79
+视觉时间：  197
+none target detected
+循环时间：  121
+视觉时间：  146
+none target detected
+循环时间：  79
+视觉时间：  204
+none target detected
+循环时间：  147
+视觉时间：  192
+none target detected
+循环时间：  153
+视觉时间：  209
+none target detected
+循环时间：  100
+视觉时间：  181
+none target detected
+循环时间：  121
+视觉时间：  205
+none target detected
+循环时间：  159
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  205
+none target detected
+循环时间：  160
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  254
+none target detected
+循环时间：  121
+视觉时间：  188
+none target detected
+循环时间：  79
+视觉时间：  159
+none target detected
+循环时间：  921
+视觉时间：  188
+none target detected
+循环时间：  159
+视觉时间：  207
+none target detected
+循环时间：  80
+视觉时间：  191
+none target detected
+循环时间：  40
+视觉时间：  205
+none target detected
+循环时间：  160
+视觉时间：  190
+none target detected
+循环时间：  140
+视觉时间：  207
+none target detected
+循环时间：  221
+视觉时间：  186
+none target detected
+循环时间：  179
+视觉时间：  206
+none target detected
+循环时间：  60
+视觉时间：  240
+none target detected
+循环时间：  40
+视觉时间：  200
+none target detected
+循环时间：  300
+视觉时间：  143
+none target detected
+循环时间：  100
+视觉时间：  207
+none target detected
+循环时间：  280
+视觉时间：  188
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  161
+视觉时间：  188
+none target detected
+循环时间：  179
+视觉时间：  202
+none target detected
+循环时间：  1021
+视觉时间：  187
+none target detected
+循环时间：  279
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  197
+none target detected
+循环时间：  159
+视觉时间：  253
+none target detected
+循环时间：  80
+视觉时间：  178
+none target detected
+循环时间：  161
+视觉时间：  160
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  205
+none target detected
+循环时间：  161
+视觉时间：  190
+none target detected
+循环时间：  79
+视觉时间：  205
+none target detected
+循环时间：  120
+视觉时间：  190
+none target detected
+循环时间：  201
+视觉时间：  210
+none target detected
+循环时间：  159
+视觉时间：  183
+none target detected
+循环时间：  241
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  238
+none target detected
+循环时间：  1300
+视觉时间：  197
+none target detected
+循环时间：  160
+视觉时间：  149
+none target detected
+循环时间：  361
+视觉时间：  202
+none target detected
+循环时间：  279
+视觉时间：  188
+none target detected
+循环时间：  100
+数字识别时间：  64
+视觉时间：  270
+pixel_coords: [950.0, 524.0]
+rc: [[   -0.95954    -0.13948    -0.24462]
+ [    0.15409    -0.98718   -0.041575]
+ [   -0.23568   -0.077587     0.96873]]
+undistortedPoint: [     954.28      531.15]
+标靶坐标：lat =  22.591616750701757 , lon =  113.9623443832724 , num =  -1
+坐标和姿态：lat =  22.5905898  lon:  113.9621004  alt:  10.506  pitch:  0.2379223108291626  yaw:  2.9823596477508545  roll:  -0.07992098480463028
+循环时间：  300
+数字识别时间：  59
+视觉时间：  181
+pixel_coords: [921.0, 711.5]
+rc: [[   -0.93661    -0.12651    -0.32675]
+ [    0.18848    -0.96803    -0.16549]
+ [   -0.29537    -0.21658     0.93051]]
+undistortedPoint: [     939.03       629.5]
+标靶坐标：lat =  22.5916131138023 , lon =  113.96236347345875 , num =  -1
+坐标和姿态：lat =  22.590538199999997  lon:  113.96210339999999  alt:  12.022  pitch:  0.2998427450656891  yaw:  2.9430036544799805  roll:  -0.22868776321411133
+循环时间：  121
+数字识别时间：  65
+视觉时间：  212
+pixel_coords: [889.0, 882.0]
+rc: [[   -0.92559    -0.12312    -0.35795]
+ [     0.2068     -0.9565    -0.20575]
+ [   -0.31704    -0.26447     0.91079]]
+undistortedPoint: [     921.54      722.34]
+标靶坐标：lat =  22.59163026468481 , lon =  113.96237904141725 , num =  -1
+坐标和姿态：lat =  22.5905007  lon:  113.9621069  alt:  13.419  pitch:  0.3226100504398346  yaw:  2.921773672103882  roll:  -0.28259778022766113
+循环时间：  179
+视觉时间：  123
+none target detected
+循环时间：  100
+视觉时间：  199
+none target detected
+循环时间：  121
+视觉时间：  190
+none target detected
+循环时间：  79
+视觉时间：  255
+none target detected
+循环时间：  121
+视觉时间：  187
+none target detected
+循环时间：  779
+视觉时间：  158
+none target detected
+循环时间：  400
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  205
+none target detected
+循环时间：  240
+视觉时间：  189
+none target detected
+循环时间：  100
+视觉时间：  207
+none target detected
+循环时间：  100
+视觉时间：  189
+none target detected
+循环时间：  120
+视觉时间：  203
+none target detected
+循环时间：  160
+视觉时间：  192
+none target detected
+循环时间：  80
+视觉时间：  207
+none target detected
+循环时间：  40
+视觉时间：  238
+none target detected
+循环时间：  400
+视觉时间：  198
+none target detected
+循环时间：  200
+视觉时间：  145
+none target detected
+循环时间：  120
+视觉时间：  203
+none target detected
+循环时间：  227
+视觉时间：  184
+none target detected
+循环时间：  1173
+视觉时间：  208
+none target detected
+循环时间：  80
+视觉时间：  191
+none target detected
+循环时间：  100
+视觉时间：  212
+none target detected
+循环时间：  100
+视觉时间：  188
+none target detected
+循环时间：  300
+视觉时间：  206
+none target detected
+循环时间：  60
+视觉时间：  186
+none target detected
+循环时间：  340
+视觉时间：  254
+none target detected
+循环时间：  460
+视觉时间：  182
+none target detected
+循环时间：  161
+视觉时间：  159
+none target detected
+循环时间：  179
+视觉时间：  186
+none target detected
+循环时间：  221
+视觉时间：  200
+none target detected
+循环时间：  979
+视觉时间：  190
+none target detected
+循环时间：  100
+视觉时间：  204
+none target detected
+循环时间：  300
+视觉时间：  192
+none target detected
+循环时间：  60
+视觉时间：  208
+none target detected
+循环时间：  40
+视觉时间：  182
+none target detected
+循环时间：  600
+视觉时间：  204
+none target detected
+循环时间：  121
+视觉时间：  238
+none target detected
+循环时间：  79
+视觉时间：  199
+none target detected
+循环时间：  1321
+视觉时间：  144
+none target detected
+循环时间：  79
+视觉时间：  205
+none target detected
+循环时间：  900
+视觉时间：  188
+none target detected
+循环时间：  100
+视觉时间：  204
+none target detected
+循环时间：  121
+视觉时间：  189
+none target detected
+循环时间：  159
+视觉时间：  208
+none target detected
+循环时间：  80
+视觉时间：  192
+none target detected
+循环时间：  23
+视觉时间：  204
+none target detected
+循环时间：  164
+视觉时间：  189
+none target detected
+循环时间：  253
+视觉时间：  259
+none target detected
+循环时间：  121
+视觉时间：  181
+none target detected
+循环时间：  79
+视觉时间：  160
+none target detected
+循环时间：  120
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  205
+none target detected
+循环时间：  147
+视觉时间：  189
+none target detected
+循环时间：  153
+视觉时间：  207
+none target detected
+循环时间：  60
+视觉时间：  190
+none target detected
+循环时间：  23
+视觉时间：  212
+none target detected
+循环时间：  177
+视觉时间：  188
+none target detected
+循环时间：  160
+视觉时间：  207
+none target detected
+循环时间：  80
+视觉时间：  238
+none target detected
+循环时间：  121
+视觉时间：  198
+none target detected
+循环时间：  979
+视觉时间：  146
+none target detected
+循环时间：  100
+视觉时间：  198
+none target detected
+循环时间：  121
+视觉时间：  196
+none target detected
+循环时间：  159
+视觉时间：  199
+none target detected
+循环时间：  80
+视觉时间：  188
+none target detected
+循环时间：  160
+视觉时间：  205
+none target detected
+循环时间：  180
+视觉时间：  191
+none target detected
+循环时间：  100
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  188
+none target detected
+循环时间：  159
+视觉时间：  255
+none target detected
+循环时间：  80
+视觉时间：  188
+none target detected
+循环时间：  23
+视觉时间：  167
+none target detected
+循环时间：  138
+视觉时间：  183
+none target detected
+循环时间：  179
+视觉时间：  207
+none target detected
+循环时间：  60
+视觉时间：  194
+none target detected
+循环时间：  240
+视觉时间：  210
+none target detected
+循环时间：  100
+视觉时间：  180
+none target detected
+循环时间：  100
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  187
+none target detected
+循环时间：  979
+视觉时间：  207
+none target detected
+循环时间：  100
+视觉时间：  238
+none target detected
+循环时间：  121
+视觉时间：  202
+none target detected
+循环时间：  79
+视觉时间：  143
+none target detected
+循环时间：  120
+视觉时间：  208
+none target detected
+循环时间：  80
+视觉时间：  190
+none target detected
+循环时间：  147
+视觉时间：  205
+none target detected
+循环时间：  153
+视觉时间：  190
+none target detected
+循环时间：  100
+视觉时间：  204
+none target detected
+循环时间：  121
+视觉时间：  190
+none target detected
+循环时间：  179
+视觉时间：  206
+none target detected
+循环时间：  60
+视觉时间：  197
+none target detected
+循环时间：  161
+视觉时间：  254
+none target detected
+循环时间：  79
+数字识别时间：  70
+视觉时间：  258
+pixel_coords: [1072.0, 470.0]
+rc: [[   -0.94977    0.072555    -0.30442]
+ [   0.052104    -0.92252    -0.38243]
+ [   -0.30858    -0.37908      0.8724]]
+undistortedPoint: [     1018.1      502.86]
+标靶坐标：lat =  22.59159851109509 , lon =  113.96234377323871 , num =  -1
+坐标和姿态：lat =  22.5905347  lon:  113.9620544  alt:  13.219  pitch:  0.3137018084526062  yaw:  3.0867884159088135  roll:  -0.40991029143333435
+循环时间：  120
+数字识别时间：  64
+视觉时间：  154
+pixel_coords: [1100.5, 657.5]
+rc: [[   -0.93622    0.022633    -0.35069]
+ [    0.13346    -0.90026     -0.4144]
+ [   -0.32509    -0.43477     0.83981]]
+undistortedPoint: [     1033.3      601.19]
+标靶坐标：lat =  22.591640341310566 , lon =  113.96237660407266 , num =  -1
+坐标和姿态：lat =  22.5905214  lon:  113.9620554  alt:  13.607000000000001  pitch:  0.33110785484313965  yaw:  2.999990940093994  roll:  -0.47770851850509644
+循环时间：  80
+数字识别时间：  64
+视觉时间：  191
+pixel_coords: [1113.5, 884.0]
+rc: [[   -0.89879   -0.030004    -0.43734]
+ [     0.2369    -0.87268    -0.42698]
+ [   -0.36885    -0.48737     0.79147]]
+undistortedPoint: [     1041.9      724.26]
+标靶坐标：lat =  22.591753002034743 , lon =  113.96247100706066 , num =  -1
+坐标和姿态：lat =  22.5905058  lon:  113.96205719999999  alt:  14.07  pitch:  0.3777722716331482  yaw:  2.883883476257324  roll:  -0.5519413352012634
+循环时间：  280
+视觉时间：  128
+none target detected
+循环时间：  80
+视觉时间：  190
+none target detected
+循环时间：  23
+视觉时间：  202
+none target detected
+循环时间：  1200
+视觉时间：  189
+none target detected
+循环时间：  138
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  192
+none target detected
+循环时间：  60
+视觉时间：  204
+none target detected
+循环时间：  161
+视觉时间：  241
+none target detected
+循环时间：  79
+视觉时间：  200
+none target detected
+循环时间：  100
+视觉时间：  148
+none target detected
+循环时间：  100
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  187
+none target detected
+循环时间：  159
+视觉时间：  207
+none target detected
+循环时间：  80
+视觉时间：  191
+none target detected
+循环时间：  40
+视觉时间：  205
+none target detected
+循环时间：  147
+视觉时间：  186
+none target detected
+循环时间：  253
+视觉时间：  201
+none target detected
+循环时间：  1100
+视觉时间：  188
+none target detected
+循环时间：  100
+视觉时间：  254
+none target detected
+循环时间：  121
+视觉时间：  186
+none target detected
+循环时间：  79
+视觉时间：  145
+none target detected
+循环时间：  120
+视觉时间：  207
+none target detected
+循环时间：  80
+视觉时间：  190
+none target detected
+循环时间：  121
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  189
+none target detected
+循环时间：  60
+视觉时间：  215
+none target detected
+循环时间：  23
+视觉时间：  186
+none target detected
+循环时间：  177
+视觉时间：  205
+none target detected
+循环时间：  160
+视觉时间：  184
+none target detected
+循环时间：  80
+视觉时间：  253
+none target detected
+循环时间：  921
+视觉时间：  186
+none target detected
+循环时间：  79
+视觉时间：  160
+none target detected
+循环时间：  121
+视觉时间：  190
+none target detected
+循环时间：  79
+视觉时间：  206
+none target detected
+循环时间：  121
+视觉时间：  188
+none target detected
+循环时间：  179
+视觉时间：  207
+none target detected
+循环时间：  60
+视觉时间：  191
+none target detected
+循环时间：  22
+视觉时间：  203
+none target detected
+循环时间：  218
+视觉时间：  189
+none target detected
+循环时间：  121
+视觉时间：  206
+none target detected
+循环时间：  79
+视觉时间：  239
+none target detected
+循环时间：  121
+视觉时间：  202
+none target detected
+循环时间：  179
+视觉时间：  144
+none target detected
+循环时间：  100
+视觉时间：  209
+none target detected
+循环时间：  121
+视觉时间：  185
+none target detected
+循环时间：  179
+视觉时间：  207
+none target detected
+循环时间：  60
+视觉时间：  191
+none target detected
+循环时间：  22
+视觉时间：  204
+none target detected
+循环时间：  166
+视觉时间：  189
+none target detected
+循环时间：  172
+视觉时间：  206
+none target detected
+循环时间：  800
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  253
+none target detected
+循环时间：  147
+视觉时间：  185
+none target detected
+循环时间：  153
+视觉时间：  164
+none target detected
+循环时间：  100
+视觉时间：  188
+none target detected
+循环时间：  121
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  189
+none target detected
+循环时间：  60
+视觉时间：  205
+none target detected
+循环时间：  161
+视觉时间：  190
+none target detected
+循环时间：  79
+视觉时间：  204
+none target detected
+循环时间：  321
+视觉时间：  187
+none target detected
+循环时间：  179
+视觉时间：  208
+none target detected
+循环时间：  60
+视觉时间：  239
+none target detected
+循环时间：  720
+视觉时间：  204
+none target detected
+循环时间：  80
+视觉时间：  151
+none target detected
+循环时间：  40
+视觉时间：  200
+none target detected
+循环时间：  121
+视觉时间：  188
+none target detected
+循环时间：  179
+视觉时间：  207
+none target detected
+循环时间：  100
+视觉时间：  187
+none target detected
+循环时间：  121
+视觉时间：  205
+none target detected
+循环时间：  159
+视觉时间：  198
+none target detected
+循环时间：  80
+视觉时间：  196
+none target detected
+循环时间：  187
+视觉时间：  189
+none target detected
+循环时间：  153
+视觉时间：  253
+none target detected
+循环时间：  221
+视觉时间：  185
+none target detected
+循环时间：  179
+视觉时间：  164
+none target detected
+循环时间：  60
+视觉时间：  186
+none target detected
+循环时间：  161
+视觉时间：  207
+none target detected
+循环时间：  79
+视觉时间：  188
+none target detected
+循环时间：  100
+视觉时间：  208
+none target detected
+循环时间：  100
+视觉时间：  189
+none target detected
+循环时间：  121
+视觉时间：  203
+none target detected
+循环时间：  979
+视觉时间：  198
+none target detected
+循环时间：  221
+数字识别时间：  67
+视觉时间：  274
+pixel_coords: [1057.5, 415.5]
+rc: [[   -0.95371    0.081339     0.28953]
+ [   -0.15422    -0.95879    -0.23863]
+ [    0.25818    -0.27223     0.92695]]
+undistortedPoint: [     1010.6      474.24]
+标靶坐标：lat =  22.59204701949455 , lon =  113.96232389086106 , num =  -1
+坐标和姿态：lat =  22.5910121  lon:  113.96212109999999  alt:  12.611  pitch:  -0.26114141941070557  yaw:  -2.9812793731689453  roll:  -0.28565528988838196
+循环时间：  179
+数字识别时间：  69
+检测到数字: 11
+视觉时间：  240
+pixel_coords: [1045.0, 728.5]
+rc: [[   -0.93459    0.011002     0.35555]
+ [   -0.18659    -0.86614    -0.46367]
+ [    0.30285    -0.49968     0.81154]]
+undistortedPoint: [     1004.2      638.64]
+标靶坐标：lat =  22.592337387660486 , lon =  113.96236123575244 , num =  11
+坐标和姿态：lat =  22.591167199999997  lon:  113.96219459999999  alt:  15.995000000000001  pitch:  -0.30768561363220215  yaw:  -2.944535970687866  roll:  -0.5518965125083923
+循环时间：  60
+视觉时间：  129
+none target detected
+循环时间：  40
+视觉时间：  137
+none target detected
+循环时间：  121
+视觉时间：  204
+none target detected
+循环时间：  239
+视觉时间：  187
+none target detected
+循环时间：  161
+视觉时间：  208
+none target detected
+循环时间：  400
+视觉时间：  183
+none target detected
+循环时间：  262
+视觉时间：  204
+none target detected
+循环时间：  377
+视觉时间：  190
+none target detected
+循环时间：  23
+视觉时间：  201
+none target detected
+循环时间：  1017
+视觉时间：  189
+none target detected
+循环时间：  120
+视觉时间：  255
+none target detected
+循环时间：  80
+视觉时间：  187
+none target detected
+循环时间：  121
+视觉时间：  161
+none target detected
+循环时间：  179
+视觉时间：  187
+none target detected
+循环时间：  100
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  193
+none target detected
+循环时间：  79
+视觉时间：  204
+none target detected
+循环时间：  200
+视觉时间：  185
+none target detected
+循环时间：  300
+视觉时间：  206
+none target detected
+循环时间：  100
+视觉时间：  191
+none target detected
+循环时间：  121
+视觉时间：  209
+none target detected
+循环时间：  400
+视觉时间：  235
+none target detected
+循环时间：  979
+视觉时间：  199
+none target detected
+循环时间：  100
+视觉时间：  149
+none target detected
+循环时间：  121
+视觉时间：  196
+none target detected
+循环时间：  179
+视觉时间：  198
+none target detected
+循环时间：  60
+视觉时间：  200
+none target detected
+循环时间：  22
+视觉时间：  187
+none target detected
+循环时间：  178
+视觉时间：  205
+none target detected
+循环时间：  240
+视觉时间：  187
+none target detected
+循环时间：  121
+视觉时间：  204
+none target detected
+循环时间：  159
+视觉时间：  186
+none target detected
+循环时间：  440
+视觉时间：  255
+none target detected
+循环时间：  80
+视觉时间：  186
+none target detected
+循环时间：  121
+视觉时间：  161
+none target detected
+循环时间：  179
+视觉时间：  189
+none target detected
+循环时间：  1021
+视觉时间：  202
+none target detected
+循环时间：  239
+视觉时间：  187
+none target detected
+循环时间：  160
+视觉时间：  200
+none target detected
+循环时间：  280
+视觉时间：  198
+none target detected
+循环时间：  200
+视觉时间：  197
+none target detected
+循环时间：  120
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  206
+none target detected
+循环时间：  160
+视觉时间：  237
+none target detected
+循环时间：  240
+视觉时间：  201
+none target detected
+循环时间：  121
+视觉时间：  146
+none target detected
+循环时间：  159
+视觉时间：  205
+none target detected
+循环时间：  80
+视觉时间：  186
+none target detected
+循环时间：  200
+视觉时间：  205
+none target detected
+循环时间：  1042
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  200
+视觉时间：  188
+none target detected
+循环时间：  281
+视觉时间：  205
+none target detected
+循环时间：  200
+视觉时间：  190
+none target detected
+循环时间：  119
+视觉时间：  258
+none target detected
+循环时间：  179
+视觉时间：  182
+none target detected
+循环时间：  60
+视觉时间：  160
+none target detected
+循环时间：  161
+视觉时间：  189
+none target detected
+循环时间：  81
+视觉时间：  209
+none target detected
+循环时间：  119
+视觉时间：  190
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  191
+none target detected
+循环时间：  179
+视觉时间：  203
+none target detected
+循环时间：  102
+视觉时间：  197
+none target detected
+循环时间：  778
+视觉时间：  201
+none target detected
+循环时间：  141
+视觉时间：  231
+none target detected
+循环时间：  579
+视觉时间：  202
+none target detected
+循环时间：  102
+视觉时间：  145
+none target detected
+循环时间：  119
+视觉时间：  206
+none target detected
+循环时间：  159
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  207
+none target detected
+循环时间：  42
+视觉时间：  187
+none target detected
+循环时间：  119
+视觉时间：  212
+none target detected
+循环时间：  259
+视觉时间：  189
+none target detected
+循环时间：  180
+数字识别时间：  65
+视觉时间：  271
+pixel_coords: [1086.5, 559.5]
+rc: [[   -0.71013      0.2427     0.66092]
+ [    -0.6337    -0.62941    -0.44975]
+ [    0.30684     -0.7382     0.60076]]
+undistortedPoint: [     1025.7      549.71]
+标靶坐标：lat =  22.592354195680112 , lon =  113.9622792759962 , num =  -1
+坐标和姿态：lat =  22.5911796  lon:  113.9622096  alt:  18.19  pitch:  -0.31186628341674805  yaw:  -2.4130077362060547  roll:  -0.8876917958259583
+循环时间：  140
+视觉时间：  124
+none target detected
+循环时间：  102
+视觉时间：  249
+none target detected
+循环时间：  119
+视觉时间：  181
+none target detected
+循环时间：  979
+视觉时间：  164
+none target detected
+循环时间：  60
+视觉时间：  189
+none target detected
+循环时间：  242
+视觉时间：  204
+none target detected
+循环时间：  345
+视觉时间：  187
+none target detected
+循环时间：  153
+视觉时间：  207
+none target detected
+循环时间：  60
+视觉时间：  190
+none target detected
+循环时间：  161
+视觉时间：  206
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  98
+视觉时间：  205
+none target detected
+循环时间：  221
+视觉时间：  240
+none target detected
+循环时间：  179
+视觉时间：  205
+none target detected
+循环时间：  60
+视觉时间：  144
+none target detected
+循环时间：  20
+视觉时间：  206
+none target detected
+循环时间：  180
+视觉时间：  188
+none target detected
+循环时间：  160
+视觉时间：  206
+none target detected
+循环时间：  800
+视觉时间：  191
+none target detected
+循环时间：  82
+视觉时间：  205
+none target detected
+循环时间：  118
+视觉时间：  190
+none target detected
+循环时间：  82
+视觉时间：  211
+none target detected
+循环时间：  119
+视觉时间：  188
+none target detected
+循环时间：  81
+视觉时间：  255
+none target detected
+循环时间：  119
+视觉时间：  190
+none target detected
+循环时间：  179
+视觉时间：  159
+none target detected
+循环时间：  60
+视觉时间：  191
+none target detected
+循环时间：  160
+视觉时间：  205
+none target detected
+循环时间：  82
+视觉时间：  184
+none target detected
+循环时间：  98
+视觉时间：  206
+none target detected
+循环时间：  102
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  202
+none target detected
+循环时间：  400
+视觉时间：  190
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  118
+视觉时间：  240
+none target detected
+循环时间：  82
+视觉时间：  201
+none target detected
+循环时间：  119
+视觉时间：  142
+none target detected
+循环时间：  999
+视觉时间：  205
+none target detected
+循环时间：  82
+视觉时间：  189
+none target detected
+循环时间：  119
+视觉时间：  206
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  207
+none target detected
+循环时间：  20
+视觉时间：  184
+none target detected
+循环时间：  500
+视觉时间：  208
+none target detected
+循环时间：  67
+视觉时间：  189
+none target detected
+循环时间：  153
+视觉时间：  256
+none target detected
+循环时间：  221
+视觉时间：  183
+none target detected
+循环时间：  159
+视觉时间：  161
+none target detected
+循环时间：  80
+视觉时间：  191
+none target detected
+循环时间：  20
+视觉时间：  205
+none target detected
+循环时间：  167
+视觉时间：  189
+none target detected
+循环时间：  153
+视觉时间：  206
+none target detected
+循环时间：  102
+视觉时间：  188
+none target detected
+循环时间：  919
+视觉时间：  205
+none target detected
+循环时间：  179
+视觉时间：  188
+none target detected
+循环时间：  200
+视觉时间：  205
+none target detected
+循环时间：  302
+视觉时间：  233
+none target detected
+循环时间：  119
+视觉时间：  202
+none target detected
+循环时间：  159
+视觉时间：  146
+none target detected
+循环时间：  80
+视觉时间：  207
+none target detected
+循环时间：  42
+视觉时间：  189
+none target detected
+循环时间：  158
+视觉时间：  206
+none target detected
+循环时间：  160
+视觉时间：  191
+none target detected
+循环时间：  82
+视觉时间：  187
+none target detected
+循环时间：  919
+视觉时间：  203
+none target detected
+循环时间：  200
+视觉时间：  191
+none target detected
+循环时间：  81
+视觉时间：  205
+none target detected
+循环时间：  119
+视觉时间：  237
+none target detected
+循环时间：  179
+视觉时间：  203
+none target detected
+循环时间：  102
+视觉时间：  143
+none target detected
+循环时间：  119
+视觉时间：  205
+none target detected
+循环时间：  199
+视觉时间：  190
+none target detected
+循环时间：  82
+视觉时间：  208
+none target detected
+循环时间：  119
+视觉时间：  188
+none target detected
+循环时间：  179
+视觉时间：  208
+none target detected
+循环时间：  60
+视觉时间：  188
+none target detected
+循环时间：  161
+视觉时间：  205
+none target detected
+循环时间：  200
+视觉时间：  188
+none target detected
+循环时间：  200
+视觉时间：  254
+none target detected
+循环时间：  959
+视觉时间：  183
+none target detected
+循环时间：  320
+视觉时间：  160
+none target detected
+循环时间：  100
+视觉时间：  198
+none target detected
+循环时间：  60
+数字识别时间：  65
+视觉时间：  271
+pixel_coords: [1286.0, 330.0]
+rc: [[   -0.93938   -0.077265     0.33405]
+ [ -0.0072967    -0.96955    -0.24477]
+ [    0.34279    -0.23237     0.91022]]
+undistortedPoint: [     1134.9      426.48]
+标靶坐标：lat =  22.592033298199382 , lon =  113.96231903334437 , num =  -1
+坐标和姿态：lat =  22.5910135  lon:  113.96208899999999  alt:  12.82  pitch:  -0.3498879373073578  yaw:  -3.1338253021240234  roll:  -0.249954491853714
+循环时间：  160
+数字识别时间：  64
+视觉时间：  188
+pixel_coords: [1181.5, 563.0]
+rc: [[    -0.9386    -0.10783     0.32771]
+ [   0.034219    -0.97431    -0.22259]
+ [    0.34329    -0.19771     0.91818]]
+undistortedPoint: [     1076.1      551.61]
+标靶坐标：lat =  22.592009259836843 , lon =  113.96230386253609 , num =  -1
+坐标和姿态：lat =  22.5909607  lon:  113.9620865  alt:  11.019  pitch:  -0.3504207134246826  yaw:  3.105151414871216  roll:  -0.21208658814430237
+循环时间：  80
+数字识别时间：  65
+视觉时间：  202
+pixel_coords: [1152.0, 849.5]
+rc: [[   -0.94557    -0.12193     0.30172]
+ [  -0.032291    -0.88742    -0.45983]
+ [    0.32383    -0.44454     0.83518]]
+undistortedPoint: [     1062.4      705.37]
+标靶坐标：lat =  22.592378011698237 , lon =  113.96237084625524 , num =  -1
+坐标和姿态：lat =  22.591156599999998  lon:  113.96214619999999  alt:  18.203  pitch:  -0.32976970076560974  yaw:  -3.1074554920196533  roll:  -0.48912686109542847
+循环时间：  500
+视觉时间：  109
+none target detected
+循环时间：  380
+视觉时间：  207
+none target detected
+循环时间：  80
+视觉时间：  189
+none target detected
+循环时间：  187
+视觉时间：  204
+none target detected
+循环时间：  133
+视觉时间：  239
+none target detected
+循环时间：  267
+视觉时间：  200
+none target detected
+循环时间：  853
+视觉时间：  145
+none target detected
+循环时间：  161
+视觉时间：  207
+none target detected
+循环时间：  119
+视觉时间：  188
+none target detected
+循环时间：  67
+视觉时间：  204
+none target detected
+循环时间：  153
+视觉时间：  191
+none target detected
+循环时间：  100
+视觉时间：  204
+none target detected
+循环时间：  147
+视觉时间：  190
+none target detected
+循环时间：  133
+视觉时间：  206
+none target detected
+循环时间：  81
+视觉时间：  188
+none target detected
+循环时间：  339
+视觉时间：  255
+none target detected
+循环时间：  247
+视觉时间：  186
+none target detected
+循环时间：  133
+视觉时间：  161
+none target detected
+循环时间：  81
+视觉时间：  189
+none target detected
+循环时间：  139
+视觉时间：  205
+none target detected
+循环时间：  100
+视觉时间：  191
+none target detected
+循环时间：  160
+视觉时间：  202
+none target detected
+循环时间：  1140
+视觉时间：  191
+none target detected
+循环时间：  61
+视觉时间：  205
+none target detected
+循环时间：  519
+视觉时间：  184
+none target detected
+循环时间：  67
+视觉时间：  206
+none target detected
+循环时间：  153
+视觉时间：  239
+none target detected
+循环时间：  100
+视觉时间：  200
+none target detected
+循环时间：  280
+视觉时间：  145
+none target detected
+循环时间：  80
+视觉时间：  207
+none target detected
+循环时间：  187
+视觉时间：  190
+none target detected
+循环时间：  53
+视觉时间：  202
+none target detected
+循环时间：  160
+视觉时间：  196
+none target detected
+循环时间：  160
+视觉时间：  206
+none target detected
+循环时间：  40
+视觉时间：  178
+none target detected
+循环时间：  1187
+视觉时间：  204
+none target detected
+循环时间：  133
+视觉时间：  196
+none target detected
+循环时间：  81
+视觉时间：  249
+none target detected
+循环时间：  186
+视觉时间：  187
+none target detected
+循环时间：  53
+视觉时间：  160
+none target detected
+循环时间：  160
+视觉时间：  188
+none target detected
+循环时间：  187
+视觉时间：  206
+none target detected
+循环时间：  173
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  204
+none target detected
+循环时间：  147
+视觉时间：  190
+none target detected
+循环时间：  133
+视觉时间：  205
+none target detected
+循环时间：  80
+视觉时间：  187
+none target detected
+循环时间：  120
+视觉时间：  208
+none target detected
+循环时间：  67
+视觉时间：  236
+none target detected
+循环时间：  253
+视觉时间：  202
+none target detected
+循环时间：  761
+视觉时间：  145
+none target detected
+循环时间：  186
+视觉时间：  207
+none target detected
+循环时间：  53
+视觉时间：  189
+none target detected
+循环时间：  100
+视觉时间：  205
+none target detected
+循环时间：  100
+视觉时间：  190
+none target detected
+循环时间：  147
+视觉时间：  205
+none target detected
+循环时间：  133
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  204
+none target detected
+循环时间：  161
+视觉时间：  191
+none target detected
+循环时间：  79
+视觉时间：  255
+none target detected
+循环时间：  160
+视觉时间：  184
+none target detected
+循环时间：  120
+视觉时间：  161
+none target detected
+循环时间：  67
+视觉时间：  190
+none target detected
+循环时间：  133
+视觉时间：  207
+none target detected
+循环时间：  80
+视觉时间：  189
+none target detected
+循环时间：  140
+视觉时间：  207
+none target detected
+循环时间：  100
+视觉时间：  188
+none target detected
+循环时间：  161
+视觉时间：  204
+none target detected
+循环时间：  239
+视觉时间：  190
+none target detected
+循环时间：  900
+视觉时间：  207
+none target detected
+循环时间：  100
+视觉时间：  238
+none target detected
+循环时间：  121
+视觉时间：  203
+none target detected
+循环时间：  79
+视觉时间：  143
+none target detected
+循环时间：  121
+视觉时间：  206
+none target detected
+循环时间：  79
+视觉时间：  189
+none target detected
+循环时间：  300
+视觉时间：  207
+none target detected
+循环时间：  100
+视觉时间：  189
+none target detected
+循环时间：  121
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  192
+none target detected
+循环时间：  61
+视觉时间：  202
+none target detected
+循环时间：  160
+视觉时间：  192
+none target detected
+循环时间：  79
+视觉时间：  252
+none target detected
+循环时间：  321
+视觉时间：  185
+none target detected
+循环时间：  159
+视觉时间：  160
+none target detected
+循环时间：  81
+视觉时间：  190
+none target detected
+循环时间：  139
+视觉时间：  204
+none target detected
+循环时间：  900
+视觉时间：  200
+none target detected
+循环时间：  120
+数字识别时间：  63
+视觉时间：  272
+pixel_coords: [1241.0, 263.0]
+rc: [[   -0.97309     0.12489     0.19366]
+ [  -0.031601    -0.90479     0.42469]
+ [    0.22826     0.40714     0.88438]]
+undistortedPoint: [     1110.9      390.24]
+标靶坐标：lat =  22.591731904836564 , lon =  113.96233011045025 , num =  -1
+坐标和姿态：lat =  22.590742499999998  lon:  113.9620973  alt:  4.112  pitch:  -0.23028677701950073  yaw:  -3.1091294288635254  roll:  0.43144500255584717
+循环时间：  80
+数字识别时间：  64
+视觉时间：  186
+pixel_coords: [1176.0, 559.5]
+rc: [[    -0.9702     0.11237     0.21465]
+ [  -0.005193    -0.89538     0.44527]
+ [    0.24223     0.43089     0.86929]]
+undistortedPoint: [     1073.2      549.76]
+标靶坐标：lat =  22.591885000775594 , lon =  113.96233453448319 , num =  -1
+坐标和姿态：lat =  22.590890299999998  lon:  113.962108  alt:  7.6690000000000005  pitch:  -0.24466367065906525  yaw:  -3.136240243911743  roll:  0.4601888358592987
+循环时间：  121
+数字识别时间：  68
+视觉时间：  208
+pixel_coords: [1079.5, 878.5]
+rc: [[   -0.97309     0.12489     0.19366]
+ [  -0.031601    -0.90479     0.42469]
+ [    0.22826     0.40714     0.88438]]
+undistortedPoint: [     1023.5      720.75]
+标靶坐标：lat =  22.591768307710772 , lon =  113.96231430307247 , num =  -1
+坐标和姿态：lat =  22.590742499999998  lon:  113.9620973  alt:  4.112  pitch:  -0.23028677701950073  yaw:  -3.1091294288635254  roll:  0.43144500255584717
+循环时间：  79
+视觉时间：  106
+none target detected
+循环时间：  500
+视觉时间：  206
+none target detected
+循环时间：  100
+视觉时间：  237
+none target detected
+循环时间：  121
+视觉时间：  206
+none target detected
+循环时间：  79
+视觉时间：  142
+none target detected
+循环时间：  121
+视觉时间：  207
+none target detected
+循环时间：  79
+视觉时间：  188
+none target detected
+循环时间：  147
+视觉时间：  205
+none target detected
+循环时间：  133
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  205
+none target detected
+循环时间：  840
+视觉时间：  189
+none target detected
+循环时间：  160
+视觉时间：  204
+none target detected
+循环时间：  161
+视觉时间：  191
+none target detected
+循环时间：  79
+视觉时间：  255
+none target detected
+循环时间：  147
+视觉时间：  184
+none target detected
+循环时间：  153
+视觉时间：  165
+none target detected
+循环时间：  100
+视觉时间：  184
+none target detected
+循环时间：  121
+视觉时间：  206
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  60
+视觉时间：  207
+none target detected
+循环时间：  23
+视觉时间：  190
+none target detected
+循环时间：  138
+视觉时间：  201
+none target detected
+循环时间：  279
+视觉时间：  198
+none target detected
+循环时间：  121
+视觉时间：  203
+none target detected
+循环时间：  159
+视觉时间：  235
+none target detected
+循环时间：  80
+视觉时间：  201
+none target detected
+循环时间：  161
+视觉时间：  142
+none target detected
+循环时间：  979
+视觉时间：  203
+none target detected
+循环时间：  60
+视觉时间：  192
+none target detected
+循环时间：  140
+视觉时间：  205
+none target detected
+循环时间：  100
+视觉时间：  189
+none target detected
+循环时间：  120
+视觉时间：  204
+none target detected
+循环时间：  80
+视觉时间：  189
+none target detected
+循环时间：  121
+视觉时间：  207
+none target detected
+循环时间：  159
+视觉时间：  193
+none target detected
+循环时间：  80
+视觉时间：  255
+none target detected
+循环时间：  22
+视觉时间：  184
+none target detected
+循环时间：  318
+视觉时间：  157
+none target detected
+循环时间：  221
+视觉时间：  183
+none target detected
+循环时间：  1200
+视觉时间：  207
+none target detected
+循环时间：  79
+视觉时间：  188
+none target detected
+循环时间：  121
+视觉时间：  206
+none target detected
+循环时间：  79
+视觉时间：  190
+none target detected
+循环时间：  121
+视觉时间：  203
+none target detected
+循环时间：  179
+视觉时间：  191
+none target detected
+循环时间：  100
+视觉时间：  206
+none target detected
+循环时间：  100
+视觉时间：  240
+none target detected
+循环时间：  100
+视觉时间：  200
+none target detected
+循环时间：  121
+视觉时间：  145
+none target detected
+循环时间：  79
+视觉时间：  207
+none target detected
+循环时间：  160
+视觉时间：  188
+none target detected
+循环时间：  160
+视觉时间：  207
+none target detected
+循环时间：  80
+视觉时间：  190
+none target detected
+循环时间：  800
+视觉时间：  206
+none target detected
+循环时间：  121
+视觉时间：  186
+none target detected
+循环时间：  261
+视觉时间：  206
+none target detected
+循环时间：  165
+视觉时间：  189
+none target detected
+循环时间：  133
+视觉时间：  262
+none target detected
+循环时间：  80
+视觉时间：  183
+none target detected
+循环时间：  23
+视觉时间：  154
+none target detected
+循环时间：  317
+视觉时间：  192
+none target detected
+循环时间：  60
+视觉时间：  207
+none target detected
+循环时间：  340
+视觉时间：  184
+none target detected
+循环时间：  221
+视觉时间：  206
+none target detected
+循环时间：  159
+视觉时间：  189
+none target detected
+循环时间：  80
+视觉时间：  207
+none target detected
+循环时间：  23
+视觉时间：  185
+none target detected
+循环时间：  1217
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  247
+none target detected
+循环时间：  179
+视觉时间：  194
+none target detected
+循环时间：  100
+视觉时间：  146
+none target detected
+循环时间：  121
+视觉时间：  202
+none target detected
+循环时间：  179
+视觉时间：  186
+none target detected
+循环时间：  221
+视觉时间：  209
+none target detected
+循环时间：  79
+视觉时间：  188
+none target detected
+循环时间：  120
+视觉时间：  206
+none target detected
+循环时间：  201
+视觉时间：  189
+none target detected
+循环时间：  239
+视觉时间：  203
+none target detected
+循环时间：  160
+视觉时间：  192
+none target detected
+循环时间：  80
+视觉时间：  253
+none target detected
+循环时间：  120
+视觉时间：  188
+none target detected
+循环时间：  80
+视觉时间：  160
+none target detected
+循环时间：  121
+视觉时间：  187
+none target detected
+循环时间：  1200
+视觉时间：  204
+none target detected
+循环时间：  179
+视觉时间：  193
+none target detected
+循环时间：  100
+视觉时间：  202
+none target detected
+循环时间：  121
+视觉时间：  189
+none target detected
+循环时间：  179
+视觉时间：  206
+none target detected
+循环时间：  60
+视觉时间：  190
+none target detected
+循环时间：  23
+视觉时间：  207
+none target detected
+循环时间：  138
+视觉时间：  235
+none target detected
+循环时间：  400
+视觉时间：  199
+none target detected
+循环时间：  399
+视觉时间：  148
+none target detected
+循环时间：  80
+视觉时间：  187
+none target detected
+循环时间：  100
+视觉时间：  206
+none target detected
+循环时间：  820
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  204
+none target detected
+循环时间：  121
+视觉时间：  189
+none target detected
+循环时间：  179
+视觉时间：  209
+none target detected
+循环时间：  60
+视觉时间：  188
+none target detected
+循环时间：  22
+视觉时间：  205
+none target detected
+循环时间：  165
+视觉时间：  234
+none target detected
+循环时间：  253
+视觉时间：  204
+none target detected
+循环时间：  121
+视觉时间：  144
+none target detected
+循环时间：  79
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  191
+none target detected
+循环时间：  79
+视觉时间：  201
+none target detected
+循环时间：  400
+视觉时间：  190
+none target detected
+循环时间：  121
+视觉时间：  203
+none target detected
+循环时间：  159
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  208
+none target detected
+循环时间：  23
+视觉时间：  183
+none target detected
+循环时间：  1217
+视觉时间：  254
+none target detected
+循环时间：  121
+视觉时间：  186
+none target detected
+循环时间：  159
+视觉时间：  162
+none target detected
+循环时间：  102
+视觉时间：  182
+none target detected
+循环时间：  418
+视觉时间：  205
+none target detected
+循环时间：  121
+视觉时间：  188
+none target detected
+循环时间：  159
+视觉时间：  208
+none target detected
+循环时间：  80
+视觉时间：  191
+none target detected
+循环时间：  740
+视觉时间：  207
+none target detected
+循环时间：  100
+视觉时间：  190
+none target detected
+循环时间：  121
+视觉时间：  204
+none target detected
+循环时间：  239
+视觉时间：  235
+none target detected
+循环时间：  22
+视觉时间：  204
+none target detected
+循环时间：  178
+视觉时间：  144
+none target detected
+循环时间：  240
+视觉时间：  204
+none target detected
+循环时间：  280
+视觉时间：  190
+none target detected
+循环时间：  80
+视觉时间：  205
+none target detected
+循环时间：  40
+视觉时间：  187
+none target detected
+循环时间：  121
+视觉时间：  206
+none target detected
+循环时间：  159
+视觉时间：  191
+none target detected
+循环时间：  80
+视觉时间：  208
+none target detected
+循环时间：  40
+视觉时间：  184
+none target detected
+循环时间：  147
+视觉时间：  254
+none target detected
+循环时间：  133
+视觉时间：  184
+none target detected
+循环时间：  80
+视觉时间：  161
+none target detected
+循环时间：  120
+视觉时间：  192
+none target detected
+循环时间：  67
+视觉时间：  201
+none target detected
+循环时间：  953
+视觉时间：  190
+none target detected
+循环时间：  100
+视觉时间：  200
+none target detected
+循环时间：  521
+视觉时间：  191
+none target detected
+循环时间：  79
+视觉时间：  203
+none target detected
+循环时间：  100
+视觉时间：  192
+none target detected
+循环时间：  60
+Traceback (most recent call last):
+  File "D:\ngyf\fc2023\module_test.py", line 244, in <module>
+    test_location_transfer(the_connection, track_list)
+  File "D:\ngyf\fc2023\module_test.py", line 118, in test_location_transfer
+    vis.shot()
+  File "D:\ngyf\fc2023\vision\vision_class.py", line 73, in shot
+    ret, self.im0 = self.cap.read()
+KeyboardInterrupt
+
+进程已结束,退出代码-1073741510 (0xC000013A: interrupted by Ctrl+C)
+
