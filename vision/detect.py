@@ -22,6 +22,7 @@ def detect(
     im: np.array,  # 新图
     model,  # 模型文件
     numrec: NumberRecognizer,  # 数字识别的类
+    use_ocr=True, # 是否使用ocr
     conf_thres=0.25,  # confidence threshold
     iou_thres=0.45,  # NMS IOU threshold
     max_det=1000,  # maximum detections per image
@@ -38,6 +39,7 @@ def detect(
         model: 模型文件
         itv: 图片显示时长
         conf_thres: 置信度阈值
+        use_ocr: 是否使用ocr
 
     Returns:
         list (vision_position): 标靶中心坐标、数值列表
@@ -97,34 +99,38 @@ def detect(
                 hei = img.shape[0]
                 wid = img.shape[1]
 
-                top = int(tlbr[1]) - 5
-                down = int(tlbr[3]) + 5
-                left = int(tlbr[0]) - 5
-                right = int(tlbr[2]) + 5
+                top = int(tlbr[1]) - 3
+                down = int(tlbr[3]) + 3
+                left = int(tlbr[0]) - 3
+                right = int(tlbr[2]) + 3
                 if top < 0 or left < 0 or down > hei or right > wid:  # 舍弃边界图片，确保标靶完整
                     continue
-                img = img[top:down, left:right]  # 对原图切片，截取标靶
 
-                img_rotated = rotate(img)
-                if img_rotated.shape[:2] == (0, 0):  # 未检测到数字正方形
-                    continue
+                if use_ocr:
+                    img = img[top:down, left:right]  # 对原图切片，截取标靶
 
-                # cv2.imwrite(f'D:/ngyf/crops/r{time.time()}.jpg', img_rotated)
+                    img_rotated = rotate(img)
+                    if img_rotated.shape[:2] == (0, 0):  # 未检测到数字正方形
+                        continue
 
-                img_crop = crop(img_rotated)
-                if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形
-                    continue
+                    # cv2.imwrite(f'D:/ngyf/crops/r{time.time()}.jpg', img_rotated)
 
-                # cv2.imwrite(f'D:/ngyf/crops/{time.time()}.jpg', img_crop)
-                # img_crop = cv2.cvtColor(img_crop, cv2.COLOR_BGR2GRAY)
-                # cv2.equalizeHist(img_crop, img_crop)
+                    img_crop = crop(img_rotated)
+                    if img_crop.shape[:2] == (0, 0):  # 未检测到数字正方形
+                        continue
 
-                tmp = int(time.time() * 1000)
-                ret = numrec.recognize(img_crop)
-                #print("数字识别时间： ", int(time.time() * 1000) - tmp)
-                if ret != -1:
-                    print(f'检测到数字: {ret}')
-                res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=ret))
+                    # cv2.imwrite(f'D:/ngyf/crops/{time.time()}.jpg', img_crop)
+                    # img_crop = cv2.cvtColor(img_crop, cv2.COLOR_BGR2GRAY)
+                    # cv2.equalizeHist(img_crop, img_crop)
+
+                    # tmp = int(time.time() * 1000)
+                    ret = numrec.recognize(img_crop)
+                    #print("数字识别时间： ", int(time.time() * 1000) - tmp)
+                    if ret != -1:
+                        print(f'检测到数字: {ret}')
+                    res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=ret))
+                else:
+                    res.append(vision_position(x=(left + right) / 2, y=(top + down) / 2, target_number=-1))
                 # 在原图上画框
                 if view_img:  # Add bbox to image
                     c = int(cls)  # integer class
