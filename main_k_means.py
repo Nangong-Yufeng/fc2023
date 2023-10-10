@@ -1,3 +1,7 @@
+"""
+使用聚类算法进行先坐标后数字的main4.0
+"""
+
 from utils import title
 import threading
 import queue
@@ -10,21 +14,19 @@ from navigation import (Waypoint, mode_set, mission_upload,
                         detect_completed, eliminate_error_target, command_retry,
                         gain_position_now, target_transfer,
                         wrong_number, wp_bombing_course, mission_current, bomb_drop,
-                        loiter, return_to_launch, initiate_bomb_drop, preflight_command
-                        ,wp_detect_course_HeBei, wp_detect_course_HeBei_2g)
+                        initiate_bomb_drop, preflight_command,
+                        wp_detect_course_HeBei_2g, target_calculate)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
+WP_NUMBER_OF_TARGET_DETECT = 20
 LEN_OF_TARGET_LIST = 50
 TIME_DELAY_MS = 150
 APPROACH_ANGLE = 255  # 投弹时的进近航向，北起点逆时针
 DETECT_TIME_LIMIT = int(3 * 60 * 1000)
-DETECT_ACC = 6  # m
 wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)  # 羊粪场
-# wp_home = Waypoint(38.543056, 115.040833, 0)
 wp_home = Waypoint(38.543938, 115.04040769999999, 0)
-# wp_start = Waypoint(38.5574343, 115.1392092, 30)  # 比赛场地，跑道右侧航向
 wp_start = Waypoint(38.5428931, 115.04135629999999, 15) # 野场，9.28
-final_target_position =  wp_start  # Waypoint(38.5431345, 115.04109799999999, 0)
+final_target_position = wp_start  # Waypoint(38.5431345, 115.04109799999999, 0)
 mission_start_time = 0
 
 
@@ -96,6 +98,21 @@ def process_image_and_pose(track_queue, detect_result):
     # 图传信号初始化
     vis = Vision(source=0, device='0', conf_thres=0.7)#"D:/ngyf/videos/DJI_0001.MP4"
 
+    # 坐标解算部分，不识别数字
+    while mission_current(the_connection) < WP_NUMBER_OF_TARGET_DETECT:
+        # 图像处理
+        vis.shot()
+        if vis.im0 is None:
+            print("图传无信号")
+            continue
+        # 视觉处理
+        vision_position_list = vis.run(use_ocr=False)
+        if len(vision_position_list) != 0:
+            for n in range(len(vision_position_list)):
+                pass
+
+
+
     result = -1
     last_show_time = 0
     while result < 0:
@@ -109,11 +126,10 @@ def process_image_and_pose(track_queue, detect_result):
             print("time up!")
             target_result = detect_completed(target_dict, is_time_out=True)
             break
-
         # 图像处理
         vis.shot()
         if vis.im0 is None:
-            print("signal lost")
+            print("图传无信号")
             continue
 
         # 视觉处理
@@ -204,56 +220,7 @@ def process_image_and_pose(track_queue, detect_result):
                                                                      target_time=target_time, timestamps=timestamps,
                                                                      tracks=tracks, vision_inform=vision_inform,
                                                                      num=num3, delay=TIME_DELAY_MS)]
-        '''
-        基于坐标和数字进行错误目标判断，如有错误可以再跑接下来的点
-        '''
-        '''
-        # 若识别到结果多于三个，可以尝试判断有无错误数据
-        if len(target_result) > 3:
-            point_list = [point1, point2, point3] = [(target1.lat, target1.lon), (target2.lat, target2.lon),
-                                                     (target3.lat, target3.lon)]
 
-            # 若两个靶标的最终结果差距小于6米，且数字具有相似性
-            if wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point1, point2).meters < DETECT_ACC:
-                print("可能出现数字识别错误")
-                error = [0, 1, 2]  # num2为错误结果，第三位为正常数字
-            elif wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point1, point3).meters < DETECT_ACC:
-                print("可能出现数字识别错误")
-                error = [0, 2, 1]  # num3为错误结果
-            elif wrong_number([target1.number, target2.number])[0] < 0 and geodesic(point2, point3).meters < DETECT_ACC:
-                print("可能出现数字识别错误")
-                error = [1, 2, 0]  # num3为错误结果
-            else:
-                error = [-1, -1, -1]  # 未有错误结果
-
-            # 顺延出现次数较多的数字，处理错误结果
-            while error[1] > 0:
-                for n in range(3, len(target_result)):
-                    # 顺延下一个数字进行替补
-                    alter_num = target_result[n]
-                    alter_target = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
-                                                   timestamps=timestamps, tracks=tracks, vision_inform=vision_inform,
-                                                   num=alter_num, delay=TIME_DELAY_MS)
-                    alter_point = (alter_target.lat, alter_target.lon)
-
-                    # 判断替补数据和原错误数据是否相似和位置邻近
-                    if (geodesic(point_list[error[0]], alter_point).meters < 6 and
-                            wrong_number([target1.number, target2.number])[0] < 0):
-                        print("替补数字可能出现识别错误")
-                        # 继续顺延下一个数字
-                        continue
-                    # 防止是另一个确定数据的错误答案
-                    elif (geodesic(point_list[error[2]], alter_point).meters < 6 and
-                            wrong_number([target1.number, target2.number])[0] < 0):
-                        print("替补数字可能出现识别错误")
-                        continue
-                    # 新的数字认为正确
-                    else:
-                        # 替换错误数据
-                        target_list[error[1]] = alter_target
-                        break
-                    # 若循环结束都相似，则使用原数据
-        '''
 
         # 对确定后的三个靶标取中位数
         number_list = numpy.array([target_list[0].number, target_list[1].number, target_list[2].number])
@@ -351,13 +318,13 @@ if __name__ == "__main__":
     while True:
         msg = mission_current(the_connection)
         if (msg >= len(wp_list) - 16):
-            print("reaching waypoint", msg)
+            print("已到达投弹处航点", msg)
             break
         if (int(round(time.time() * 1000)) - mission_start_time) > int(5.2 * 60 * 1000):
-            print("time out!")
+            print("时间过久了，随意投弹")
             break
         if msg != last_wp:
-            print("reaching ", msg)
+            print("到达航路点 ", msg)
             last_wp = msg
             continue
         else:

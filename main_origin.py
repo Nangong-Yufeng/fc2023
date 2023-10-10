@@ -1,5 +1,5 @@
 """
-这是将在比赛时被运行的文件
+初代main函数
 """
 
 from utils import title

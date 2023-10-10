@@ -1,3 +1,7 @@
+"""
+经过多线程改写后的main函数2.0
+"""
+
 from utils import title
 import threading
 import queue

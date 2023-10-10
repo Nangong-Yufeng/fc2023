@@ -11,7 +11,7 @@ from navigation import (Waypoint, mode_set, mission_upload,
                         wrong_number, wp_bombing_course, mission_current, bomb_drop,
                         loiter, return_to_launch, initiate_bomb_drop, preflight_command
                         ,wp_detect_course_HeBei, wp_detect_course_HeBei_2g, force_arm,
-                        gain_transform_frequency)
+                        gain_transform_frequency, k_means_calculate, target_point)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 50
@@ -25,7 +25,13 @@ wp_start = Waypoint(38.5590428, 115.1420812, 15)  # A组，顺时针侦察
 final_target_position = Waypoint(38.5592552, 115.1421690, 0)
 mission_start_time = 0
 
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=921600)
+A = target_point(0.0001, 0.0002, 1)
+B = target_point(0.0001, 0.0002, 2)
+C = target_point(0.0002, 0.0001,2)
+
+a = k_means_calculate([A, B, C])
+'''
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=921600)#921600)
 
 # force_arm(the_connection)
 
@@ -46,4 +52,4 @@ B_target4 = Waypoint(38.559445, 115.142059, 0)
 wp = [A_target1, A_target2, A_target3, A_target4, B_target1, B_target2, B_target3, B_target4]
 mission_upload(the_connection, wp, wp_home)
 
-
+'''
