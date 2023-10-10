@@ -53,7 +53,7 @@ class Vision:
         # 加载摄像头
         print("视觉：加载摄像头")
         self.im0 = None
-        self.cap = cv2.VideoCapture(source, cv2.CAP_DSHOW)#
+        self.cap = cv2.VideoCapture(source)# , cv2.CAP_DSHOW
         print("视觉：设置视频格式")
         self.cap.set(cv2.CAP_PROP_FPS, 60)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
@@ -72,12 +72,15 @@ class Vision:
         """
         ret, self.im0 = self.cap.read()
 
-    def run(self):
+    def run(self, use_ocr=True):
         """ 检测图像中的标靶，返回数值与坐标
+
+        Args:
+            use_ocr: 是否使用ocr
 
         Return:
              list (vision_position): 标靶中心坐标、数值列表
         """
-        # self.im0 = cv2.resize(self.im0, (1920, 1080))
+        self.im0 = cv2.resize(self.im0, (1920, 1080))
         im = MyLoadIamge(im0=self.im0, img_size=self.imgsz, stride=self.stride, auto=self.pt)
-        return detect(im0=self.im0, im=im, model=self.model, conf_thres=self.conf_thres, numrec=self.numrec)
+        return detect(im0=self.im0, im=im, model=self.model, conf_thres=self.conf_thres, numrec=self.numrec, use_ocr=use_ocr)
