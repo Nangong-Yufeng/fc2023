@@ -1,38 +1,55 @@
 """
 使用聚类算法进行先坐标后数字的main4.0
 """
-
+import numpy as np
 from utils import title
 import threading
 import queue
 import time
-from geopy.distance import geodesic
-import numpy
+from scipy.interpolate import UnivariateSpline
 from vision.vision_class import Vision
 from navigation import (Waypoint, mode_set, mission_upload,
-                        wp_detect_course, loiter_at_present, gain_track_point,
-                        detect_completed, eliminate_error_target, command_retry,
-                        gain_position_now, target_transfer,
-                        wrong_number, wp_bombing_course, mission_current, bomb_drop,
+                        gain_track_point, match_if_out_of_area,
+                        gain_position_now, wp_bombing_course, mission_current, bomb_drop,
                         initiate_bomb_drop, preflight_command,
-                        wp_detect_course_HeBei_2g, target_calculate)
+                        wp_detect_course_HeBei_2g, k_means_calculate, coordinate_transfer,
+                        target_point, coordinate_aver_cal, target_match)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
-WP_NUMBER_OF_TARGET_DETECT = 20
+WP_NUMBER_OF_TARGET_DETECT = 20  # 靶标坐标侦察部分的航点数量
+WP_NUMBER_OF_NUMBER_DETECT = 40  # 数字侦察部分的航点数量
 LEN_OF_TARGET_LIST = 50
-TIME_DELAY_MS = 150
+TIME_DELAY_MS = 250
 APPROACH_ANGLE = 255  # 投弹时的进近航向，北起点逆时针
 DETECT_TIME_LIMIT = int(3 * 60 * 1000)
-wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)  # 羊粪场
+'''
+需要测量的坐标
+'''
+# home点
 wp_home = Waypoint(38.543938, 115.04040769999999, 0)
-wp_start = Waypoint(38.5428931, 115.04135629999999, 15) # 野场，9.28
-final_target_position = wp_start  # Waypoint(38.5431345, 115.04109799999999, 0)
+# 靶标区的四个顶点
+wp_boarder = [Waypoint(0, 0, 0),
+              Waypoint(0, 0, 0),
+              Waypoint(0, 0, 0),
+              Waypoint(0, 0, 0)]
+# 三个靶标位置的估计点
+wp_known = [Waypoint(0, 0, 0),
+            Waypoint(0, 0, 0),
+            Waypoint(0, 0, 0)]
+target_coordinate = wp_known  # 事先设置的三个靶标的预测位置，防止出现没有解算结果的情况
+final_target_coordinate = wp_known[0]  # 防止没有数字解算结果，直接运行设定目标
 mission_start_time = 0
+
+# 应该没用了，但是现在侦察航线还没改
+wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)  # 羊粪场
+wp_start = Waypoint(38.5428931, 115.04135629999999, 15)  # 野场，9.28
 
 
 '''
 线程1：获取姿态数据并生成带时间戳的姿态序列
 '''
+
+
 def get_attitude_data(track_queue, detect_result):
     # 初始化对轨
     time_start_plane = gain_position_now(the_connection).time
@@ -45,15 +62,6 @@ def get_attitude_data(track_queue, detect_result):
     while not detect_result.empty():
         # 获取位姿态数据
         track = gain_track_point(the_connection)
-
-        # 记录下原始位姿数据，观察错误率
-        with open(file='C:/Users/35032/Desktop/raw_posture_gps.txt', mode='a') as f:
-            f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon))
-            f.write("raw inform: lat " + str(track.lat) + " lon " + str(track.lon)
-                    + " alt " + str(track.alt) + " time " + str(track.time)
-                    + " pitch " + str(track.pitch) + " roll " + str(track.roll)
-                    + "yaw " + str(track.yaw) + "\n" + "relay " + str(TIME_DELAY_MS))
-
         '''
         对获取的位姿信息进行不正常值筛选
         '''
@@ -73,59 +81,28 @@ def get_attitude_data(track_queue, detect_result):
         # 将姿态数据和时间戳添加到姿态队列中
         track_queue.put((timestamp, track))
 
-        '''
         # 清除过时的数据点C
         current_time = int(round(time.time() * 1000))
         while not track_queue.empty():
             data = track_queue.get()
-            if current_time - data[0] <= 10000:  # 假设保留最近10秒的数据点
+            if current_time - data[0] <= 50000:  # 假设保留最近50秒的数据点
                 track_queue.put(data)
                 break
-        '''
 
 
 '''
 线程2：处理图像、数字后处理和坐标解算
 '''
+
+
 def process_image_and_pose(track_queue, detect_result):
-    # 侦察中记录侦察到靶标时靶标的数字、视觉位置和检测时的系统时间，以时间为key
-    time_target_dict = {}
-    # 目标数字与测试记录，以数字为key，用于过程淘汰算法
-    target_dict = {}
-    # 记录识别并测试得到的三个靶标数字
-    target_result = [-1, -1, -1]
+    target_list = []
+    vis = Vision(source=0, device='0', conf_thres=0.7)  # D:/ngyf/videos/DJI_0001.MP4"
 
-    # 图传信号初始化
-    vis = Vision(source=0, device='0', conf_thres=0.7)#"D:/ngyf/videos/DJI_0001.MP4"
-
-    # 坐标解算部分，不识别数字
-    while mission_current(the_connection) < WP_NUMBER_OF_TARGET_DETECT:
-        # 图像处理
-        vis.shot()
-        if vis.im0 is None:
-            print("图传无信号")
-            continue
-        # 视觉处理
-        vision_position_list = vis.run(use_ocr=False)
-        if len(vision_position_list) != 0:
-            for n in range(len(vision_position_list)):
-                pass
-
-
-
-    result = -1
-    last_show_time = 0
-    while result < 0:
-        current_time = int(round(time.time() * 1000))
-
-        # 时间保护，若时间到3分半还为得到识别结果，则直接进入投弹
-        if (current_time - mission_start_time) * 1e-3 - last_show_time > 60:
-            print("运行时间：", (current_time - mission_start_time) * 1e-3, "秒")
-            last_show_time = (current_time - mission_start_time) * 1e-3
-        if current_time - mission_start_time > DETECT_TIME_LIMIT:
-            print("time up!")
-            target_result = detect_completed(target_dict, is_time_out=True)
-            break
+    '''
+    使用聚类算法进行靶标坐标侦察
+    '''
+    while mission_current(the_connection) < WP_NUMBER_OF_TARGET_DETECT-1:
         # 图像处理
         vis.shot()
         if vis.im0 is None:
@@ -133,10 +110,89 @@ def process_image_and_pose(track_queue, detect_result):
             continue
 
         # 视觉处理
-        vision_position_list = vis.run()
+        vision_position_list = vis.run(use_ocr=False)  # 不识别数字
 
         # 检测到靶标
-        if len(vision_position_list) != 0:
+        if len(vision_position_list) != 0 and track_queue.qsize():
+
+            for n in range(len(vision_position_list)):
+
+                current_time = int(round(time.time() * 1000)) - TIME_DELAY_MS
+
+                # 提取时间戳和对应的姿态数据
+                timestamps, tracks = zip(*list(track_queue.queue))
+
+                # 如果有足够的数据点，执行插值和解算
+                if len(tracks) >= 5:
+                    # 根据时间戳排序数据点
+                    sorted_indices = sorted(range(len(timestamps)), key=lambda i: -timestamps[i])
+
+                    # 获取最接近指定时间的5个数据点的索引
+                    selected_indices = sorted_indices[4::-1]
+
+                    # 提取选定的数据点
+                    selected_tracks = [tracks[i] for i in selected_indices]
+                    selected_timestamps = [timestamps[i] for i in selected_indices]
+
+                    # 强制数据递增
+                    for i in range(len(selected_timestamps) - 1):
+                        if selected_timestamps[i] == selected_timestamps[i + 1]:
+                            selected_timestamps[i + 1] += 1
+
+                    # 使用三次多项式插值
+                    roll_interp = UnivariateSpline(selected_timestamps, [data.roll for data in selected_tracks],
+                                                   s=0)
+                    pitch_interp = UnivariateSpline(selected_timestamps, [data.pitch for data in selected_tracks],
+                                                    s=0)
+                    yaw_interp = UnivariateSpline(selected_timestamps, [data.yaw for data in selected_tracks], s=0)
+                    lat_interp = UnivariateSpline(selected_timestamps, [data.lat for data in selected_tracks], s=0)
+                    lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=0)
+                    alt_interp = UnivariateSpline(selected_timestamps, [data.alt for data in selected_tracks], s=0)
+
+                    # 获取插值后的姿态数据
+                    target = coordinate_transfer(lat_interp(current_time), lon_interp(current_time),
+                                                 alt_interp(current_time), yaw_interp(current_time),
+                                                 pitch_interp(current_time), roll_interp(current_time),
+                                                 vision_position_list[n].x,
+                                                 vision_position_list[n].y, vision_position_list[n].num)
+                    target_list.append(target)
+                else:
+                    print("没有足够位姿点进行插值")
+                    continue
+
+        # 未检测到靶标
+        else:
+            continue
+    print("靶标解算数据收集完成！")
+
+    # 进行k-means聚类计算坐标点
+    global target_coordinate
+    coordinate_k = k_means_calculate(target_list)  # 返回三个坐标点列表
+    if coordinate_k is None:
+        print("聚类结果为空，使用预设值")
+    else:
+        print("聚类成功")
+        target_coordinate = coordinate_k
+
+    '''
+    进行数字识别和靶标匹配
+    '''
+    target_num_list = []  # 记录靶标坐标和数字的列表
+    target_num_dict = {}  # 记录某个数字出现的数量
+
+    # 侦察航线结束就停止各线程
+    while mission_current(the_connection) < WP_NUMBER_OF_NUMBER_DETECT:
+        # 图像处理
+        vis.shot()
+        if vis.im0 is None:
+            print("图传无信号")
+            continue
+
+        # 视觉处理
+        vision_position_list = vis.run()  # 识别数字
+
+        # 检测到靶标
+        if len(vision_position_list) != 0 and track_queue.qsize():
 
             for n in range(len(vision_position_list)):
 
@@ -145,117 +201,91 @@ def process_image_and_pose(track_queue, detect_result):
                     continue
                 # 数字识别得到结果
                 else:
-                    print("检测到靶标数字： ", vision_position_list[n].num)
-                    detect_time = int(round(time.time() * 1000)) - TIME_DELAY_MS
+                    current_time = int(round(time.time() * 1000)) - TIME_DELAY_MS
 
-                    # 记录识别到靶标的时间和靶标数字
-                    time_target_dict[detect_time] = [vision_position_list[n].num,
-                                                     vision_position_list[n].x, vision_position_list[n].y]
+                    # 提取时间戳和对应的姿态数据
+                    timestamps, tracks = zip(*list(track_queue.queue))
 
-                    # 对靶标数据进行过程淘汰
-                    target_number = vision_position_list[n].num
-                    # 该目标是第一次出现
-                    if target_dict.get(target_number, -1) < 0:
-                        target_dict[target_number] = 1
-                    # 该目标不是第一次出现，且数量小于指定数量
-                    elif target_dict.get(target_number, -1) < 0.3 * LEN_OF_TARGET_LIST:
-                        target_dict[target_number] += 1
-                    # 该目标不是第一次出现，但存储数量已经达到指定上限
-                    else:
-                        continue
-                    # 如果超出设定范围，删除数量最少的一项
-                    eliminate_error_target(target_dict)
+                    # 如果有足够的数据点，执行插值和解算
+                    if len(tracks) >= 5:
+                        # 根据时间戳排序数据点
+                        sorted_indices = sorted(range(len(timestamps)), key=lambda i: -timestamps[i])
 
-                    # 判定侦察任务是否完成， 若得到探测结果，传入target列表，长度为3
-                    target_result = detect_completed(target_dict, is_time_out=False)
-                    result = target_result[0]
-                    break
+                        # 获取最接近指定时间的5个数据点的索引
+                        selected_indices = sorted_indices[4::-1]
 
-        # 未检测到靶标
-        else:
-            result = -1
+                        # 提取选定的数据点
+                        selected_tracks = [tracks[i] for i in selected_indices]
+                        selected_timestamps = [timestamps[i] for i in selected_indices]
 
-    # 提取出该queue中的值，终止其他两个线程
+                        # 强制数据递增
+                        for i in range(len(selected_timestamps) - 1):
+                            if selected_timestamps[i] == selected_timestamps[i + 1]:
+                                selected_timestamps[i + 1] += 1
+
+                        # 使用三次多项式插值
+                        lat_interp = UnivariateSpline(selected_timestamps, [data.lat for data in selected_tracks], s=0)
+                        lon_interp = UnivariateSpline(selected_timestamps, [data.lon for data in selected_tracks], s=0)
+
+                        # 直接使用读到数字时的飞机坐标，不进行解算
+                        target = target_point(lat_interp(current_time), lon_interp(current_time),
+                                              vision_position_list[n].num)
+
+                        # 存入坐标列表
+                        target_num_list.append(target)
+
+                        # 存入坐标字典
+                        if target_num_dict.get(target.number, -1) < 0:
+                            target_num_dict[target.number] = 1
+                        # 该目标不是第一次出现
+                        else:
+                            target_num_dict[target.number] += 1
+
+    # 数字侦察完成，关闭其他两个线程
     detect_result.get()
+    print("数字侦察完成")
 
-    print("侦察任务完成！")
-    while not mode_set(the_connection, 12):
-        continue
+    # 根据字典进行排序
+    key = list(target_num_dict.keys())
+    key.sort(key=target_num_dict.get, reverse=True)
 
-    '''
-    侦察完成 进行数据后处理
-    '''
-    # 提取时间戳和对应的姿态数据
-    timestamps, tracks = zip(*list(track_queue.queue))
-    # 存储的视觉识别世界戳
-    target_time = list(time_target_dict.keys())
-    # 存储的视觉信息
-    vision_inform = list(time_target_dict.values())
-
-    global final_target_position
-
-    # 若没有检测到任何数字
-    if len(time_target_dict) == 0:
-        pass
-    # 若视觉只检查到一个或两个数字
-    elif len(target_result) == 1 or len(target_result) == 2:
-        final_target_position = target_transfer(time_target_dict=time_target_dict, target_time=target_time,
-                                                timestamps=timestamps,
-                                                tracks=tracks, vision_inform=vision_inform,
-                                                num=target_result[0], delay=TIME_DELAY_MS)
+    global final_target_coordinate
+    if len(key) == 0:
+        final_target_coordinate = target_coordinate[1]
+    elif len(key) == 1:
+        coordinate = coordinate_aver_cal(target_list, key[0])
+        list_num = [coordinate,
+                    target_point(0, 0, 0),
+                    target_point(0, 0, 0)]
+        final_target_coordinate = target_match(target_coordinate, list_num, 0)
+    elif len(key) == 2:
+        coordinate1 = coordinate_aver_cal(target_list, key[0])
+        coordinate2 = coordinate_aver_cal(target_list, key[1])
+        list_num = [coordinate1,
+                    coordinate2,
+                    target_point(0, 0, 0)]
+        final_target_coordinate = target_match(target_coordinate, list_num, 0)  # 只有两个数据的情况下，还是选第一个
     else:
-        [num1, num2, num3] = target_result[0:3]
-        print(num1, num2, num3)
+        # 分别计算三个靶标的坐标
+        coordinate1 = coordinate_aver_cal(target_list, key[0])
+        coordinate2 = coordinate_aver_cal(target_list, key[1])
+        coordinate3 = coordinate_aver_cal(target_list, key[2])
+        list_num = [coordinate1, coordinate2, coordinate3]
+        # 计算中位数，获取其在数组中的位置
+        median = np.median(key)
+        target_place = 0
+        for i in range(len(key)):
+            if key[i] == median:
+                target_place = i
+        # 最后与聚类坐标进行匹配选取
+        final_target_coordinate = target_match(target_coordinate, list_num, target_place)
 
-        # 解算出三个识别结果对应处理后的坐标
-        target_list = [target1, target2, target3] = [target_transfer(time_target_dict=time_target_dict,
-                                                                     target_time=target_time, timestamps=timestamps,
-                                                                     tracks=tracks, vision_inform=vision_inform,
-                                                                     num=num1, delay=TIME_DELAY_MS),
-                                                     target_transfer(time_target_dict=time_target_dict,
-                                                                     target_time=target_time, timestamps=timestamps,
-                                                                     tracks=tracks, vision_inform=vision_inform,
-                                                                     num=num2, delay=TIME_DELAY_MS),
-                                                     target_transfer(time_target_dict=time_target_dict,
-                                                                     target_time=target_time, timestamps=timestamps,
-                                                                     tracks=tracks, vision_inform=vision_inform,
-                                                                     num=num3, delay=TIME_DELAY_MS)]
-
-
-        # 对确定后的三个靶标取中位数
-        number_list = numpy.array([target_list[0].number, target_list[1].number, target_list[2].number])
-        final_target_number = numpy.median(number_list)
-
-        if target_list[0].number == final_target_number:
-            target = target_list[0]
-        elif target_list[1].number == final_target_number:
-            target = target_list[1]
-        else:
-            target = target_list[2]
-
-        print("靶标信息计算完成，结果为：", final_target_number)
-        final_target_position = target
-        print("靶标解算坐标", target.lat, target.lon)
-
-
-'''
-线程3：航点任务循环
-'''
-def detect_mission_circling(the_connection, detect_result):
-    # 任务开始时间
-    global mission_start_time
-    mission_start_time = int(round(time.time() * 1000))
-
-    # 切换自动飞行
-
-    # 侦察部分航线
-    while not detect_result.empty():
-        if the_connection.recv_match(type='MISSION_CURRENT',blocking=True).seq < len(detect_course) - 2:
-            continue
-        while True:
-            if mode_set(the_connection, 10):
-                break
-        print("next detect circle")
+    # 确认最终结果是否在靶标区内
+    final_target_coordinate = match_if_out_of_area(target=final_target_coordinate,
+                                                   target_boarder=wp_boarder,
+                                                   target_known=wp_known)
+    print("最终解算坐标结果： lat: ", final_target_coordinate.lat, " lon: ", final_target_coordinate.lon)
+    # 获取靶标坐标，线程二关闭
 
 
 if __name__ == "__main__":
@@ -270,7 +300,7 @@ if __name__ == "__main__":
     the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
     # 生成并上传任务，比赛时不需要
-    detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=140)# wp_detect_course_HeBei(wp_detect, 16)
+    detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=140)  # wp_detect_course_HeBei(wp_detect, 16)
     mission_upload(the_connection, detect_course, wp_home)
 
     # 起飞前准备
@@ -285,22 +315,19 @@ if __name__ == "__main__":
     # 创建两个线程，一个用于获取姿态数据，另一个用于处理图像和位姿确定
     attitude_thread = threading.Thread(target=get_attitude_data, args=(track_queue, detect_result))
     image_thread = threading.Thread(target=process_image_and_pose, args=(track_queue, detect_result))
-    mission_thread = threading.Thread(target=detect_mission_circling, args=(the_connection, detect_result))
 
     attitude_thread.start()
     image_thread.start()
-    mission_thread.start()
 
     attitude_thread.join()
     image_thread.join()
-    mission_thread.join()
 
     '''
     进行投弹
     '''
     # 盘旋等待任务上传
-    wp_list = wp_bombing_course(final_target_position, APPROACH_ANGLE)
-    # mission_upload(the_connection, wp_list, wp_home)
+    wp_list = wp_bombing_course(final_target_coordinate, APPROACH_ANGLE)
+    mission_upload(the_connection, wp_list, wp_home)
 
     # 盘旋等待任务角度合适
     initiate_bomb_drop(the_connection, APPROACH_ANGLE)
@@ -317,7 +344,7 @@ if __name__ == "__main__":
 
     while True:
         msg = mission_current(the_connection)
-        if (msg >= len(wp_list) - 16):
+        if msg >= len(wp_list) - 16:
             print("已到达投弹处航点", msg)
             break
         if (int(round(time.time() * 1000)) - mission_start_time) > int(5.2 * 60 * 1000):
@@ -335,4 +362,4 @@ if __name__ == "__main__":
     '''
     任务结束
     '''
-    #return_to_launch(the_connection)
+    # return_to_launch(the_connection)
