@@ -37,6 +37,29 @@ def send_mission(the_connection, wp, seq):
     the_connection.mav.send(mission_message)
 
 
+def send_mission_include_bomb_drop(the_connection, mission_list, seq, is_waypoint=True):
+    if is_waypoint:
+        mission_message = mavutil.mavlink.MAVLink_mission_item_int_message(the_connection.target_system,
+                                                                           the_connection.target_component, seq,
+                                                                           mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                                                                           mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+                                                                           0, 0, 0, 0, 0, 0,
+                                                                           int(mission_list[seq].lat * 1e7),
+                                                                           int(mission_list[seq].lon * 1e7),
+                                                                           mission_list[seq].alt,
+                                                                           mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        the_connection.mav.send(mission_message)
+    else:
+        mission_message = mavutil.mavlink.MAVLink_mission_item_int_message(the_connection.target_system,
+                                                                           the_connection.target_component, seq,
+                                                                           mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                                                                           mavutil.mavlink.MAV_CMD_DO_REPEAT_SERVO,
+                                                                           0, 0, 5, 1000, 5, 0.001,
+                                                                           0, 0, 0,
+                                                                           mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+        the_connection.mav.send(mission_message)
+
+
 # 在模拟器中可行，但实际飞控不支持
 def mission_accomplished(the_connection, wp_list_len):
     msg = rec_match_received(the_connection, 'MISSION_CURRENT')
@@ -47,9 +70,9 @@ def mission_accomplished(the_connection, wp_list_len):
         return -10
 
 
-def mission_upload(the_connection, wp, home_position):
+def mission_upload(the_connection, wp, home_position=0):
 
-    wp.insert(0, home_position)
+    wp.insert(0, wp[0])  # 存在奇怪的吞点现象
 
     # 上传航点数量信息
     send_mission_list(the_connection, wp)
@@ -81,6 +104,48 @@ def mission_upload(the_connection, wp, home_position):
 
                 print("任务上传成功")
                 break
+
+
+def mission_upload_including_bomb_drop(the_connection, mission_list, seq_of_bomb_drop):
+
+    mission_list.insert(0, mission_list[0])  # 存在奇怪的吞点现象
+    mission_list.insert(seq_of_bomb_drop, mission_list[seq_of_bomb_drop])  # 投弹点
+
+    # 上传航点数量信息
+    send_mission_list(the_connection, mission_list)
+
+    # 在地图中显示静态航点
+    waypoint_print_list = []
+    for count in range(len(mission_list)):
+        waypoint_print_list.append((mission_list[count].lat, mission_list[count].lon))
+
+    while True:
+        message = the_connection.recv_match(blocking=True)
+        message = message.to_dict()
+
+        # 验证是否为MISSION_REQUEST
+        if message["mavpackettype"] == mavutil.mavlink.MAVLink_mission_request_message.msgname:
+
+            # 验证是否为mission items类型
+            if message["mission_type"] == mavutil.mavlink.MAV_MISSION_TYPE_MISSION:
+                seq = message["seq"]
+
+                # 发送航点信息
+                if seq == seq_of_bomb_drop:
+                    send_mission_include_bomb_drop(the_connection, mission_list, seq, is_waypoint=False)
+                else:
+                    send_mission_include_bomb_drop(the_connection, mission_list, seq, is_waypoint=True)
+
+        elif message["mavpackettype"] == mavutil.mavlink.MAVLink_mission_ack_message.msgname:
+
+            # 若回传信息为任务被接受（mission_ack信息）
+            if message["mission_type"] == mavutil.mavlink.MAV_MISSION_TYPE_MISSION and \
+                    message["type"] == mavutil.mavlink.MAV_MISSION_ACCEPTED:
+
+                print("任务上传成功")
+                break
+
+
 
 
 # 上传航点集并阻塞程序直到完成全部预定航点任务，并且打印动态参数

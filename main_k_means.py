@@ -26,7 +26,7 @@ DETECT_TIME_LIMIT = int(3 * 60 * 1000)
 需要测量的坐标
 '''
 # home点
-wp_home = Waypoint(38.543938, 115.04040769999999, 0)
+wp_home = Waypoint(28.5928658, 113.1872269, 0)
 # 靶标区的四个顶点
 wp_boarder = [Waypoint(0, 0, 0),
               Waypoint(0, 0, 0),
@@ -336,30 +336,7 @@ if __name__ == "__main__":
     while not mode_set(the_connection, 10):
         continue
 
-    # 到达预设投弹位置前，设置时间检查防止因为信号中断不投弹
-    last_wp = 0
-    mission_current(the_connection)
-    time.sleep(5)
-    mission_current(the_connection)
-
-    while True:
-        msg = mission_current(the_connection)
-        if msg >= len(wp_list) - 16:
-            print("已到达投弹处航点", msg)
-            break
-        if (int(round(time.time() * 1000)) - mission_start_time) > int(5.2 * 60 * 1000):
-            print("时间过久了，随意投弹")
-            break
-        if msg != last_wp:
-            print("到达航路点 ", msg)
-            last_wp = msg
-            continue
-        else:
-            continue
-
-    bomb_drop(the_connection)
-
     '''
     任务结束
     '''
-    # return_to_launch(the_connection)
+
