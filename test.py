@@ -27,7 +27,7 @@ wp_home = Waypoint(38.543938, 115.04040769999999, 0)
 wp_start = Waypoint(38.5590428, 115.1420812, 15)  # A组，顺时针侦察
 final_target_position = Waypoint(38.5592552, 115.1421690, 0)
 mission_start_time = 0
-
+''''
 key = [5,7,9]
 print(np.median(key))
 
@@ -56,7 +56,7 @@ a = target_match(target_list, target_num, 0)
 print(a.lat, a.lon)
 a = k_means_calculate([A, B, C])
 '''
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=921600)#921600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)#921600)
 
 # force_arm(the_connection)
 
@@ -69,7 +69,7 @@ A_target4 = Waypoint(38.557302, 115.138819, 0)
 
 
 B_target1 = Waypoint(38.559180, 115.142050, 0)
-B_target2 = Waypoint(38.559315, 115.142202, 0)
+B_target2 = Waypoint(38.559315, 115.142202,     0)
 B_target3 = Waypoint(38.559314, 115.141904, 0)
 B_target4 = Waypoint(38.559445, 115.142059, 0)
 
@@ -77,4 +77,3 @@ B_target4 = Waypoint(38.559445, 115.142059, 0)
 wp = [A_target1, A_target2, A_target3, A_target4, B_target1, B_target2, B_target3, B_target4]
 mission_upload(the_connection, wp, wp_home)
 
-'''
