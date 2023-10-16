@@ -1,8 +1,6 @@
 from pymavlink import mavutil
 from utils import title
-from navigation import (Waypoint, mission_upload,
-                        wp_bombing_course, mission_current, bomb_drop,
-                        preflight_command, wp_bombing_insert_course,
+from navigation import (Waypoint, wp_bombing_insert_course,
                         wp_circle_course, wp_straight_course, mission_upload_including_bomb_drop)
 from math import *
 
@@ -33,17 +31,17 @@ wp_home = Waypoint(28.5928658, 113.1872269, 30)
 TARGET_CHOOSE_A = 0
 TARGET_CHOOSE_B = 0
 # 侦察进近方向，指南针标准
-DETECT_APPROACH_A = 340
+DETECT_APPROACH_A = 335
 DETECT_APPROACH_B = 160
 # 盘旋直径
 Diameter = 0.00055
 # 飞掠靶标区和绕圈处的高度设置，第一圈直接投弹的高度设置
-Alt_detect = 25
-Alt_circle = 50
-Alt_bomb_start = 25
-Alt_bomb_drop = 20
+Alt_detect = 20
+Alt_circle = 45
+Alt_bomb_start = 15
+Alt_bomb_drop = 10
 # 在靶标坐标前后拓展的距离
-Length_expend = 0.00015
+Length_expend = 0.00010
 Length_start = 0.00090  # 约90米
 Length_bomb_start = 0.00050  # 约50米
 Length_bomb = 0.00025  # 约20米
@@ -70,7 +68,7 @@ def course(detect_angle, group='A',
         wp_bomb_drop = Waypoint(A_target[TARGET_CHOOSE_A].lat + Length_bomb * sin(angle + pi),
                                 A_target[TARGET_CHOOSE_A].lon + Length_bomb * cos(angle + pi), Alt_bomb_drop)
         wp_target = Waypoint(A_target[TARGET_CHOOSE_A].lat,
-                             A_target[TARGET_CHOOSE_A].lon, Alt_bomb_drop)
+                             A_target[TARGET_CHOOSE_A].lon, Alt_bomb_drop+5)
         # 第一圈 内侧靶标
         wp_start1 = Waypoint(wp_range_A[0].lat + length_expend * sin(angle + pi),
                              wp_range_A[0].lon + length_expend * cos(angle + pi), alt_detect)
@@ -98,7 +96,7 @@ def course(detect_angle, group='A',
         wp_bomb_drop = Waypoint(B_target[TARGET_CHOOSE_B].lat + Length_bomb * sin(angle + pi),
                                 B_target[TARGET_CHOOSE_B].lon + Length_bomb * cos(angle + pi), Alt_bomb_drop)
         wp_target = Waypoint(B_target[TARGET_CHOOSE_B].lat,
-                             B_target[TARGET_CHOOSE_B].lon, Alt_bomb_drop)
+                             B_target[TARGET_CHOOSE_B].lon, Alt_bomb_drop+5)
 
         # 第一圈 内侧靶标
         wp_start1 = Waypoint(wp_range_B[0].lat + length_expend * sin(angle + pi),
@@ -120,12 +118,6 @@ def course(detect_angle, group='A',
         wp_turn22 = Waypoint(wp_start2.lat + diameter * sin(angle + direction * right_angle),
                              wp_start2.lon + diameter * cos(angle + direction * right_angle), alt_circle)
 
-    # 第三圈 中间掠过补充
-    wp_start3 = Waypoint(0.5 * wp_start1.lat + 0.5 * wp_start2.lat,
-                         0.5 * wp_start1.lon + 0.5 * wp_start2.lon, alt_detect)
-    wp_end3 = Waypoint(0.5 * wp_end1.lat + 0.5 * wp_end2.lat,
-                       0.5 * wp_end1.lon + 0.5 * wp_end2.lon, alt_detect)
-
     wp_line_start = wp_straight_course([wp_start, wp_bomb_start], 2)
     wp_line_bomb = wp_bombing_insert_course([wp_bomb_start, wp_bomb_drop], 10, 3, angle)
 
@@ -136,10 +128,7 @@ def course(detect_angle, group='A',
 
     line21 = wp_straight_course([wp_start2, wp_end2], 2)
     circle21 = wp_circle_course([wp_end2, wp_turn21], 3, 180, direction=direction)
-    line22 = [wp_turn21, wp_turn22]
-    circle22 = wp_circle_course([wp_turn22, wp_start3], 3, 180, direction=direction)
-
-    line31 = wp_straight_course([wp_start3, wp_end3], 2)
+    line22 = [wp_turn21, wp_home]
 
     mission_course = wp_line_start
     mission_course.pop(-1)
@@ -156,12 +145,6 @@ def course(detect_angle, group='A',
     mission_course.extend(circle21)
     mission_course.pop(-1)
     mission_course.extend(line22)
-    mission_course.pop(-1)
-    mission_course.extend(circle22)
-
-    mission_course.extend(line31)
-    mission_course.pop(-1)
-    mission_course.append(wp_home)
 
     return mission_course
 
@@ -184,11 +167,11 @@ if __name__ == "__main__":
     if choice == 'A' or choice == 'a':
         course_final = course(group='A', detect_angle=DETECT_APPROACH_A,  direction=Direction_A)
         print("上传A组航线信息")
-        mission_upload_including_bomb_drop(the_connection, course_final, 20)
+        mission_upload_including_bomb_drop(the_connection, course_final, [15])
     elif choice == 'B' or choice == 'b':
         course_final = course(group='B', detect_angle=DETECT_APPROACH_B,  direction=Direction_B)
         print("上传B组航线信息")
-        mission_upload_including_bomb_drop(the_connection, course_final, 20)
+        mission_upload_including_bomb_drop(the_connection, course_final, [15])
     else:
         print("输入错误 可以跳过或建议remake")
 

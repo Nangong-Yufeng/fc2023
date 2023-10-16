@@ -5,7 +5,7 @@ from .class_list import Waypoint, target_point
 from .get_para import (gain_mission, gain_position_now,
                        gain_track_of_time, gain_heading)
 from .preflight import mode_set
-from .error_process import error_process, rec_match_received
+from .error_process import rec_match_received
 from .transfer import coordinate_transfer
 import bisect
 from scipy.interpolate import UnivariateSpline
@@ -111,7 +111,8 @@ def mission_upload(the_connection, wp, home_position=0):
 def mission_upload_including_bomb_drop(the_connection, mission_list, seq_of_bomb_drop):
 
     mission_list.insert(0, mission_list[0])  # 存在奇怪的吞点现象
-    mission_list.insert(seq_of_bomb_drop, mission_list[seq_of_bomb_drop])  # 投弹点
+    for i in range(len(seq_of_bomb_drop)):
+        mission_list.insert(seq_of_bomb_drop[i], mission_list[seq_of_bomb_drop[i]])  # 投弹点
 
     # 上传航点数量信息
     send_mission_list(the_connection, mission_list)
@@ -132,12 +133,17 @@ def mission_upload_including_bomb_drop(the_connection, mission_list, seq_of_bomb
             if message["mission_type"] == mavutil.mavlink.MAV_MISSION_TYPE_MISSION:
                 seq = message["seq"]
 
+                result = False
                 # 发送航点信息
-                if seq == seq_of_bomb_drop:
-                    send_mission_include_bomb_drop(the_connection, mission_list, seq, is_waypoint=False)
-                else:
+                for i in range(len(seq_of_bomb_drop)):
+                    if seq == seq_of_bomb_drop[i]:
+                        send_mission_include_bomb_drop(the_connection, mission_list, seq, is_waypoint=False)
+                        result = True
+                        break
+                    else:
+                        result = False
+                if not result:
                     send_mission_include_bomb_drop(the_connection, mission_list, seq, is_waypoint=True)
-
         elif message["mavpackettype"] == mavutil.mavlink.MAVLink_mission_ack_message.msgname:
 
             # 若回传信息为任务被接受（mission_ack信息）
@@ -180,8 +186,8 @@ def clear_waypoint(vehicle):
 
     # create mission request list message
     message = mavutil.mavlink.MAVLink_mission_request_list_message(target_system=vehicle.target_system,
-                                                                target_component=vehicle.target_component,
-                                                                mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+                                                                   target_component=vehicle.target_component,
+                                                                   mission_type=mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
 
     # send the message to the vehicle
     vehicle.mav.send(message)
@@ -196,6 +202,32 @@ def clear_waypoint(vehicle):
     # get the mission item count
     count = message["count"]
     print("Total mission item count:", count)
+
+
+def mission_jump_to(the_connection, sequence):
+    the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_DO_JUMP, 0, sequence, 1, 0, 0, 0, 0, 0)
+    the_connection.mav.command_long_send(the_connection.target_system,  # target_system
+                                         the_connection.target_component,
+                                         mavutil.mavlink.MAV_CMD_REQUEST_MESSAGE,  # command
+                                         0,  # confirmation
+                                         77,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
+    msg = rec_match_received(the_connection, "COMMAND_ACK")
+    if msg is None:
+        print("未受到信号，任务跳转失败")
+        return False
+    if msg.result == 0:
+        print("飞向航路点 ", sequence)
+        return True
+    else:
+        print("执行任务跳转失败")
+        return False
 
 
 '''
@@ -908,35 +940,38 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 
 
 # 投弹航线生成，以进场航线指向为主要参数, 指南针标准
-def wp_bombing_course(wp_target, approach_angle, turn_direction='anti_clock',
-                      length_enter=20,  radius=50, length_approach=100, length_bomb=20, length_left=40,
-                      precision_circle=4, precision_approach=6, precision_bomb=10, precision_enter=2,
-                      alt_target=15, alt_bomb_start=9, alt_approach=15, alt_left=18, length_side_points=3):
+def wp_bombing_course(wp_target, approach_angle, length_bomb_lead, turn_direction=1,
+                      length_enter=10,  radius=30, length_approach=80, length_bomb_start=20, length_left=40,
+                      precision_circle=4, precision_approach=2, precision_bomb=10, precision_enter=1,
+                      alt_bomb_drop=15, alt_bomb_start=9, alt_approach=15, alt_left=18, length_side_points=3):
     # 从指南针标准转为
     approach_angle = 360 - approach_angle
 
     # 转为弧度制，以正北为零点，逆时针增加0-360
     approach_angle = (approach_angle - 90) * math.pi / 180
 
-    wp_target.alt = alt_target
+    len_north0 = length_bomb_lead * math.sin(approach_angle)
+    len_east0 = length_bomb_lead * math.cos(approach_angle)
+    [lat0, lon0] = XYtoGPS(len_north0, len_east0, ref_lat=wp_target.lat, ref_lon=wp_target.lon)
+    wp_bomb_drop = Waypoint(lat0, lon0, alt=alt_bomb_drop)
 
     # 生成投弹航线
-    len_north1 = length_bomb * math.sin(approach_angle)
-    len_east1 = length_bomb * math.cos(approach_angle)
-    [lat1, lon1] = XYtoGPS(len_north1, len_east1, ref_lat=wp_target.lat, ref_lon=wp_target.lon)
-    wp_bomb = Waypoint(lat=lat1, lon=lon1, alt=alt_bomb_start)
+    len_north1 = length_bomb_start * math.sin(approach_angle)
+    len_east1 = length_bomb_start * math.cos(approach_angle)
+    [lat1, lon1] = XYtoGPS(len_north1, len_east1, ref_lat=wp_bomb_drop.lat, ref_lon=wp_bomb_drop.lon)
+    wp_bomb_start = Waypoint(lat=lat1, lon=lon1, alt=alt_bomb_start)
     # 生成投弹部分航线
-    bomb_line = wp_bombing_insert_course([wp_bomb, wp_target], precision_bomb, length_side_points, approach_angle)
+    bomb_line = wp_bombing_insert_course([wp_bomb_start, wp_bomb_drop], precision_bomb, length_side_points, approach_angle)
 
     # 生成直线进近航线
     len_north2 = length_approach * math.sin(approach_angle)
     len_east2 = length_approach * math.cos(approach_angle)
-    [lat2, lon2] = XYtoGPS(len_north2, len_east2, ref_lat=wp_bomb.lat, ref_lon=wp_bomb.lon)
+    [lat2, lon2] = XYtoGPS(len_north2, len_east2, ref_lat=wp_bomb_start.lat, ref_lon=wp_bomb_start.lon)
     wp_approach = Waypoint(lat=lat2, lon=lon2, alt=alt_approach)
-    approach_line = wp_straight_course([wp_approach, wp_bomb], precision_approach)
+    approach_line = wp_straight_course([wp_approach, wp_bomb_start], precision_approach)
 
     # 生成掉头对准航线
-    if turn_direction == 'anti_clock':
+    if turn_direction == 1:
         len_north3 = 2 * radius * math.sin(approach_angle - 0.5 * math.pi)
         len_east3 = 2 * radius * math.cos(approach_angle - 0.5 * math.pi)
         [lat3, lon3] = XYtoGPS(len_north3, len_east3, ref_lat=wp_approach.lat, ref_lon=wp_approach.lon)

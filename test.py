@@ -14,19 +14,11 @@ from navigation import (Waypoint, mode_set, mission_upload,
                         loiter, return_to_launch, initiate_bomb_drop, preflight_command
                         ,wp_detect_course_HeBei, wp_detect_course_HeBei_2g, force_arm,
                         gain_transform_frequency, k_means_calculate, target_point, target_order,
-                        target_match, coordinate_aver_cal)
+                        target_match, coordinate_aver_cal, contest_detect_course, k_means_calculate, coordinate_transfer,
+                        target_point, coordinate_aver_cal, target_match,
+                        mission_upload_including_bomb_drop, mission_jump_to)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
-LEN_OF_TARGET_LIST = 50
-TIME_DELAY_MS = 150
-DETECT_ANGLE = 231
-APPROACH_ANGLE = 309  # 投弹时的进近航向，北起点逆时针
-DETECT_TIME_LIMIT = int(3 * 60 * 1000)
-DETECT_ACC = 6  # m
-wp_home = Waypoint(38.543938, 115.04040769999999, 0)
-wp_start = Waypoint(38.5590428, 115.1420812, 15)  # A组，顺时针侦察
-final_target_position = Waypoint(38.5592552, 115.1421690, 0)
-mission_start_time = 0
 ''''
 key = [5,7,9]
 print(np.median(key))
@@ -56,24 +48,69 @@ a = target_match(target_list, target_num, 0)
 print(a.lat, a.lon)
 a = k_means_calculate([A, B, C])
 '''
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=115200)#921600)
 
-# force_arm(the_connection)
+# 侦察航线的转弯直径
+DIAMETER = 0.00060
+# 航线转向方向
+DIRECTION = 1
+# 直线航线拓展长度
+LENGTH_EXTEND = 0.00010
+# 靶标坐标侦察部分的航点数量
+WP_NUMBER_OF_TARGET_DETECT = 20
+# 数字侦察部分的航点数量
+WP_NUMBER_OF_NUMBER_DETECT = 40
+# 投弹点的位置
+WP_SEQ_OF_BOMB_DROP = 10
+# 设定的延迟时间
+TIME_DELAY_MS = 250
+# 侦察航向，指南针标准
+DETECT_ANGLE = 340
 
-gain_transform_frequency(the_connection)
+# 投弹进场航向，指南针标准
+if DETECT_ANGLE > 180:
+    APPROACH_ANGLE = DETECT_ANGLE - 180
+else:
+    APPROACH_ANGLE = DETECT_ANGLE + 180
+'''
+需要测量的坐标
+'''
+# home点
+wp_home = Waypoint(28.5928658, 113.1872269, 0)
+# 靶标区的四个顶点，注意按照侦察航线顺序
+wp_boarder = [Waypoint(28.5937116, 113.1869191, 0),
+              Waypoint(28.5939566, 113.1868185, 0),
+              Waypoint(28.5937976, 113.1871538, 0),
+              Waypoint(28.5940625, 113.1870545, 0)]
+target_coordinate = [target1, target2, target3] = [Waypoint(28.5937116, 113.1869191, 0),
+                                                   Waypoint(28.5939566, 113.1868185, 0),
+                                                   Waypoint(28.5937976, 113.1871538, 0)]  # 三个靶标的测量位置
 
-A_target1 = Waypoint(38.557288, 115.139136, 0)
-A_target2 = Waypoint(38.557168, 115.138972, 0)
-A_target3 = Waypoint(38.557443, 115.139024, 0)
-A_target4 = Waypoint(38.557302, 115.138819, 0)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=921600)
 
+detect_course = []
+# 第一圈
+detect_course.extend(contest_detect_course(detect_angle=DETECT_ANGLE, start_coordinate=wp_boarder[0],
+                                           end_coordinate=wp_boarder[1], direction=DIRECTION,
+                                           alt_detect=15, alt_circle=35, diameter=DIAMETER,
+                                           length_expend=LENGTH_EXTEND))
+# 第二圈
+detect_course.extend(contest_detect_course(detect_angle=DETECT_ANGLE, start_coordinate=wp_boarder[2],
+                                           end_coordinate=wp_boarder[3], direction=DIRECTION,
+                                           alt_detect=15, alt_circle=35, diameter=DIAMETER,
+                                           length_expend=LENGTH_EXTEND))
+for i in range(0, 5):
+    detect_course.pop(-1)
 
-B_target1 = Waypoint(38.559180, 115.142050, 0)
-B_target2 = Waypoint(38.559315, 115.142202,     0)
-B_target3 = Waypoint(38.559314, 115.141904, 0)
-B_target4 = Waypoint(38.559445, 115.142059, 0)
+bomb_course = []
 
+bomb_course.extend(wp_bombing_course(target1, approach_angle=APPROACH_ANGLE, length_bomb_lead=23,
+                                     turn_direction=-DIRECTION))
+bomb_course.extend(wp_bombing_course(target2, approach_angle=APPROACH_ANGLE, length_bomb_lead=23,
+                                     turn_direction=-DIRECTION))
+bomb_course.extend(wp_bombing_course(target3, approach_angle=APPROACH_ANGLE, length_bomb_lead=23,
+                                     turn_direction=-DIRECTION))
 
-wp = [A_target1, A_target2, A_target3, A_target4, B_target1, B_target2, B_target3, B_target4]
-mission_upload(the_connection, wp, wp_home)
+mission_course = detect_course
+mission_course.extend(bomb_course)
 
+mission_upload_including_bomb_drop(the_connection, detect_course, [35, 57, 79])

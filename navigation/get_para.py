@@ -32,18 +32,18 @@ def gain_ground_speed(the_connection):
 # 不使用track_point类中姿态的部分
 def gain_position_now(the_connection):
     the_connection.mav.command_long_send(the_connection.target_system,  # target_system
-                                               the_connection.target_component,
-                                               512,  # command
-                                               0,  # confirmation
-                                               33,  # param1
-                                               0,  # param2
-                                               0,  # param3
-                                               0,  # param4
-                                               0,  # param5
-                                               0,  # param6
-                                               0)  # param7
+                                         the_connection.target_component,
+                                         512,  # command
+                                         0,  # confirmation
+                                         33,  # param1
+                                         0,  # param2
+                                         0,  # param3
+                                         0,  # param4
+                                         0,  # param5
+                                         0,  # param6
+                                         0)  # param7
     msg = the_connection.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
-    #msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
+    # msg = rec_match_received(the_connection, 'GLOBAL_POSITION_INT')
     wp_now = track_point(msg.lat*1e-7, msg.lon*1e-7, msg.relative_alt*1e-3, msg.time_boot_ms, 0, 0, 0)
     return wp_now
 
@@ -121,7 +121,8 @@ def gain_track_of_time(the_connection, track_list, time_last=50):
     else:
         pass
     return [position.time, position.alt]
-    #print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon, track_list[num].alt, track_list[num].time)
+    # print("random track point ", len(track_list), ":", track_list[num].lat, track_list[num].lon,
+    # track_list[num].alt, track_list[num].time)
 
 
 # 获取坐标和姿态信息，用于目标位置解算
