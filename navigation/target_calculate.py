@@ -144,10 +144,10 @@ def target_match(list_k, list_num, target_num):
     # 返回匹配结果
     for i in range(len(row_ind)):
         if row_ind[i] == target_num:
-            return Waypoint(list_k[col_ind[i]].lat, list_k[col_ind[i]].lon, 0)
+            return Waypoint(list_k[col_ind[i]].lat, list_k[col_ind[i]].lon, i)
 
     # 防止没有返回值
-    return Waypoint(list_k[col_ind[1]].lat, list_k[col_ind[1]].lon, 0)
+    return Waypoint(list_k[col_ind[1]].lat, list_k[col_ind[1]].lon, 1)
 
 
 # 判断某个坐标是否在指定的矩形区域内（粗暴的南北正向矩形）
