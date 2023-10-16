@@ -18,10 +18,12 @@ DETECT_CONFIDENCE = 0.6
 '''
 通用任务函数
 '''
+
+
 def send_mission_list(the_connection, wp):
     args = (the_connection.target_system,
-           the_connection.target_component,
-           len(wp))#, mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
+            the_connection.target_component,
+            len(wp))  # mavutil.mavlink.MAV_MISSION_TYPE_MISSION)
     wp_list = mavutil.mavlink.MAVLink_mission_count_message(*args)
     the_connection.mav.send(wp_list)
 
@@ -66,7 +68,7 @@ def mission_accomplished(the_connection, wp_list_len):
     if msg.seq == wp_list_len and msg.mission_state == 5:
         return 1
     else:
-        #print("seq: ", msg.seq, "state: ", msg.mission_state)
+        # print("seq: ", msg.seq, "state: ", msg.mission_state)
         return -10
 
 
@@ -146,9 +148,7 @@ def mission_upload_including_bomb_drop(the_connection, mission_list, seq_of_bomb
                 break
 
 
-
-
-# 上传航点集并阻塞程序直到完成全部预定航点任务，并且打印动态参数
+# 已弃用 上传航点集并阻塞程序直到完成全部预定航点任务，并且打印动态参数
 def upload_mission_till_completed(the_connection, wp, home_position, track_list):
     mission_upload(the_connection, wp, home_position)
 
@@ -201,6 +201,8 @@ def clear_waypoint(vehicle):
 '''
 对接视觉需要的函数
 '''
+
+
 # 手写方法，已弃用 对摄像头延时等影响造成延迟的消除，delay具体值需要使用实验测定
 def delay_eliminate(track_list, time, delay=500):
     # 使用二分法查找离要求最近的时刻
@@ -229,6 +231,8 @@ def delay_eliminate(track_list, time, delay=500):
 '''
 指定形状航线生成函数
 '''
+
+
 def XYtoGPS(x, y, ref_lat, ref_lon):
     # input GPS and Reference GPS in degrees
     # output XY in meters (m) X:North Y:East
@@ -257,6 +261,7 @@ def XYtoGPS(x, y, ref_lat, ref_lon):
         lon = math.degrees(ref_lon)
 
     return [lat, lon]
+
 
 def GPStoXY(lat, lon, height, ref_lat, ref_lon):
     # input GPS and Reference GPS in degrees
@@ -308,7 +313,7 @@ def wp_straight_course(wp, precision):
     i = 0
     for i in range(0, precision):
         wp_new = Waypoint(wp_list[i].lat+lat_len, wp_list[i].lon+lon_len, wp_list[i].alt+alt_len)
-        #wp_new.show()
+        # wp_new.show()
         wp_list.append(wp_new)
         i += 1
 
@@ -336,9 +341,9 @@ def wp_circle_course(wp, precision, angle, direction=1):
         theta_start = math.pi * 1.5
     else:
         theta_start = math.atan(lat_len/lon_len)
-    if lon_len >= 0: #一四象限
+    if lon_len >= 0: # 一四象限
         pass
-    else: #二三象限
+    else: # 二三象限
         theta_start += math.pi
 
     # 计算半径和角度步长
@@ -640,7 +645,7 @@ def wp_detect_course_HeBei_2g(wp_center, wp_start, alt_detect=12, alt_circle=25,
 
 
 # 角度为北为起点、顺时针方向
-def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00006 , radius=0.00035):
+def wp_detect_course_HeBei(wp_center, alt, group='60', interval=0.00006, radius=0.00035):
     if group == '60':  # 航向60
         angle = pi
         right_angle = pi * 0.5
@@ -833,6 +838,8 @@ def wp_detect_course(wp, alt, approach_angle='east'):
 '''
 投弹相关函数
 '''
+
+
 # 已弃用，见wp_bombing_course
 def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, direction=1):
     # 自动生成航路点集
@@ -846,7 +853,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
     else:  # 二三象限
         theta += math.pi
 
-    #theta = theta * math.pi / 180
+    # theta = theta * math.pi / 180
 
     # 暂时想不到根据距离推算经纬度关系的方法，姑且用0.001度约为一百米的方法估测
     # d_lat = 2 * radius * math.sin(theta) * 1e-5
@@ -900,12 +907,15 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
     return wp_bomb_drop
 
 
-# 投弹航线生成，以进场航线指向为主要参数, 角度以正北为零点，逆时针增加0-360
+# 投弹航线生成，以进场航线指向为主要参数, 指南针标准
 def wp_bombing_course(wp_target, approach_angle, turn_direction='anti_clock',
                       length_enter=20,  radius=50, length_approach=100, length_bomb=20, length_left=40,
                       precision_circle=4, precision_approach=6, precision_bomb=10, precision_enter=2,
                       alt_target=15, alt_bomb_start=9, alt_approach=15, alt_left=18, length_side_points=3):
-    # 转为弧度制
+    # 从指南针标准转为
+    approach_angle = 360 - approach_angle
+
+    # 转为弧度制，以正北为零点，逆时针增加0-360
     approach_angle = (approach_angle - 90) * math.pi / 180
 
     wp_target.alt = alt_target
@@ -938,7 +948,6 @@ def wp_bombing_course(wp_target, approach_angle, turn_direction='anti_clock',
         [lat3, lon3] = XYtoGPS(len_north3, len_east3, ref_lat=wp_approach.lat, ref_lon=wp_approach.lon)
         wp_turn_start = Waypoint(lat=lat3, lon=lon3, alt=alt_approach)
         turn_circle = wp_circle_course([wp_turn_start, wp_approach], precision_circle, 180, direction=-1)
-
 
     # 生成几个航点使飞机更好地进入掉头航线
     len_north4 = length_enter * math.sin(approach_angle + math.pi)
@@ -1035,6 +1044,8 @@ def initiate_bomb_drop(the_connection, angle):
 '''
 飞机动作控制函数
 '''
+
+
 def return_to_launch(the_connection):
     the_connection.mav.command_long_send(the_connection.target_system, the_connection.target_component,
                                          mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -1086,7 +1097,7 @@ def loiter_at_present(the_connection, alt):
         print("loiter at present of lat: ", lat, "lon: ", lon, "alt: ", alt)
         return True
     else:
-       print("loiter failed")
+        print("loiter failed")
     return False
 
 
@@ -1127,7 +1138,7 @@ def yard_fly(the_connection, wp, home_position, track_list):
     wp_list.extend(wp_circle_course(wp_circle2, 3, 180, 1))
     wp_list.pop(-1)
     wp_list.extend(wp_straight_course(wp_line1, 3))
-    #wp_list.append(home_position)
+    # wp_list.append(home_position)
 
     print(len(wp_list))
     mission_upload(the_connection, wp_list, home_position)
@@ -1135,23 +1146,58 @@ def yard_fly(the_connection, wp, home_position, track_list):
         pass
 
     count = 0
-    while True:#input("输入0进行环操场航线： ") == '0':
+    while True:  # input("输入0进行环操场航线： ") == '0':
 
-      mode_set(the_connection, 10)
+        mode_set(the_connection, 10)
 
-      while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list)-1:
-         gain_track_of_time(the_connection, track_list)
-         continue
-      count += 1
-      print("circle NO.", count, " completed")
-      loiter(the_connection, home_position)
-      if input("输入0进行下一圈： ") == '0':
-          pass
+        while rec_match_received(the_connection, 'MISSION_CURRENT').seq < len(wp_list)-1:
+            gain_track_of_time(the_connection, track_list)
+            continue
+        count += 1
+        print("circle NO.", count, " completed")
+        loiter(the_connection, home_position)
+        if input("输入0进行下一圈： ") == '0':
+            pass
+
+
+def contest_detect_course(detect_angle, start_coordinate, end_coordinate,
+                          diameter, alt_detect, alt_circle, length_expend, direction=-1):
+    # 转换为象限角
+    angle = pi * ((360 - detect_angle) + 90) / 180
+    right_angle = 0.5 * pi
+
+    # 起始处和转向点
+    wp_start = Waypoint(start_coordinate.lat + length_expend * sin(angle + pi),
+                        start_coordinate.lon + length_expend * cos(angle + pi), alt_detect)
+    wp_end = Waypoint(end_coordinate.lat + length_expend * sin(angle),
+                      end_coordinate.lon + length_expend * cos(angle), alt_detect)
+    wp_turn1 = Waypoint(wp_end.lat + diameter * sin(angle + direction * right_angle),
+                        wp_end.lon + diameter * cos(angle + direction * right_angle), alt_circle)
+    wp_turn2 = Waypoint(wp_start.lat + diameter * sin(angle + direction * right_angle),
+                        wp_start.lon + diameter * cos(angle + direction * right_angle), alt_circle)
+
+    line = wp_straight_course([wp_start, wp_end], 2)
+    circle = wp_circle_course([wp_end, wp_turn1], 3, 180, direction=direction)
+    line2 = [wp_turn1, wp_turn2]
+    circle2 = wp_circle_course([wp_turn2, wp_start], 3, 180, direction=direction)
+
+    mission_course = line
+    mission_course.pop(-1)
+    mission_course.extend(circle)
+    mission_course.pop(-1)
+    mission_course.extend(line2)
+    mission_course.pop(-1)
+    mission_course.extend(circle2)
+    mission_course.pop(-1)
+
+    return mission_course
 
 
 '''
 数字后处理算法函数
 '''
+
+
 # 计算目标字典表中存储目标总数
 def length_of_dict(dict):
     value = list(dict.values())

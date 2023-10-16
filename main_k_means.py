@@ -10,39 +10,53 @@ from scipy.interpolate import UnivariateSpline
 from vision.vision_class import Vision
 from navigation import (Waypoint, mode_set, mission_upload,
                         gain_track_point, match_if_out_of_area,
-                        gain_position_now, wp_bombing_course, mission_current, bomb_drop,
+                        gain_position_now, wp_bombing_course, mission_current,
                         initiate_bomb_drop, preflight_command,
-                        wp_detect_course_HeBei_2g, k_means_calculate, coordinate_transfer,
-                        target_point, coordinate_aver_cal, target_match)
+                        contest_detect_course, k_means_calculate, coordinate_transfer,
+                        target_point, coordinate_aver_cal, target_match,
+                        mission_upload_including_bomb_drop)
 from pymavlink import mavutil
-# 目标字典的目标存储个数
-WP_NUMBER_OF_TARGET_DETECT = 20  # 靶标坐标侦察部分的航点数量
-WP_NUMBER_OF_NUMBER_DETECT = 40  # 数字侦察部分的航点数量
-LEN_OF_TARGET_LIST = 50
+'''
+需要设定的参数
+'''
+# 侦察航线的转弯直径
+DIAMETER = 0.00060
+# 航线转向方向
+DIRECTION = 1
+# 直线航线拓展长度
+LENGTH_EXTEND = 0.00010
+# 靶标坐标侦察部分的航点数量
+WP_NUMBER_OF_TARGET_DETECT = 20
+# 数字侦察部分的航点数量
+WP_NUMBER_OF_NUMBER_DETECT = 40
+# 投弹点的位置
+WP_SEQ_OF_BOMB_DROP = 10
+# 设定的延迟时间
 TIME_DELAY_MS = 250
-APPROACH_ANGLE = 255  # 投弹时的进近航向，北起点逆时针
-DETECT_TIME_LIMIT = int(3 * 60 * 1000)
+# 侦察航向，指南针标准
+DETECT_ANGLE = 340
+
+# 投弹进场航向，指南针标准
+if DETECT_ANGLE > 180:
+    APPROACH_ANGLE = DETECT_ANGLE - 180
+else:
+    APPROACH_ANGLE = DETECT_ANGLE + 180
 '''
 需要测量的坐标
 '''
 # home点
 wp_home = Waypoint(28.5928658, 113.1872269, 0)
-# 靶标区的四个顶点
-wp_boarder = [Waypoint(0, 0, 0),
-              Waypoint(0, 0, 0),
-              Waypoint(0, 0, 0),
-              Waypoint(0, 0, 0)]
+# 靶标区的四个顶点，注意按照侦察航线顺序
+wp_boarder = [Waypoint(38.557288, 115.139136, 0),
+              Waypoint(38.557168, 115.138972, 0),
+              Waypoint(38.557443, 115.139024, 0),
+              Waypoint(38.557302, 115.138819, 0)]
 # 三个靶标位置的估计点
 wp_known = [Waypoint(0, 0, 0),
             Waypoint(0, 0, 0),
             Waypoint(0, 0, 0)]
 target_coordinate = wp_known  # 事先设置的三个靶标的预测位置，防止出现没有解算结果的情况
 final_target_coordinate = wp_known[0]  # 防止没有数字解算结果，直接运行设定目标
-mission_start_time = 0
-
-# 应该没用了，但是现在侦察航线还没改
-wp_detect = Waypoint(38.5431345, 115.04109799999999, 30)  # 羊粪场
-wp_start = Waypoint(38.5428931, 115.04135629999999, 15)  # 野场，9.28
 
 
 '''
@@ -300,7 +314,41 @@ if __name__ == "__main__":
     the_connection = mavutil.mavlink_connection('/COM3', baud=57600)
 
     # 生成并上传任务，比赛时不需要
-    detect_course = wp_detect_course_HeBei_2g(None, wp_start, approaching=140)  # wp_detect_course_HeBei(wp_detect, 16)
+    detect_course = []
+    # 坐标侦察部分
+
+    # 第一圈
+    detect_course.extend(contest_detect_course(detect_angle=DETECT_ANGLE, start_coordinate=wp_boarder[0],
+                                               end_coordinate=wp_boarder[1], direction=DIRECTION,
+                                               alt_detect=30, alt_circle=35, diameter=DIAMETER,
+                                               length_expend=LENGTH_EXTEND))
+    # 第二圈
+    detect_course.extend(contest_detect_course(detect_angle=DETECT_ANGLE, start_coordinate=wp_boarder[2],
+                                               end_coordinate=wp_boarder[3], direction=DIRECTION,
+                                               alt_detect=30, alt_circle=35, diameter=DIAMETER,
+                                               length_expend=LENGTH_EXTEND))
+
+    # 数字侦察部分
+
+    # 第一圈
+    detect_course.extend(contest_detect_course(detect_angle=DETECT_ANGLE, start_coordinate=wp_boarder[0],
+                                               end_coordinate=wp_boarder[1], direction=DIRECTION,
+                                               alt_detect=15, alt_circle=35, diameter=DIAMETER,
+                                               length_expend=LENGTH_EXTEND))
+    # 第二圈
+    detect_course.extend(contest_detect_course(detect_angle=DETECT_ANGLE, start_coordinate=wp_boarder[2],
+                                               end_coordinate=wp_boarder[3], direction=DIRECTION,
+                                               alt_detect=15, alt_circle=35, diameter=DIAMETER,
+                                               length_expend=LENGTH_EXTEND))
+    # 第三圈
+    wp_start3 = Waypoint(0.5 * wp_boarder[0].lat + 0.5 * wp_boarder[2].lat,
+                         0.5 * wp_boarder[0].lon + 0.5 * wp_boarder[2].lon, 15)
+    wp_end3 = Waypoint(0.5 * wp_boarder[1].lat + 0.5 * wp_boarder[3].lat,
+                       0.5 * wp_boarder[1].lon + 0.5 * wp_boarder[3].lon, 15)
+    detect_course.extend(contest_detect_course(detect_angle=DETECT_ANGLE, start_coordinate=wp_start3,
+                                               end_coordinate=wp_end3, direction=DIRECTION,
+                                               alt_detect=15, alt_circle=35, diameter=DIAMETER,
+                                               length_expend=LENGTH_EXTEND))
     mission_upload(the_connection, detect_course, wp_home)
 
     # 起飞前准备
@@ -327,7 +375,7 @@ if __name__ == "__main__":
     '''
     # 盘旋等待任务上传
     wp_list = wp_bombing_course(final_target_coordinate, APPROACH_ANGLE)
-    mission_upload(the_connection, wp_list, wp_home)
+    mission_upload_including_bomb_drop(the_connection, wp_list, WP_SEQ_OF_BOMB_DROP)
 
     # 盘旋等待任务角度合适
     initiate_bomb_drop(the_connection, APPROACH_ANGLE)

@@ -56,7 +56,7 @@ a = target_match(target_list, target_num, 0)
 print(a.lat, a.lon)
 a = k_means_calculate([A, B, C])
 '''
-the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)#921600)
+the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=115200)#921600)
 
 # force_arm(the_connection)
 

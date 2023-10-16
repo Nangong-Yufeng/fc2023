@@ -24,7 +24,7 @@ B_edge4 = Waypoint(38.559445, 115.142059, 0)
 wp_range_B = [B_edge1, B_edge2, B_edge3, B_edge4]
 B_target = [B_edge1, B_edge2, B_edge3]
 
-wp_home = Waypoint(28.5928658, 113.1872269, 0)
+wp_home = Waypoint(28.5928658, 113.1872269, 30)
 
 '''                                         
 参数表
@@ -35,10 +35,6 @@ TARGET_CHOOSE_B = 0
 # 侦察进近方向，指南针标准
 DETECT_APPROACH_A = 340
 DETECT_APPROACH_B = 160
-
-# 投弹进近航向，北向起点逆时针标准
-BOMB_APPROACH_A = 309
-BOMB_APPROACH_B = 129
 # 盘旋直径
 Diameter = 0.00055
 # 飞掠靶标区和绕圈处的高度设置，第一圈直接投弹的高度设置
@@ -73,6 +69,8 @@ def course(detect_angle, group='A',
                                  A_target[TARGET_CHOOSE_A].lon + Length_bomb_start * cos(angle + pi), Alt_bomb_start)
         wp_bomb_drop = Waypoint(A_target[TARGET_CHOOSE_A].lat + Length_bomb * sin(angle + pi),
                                 A_target[TARGET_CHOOSE_A].lon + Length_bomb * cos(angle + pi), Alt_bomb_drop)
+        wp_target = Waypoint(A_target[TARGET_CHOOSE_A].lat,
+                             A_target[TARGET_CHOOSE_A].lon, Alt_bomb_drop)
         # 第一圈 内侧靶标
         wp_start1 = Waypoint(wp_range_A[0].lat + length_expend * sin(angle + pi),
                              wp_range_A[0].lon + length_expend * cos(angle + pi), alt_detect)
@@ -99,6 +97,8 @@ def course(detect_angle, group='A',
                                  B_target[TARGET_CHOOSE_B].lon + Length_bomb_start * cos(angle + pi), Alt_bomb_start)
         wp_bomb_drop = Waypoint(B_target[TARGET_CHOOSE_B].lat + Length_bomb * sin(angle + pi),
                                 B_target[TARGET_CHOOSE_B].lon + Length_bomb * cos(angle + pi), Alt_bomb_drop)
+        wp_target = Waypoint(B_target[TARGET_CHOOSE_B].lat,
+                             B_target[TARGET_CHOOSE_B].lon, Alt_bomb_drop)
 
         # 第一圈 内侧靶标
         wp_start1 = Waypoint(wp_range_B[0].lat + length_expend * sin(angle + pi),
@@ -120,7 +120,6 @@ def course(detect_angle, group='A',
         wp_turn22 = Waypoint(wp_start2.lat + diameter * sin(angle + direction * right_angle),
                              wp_start2.lon + diameter * cos(angle + direction * right_angle), alt_circle)
 
-
     # 第三圈 中间掠过补充
     wp_start3 = Waypoint(0.5 * wp_start1.lat + 0.5 * wp_start2.lat,
                          0.5 * wp_start1.lon + 0.5 * wp_start2.lon, alt_detect)
@@ -128,23 +127,24 @@ def course(detect_angle, group='A',
                        0.5 * wp_end1.lon + 0.5 * wp_end2.lon, alt_detect)
 
     wp_line_start = wp_straight_course([wp_start, wp_bomb_start], 2)
-    wp_line_bomb = wp_bombing_insert_course([wp_bomb_start, wp_bomb_drop], 16, 3, angle)
+    wp_line_bomb = wp_bombing_insert_course([wp_bomb_start, wp_bomb_drop], 10, 3, angle)
 
     # line11 = wp_straight_course([wp_start1, wp_end1], 3)
     circle11 = wp_circle_course([wp_end1, wp_turn11], 3, 180, direction=direction)
     line12 = [wp_turn11, wp_turn12]
     circle12 = wp_circle_course([wp_turn12, wp_start2], 3, 180, direction=direction)
 
-    line21 = wp_straight_course([wp_start2, wp_end2], 3)
+    line21 = wp_straight_course([wp_start2, wp_end2], 2)
     circle21 = wp_circle_course([wp_end2, wp_turn21], 3, 180, direction=direction)
     line22 = [wp_turn21, wp_turn22]
     circle22 = wp_circle_course([wp_turn22, wp_start3], 3, 180, direction=direction)
 
-    line31 = wp_straight_course([wp_start3, wp_end3], 3)
+    line31 = wp_straight_course([wp_start3, wp_end3], 2)
 
     mission_course = wp_line_start
     mission_course.pop(-1)
     mission_course.extend(wp_line_bomb)
+    mission_course.append(wp_target)
     mission_course.extend(circle11)
     mission_course.pop(-1)
     mission_course.extend(line12)
