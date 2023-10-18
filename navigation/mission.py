@@ -943,7 +943,7 @@ def bombing_course(wp_now, wp_target, precision, course_len, radius, theta, dire
 def wp_bombing_course(wp_target, approach_angle, length_bomb_lead, turn_direction=1,
                       length_enter=10,  radius=30, length_approach=80, length_bomb_start=20, length_left=40,
                       precision_circle=4, precision_approach=2, precision_bomb=10, precision_enter=1,
-                      alt_bomb_drop=15, alt_bomb_start=9, alt_approach=15, alt_left=18, length_side_points=3):
+                      alt_bomb_drop=10, alt_bomb_start=20, alt_approach=15, alt_left=18, length_side_points=3):
     # 从指南针标准转为
     approach_angle = 360 - approach_angle
 
