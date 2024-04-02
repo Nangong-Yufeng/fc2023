@@ -17,9 +17,7 @@
 
 执行
 
-     ~/.profile
-
-然后重启
+     .~/.profile
 
 
 # 2.SITL基本指令运行
