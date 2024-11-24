@@ -1,5 +1,4 @@
 import time
-
 from navigation import (Waypoint, set_home, mode_set, arm, mission_upload,
                         wp_detect_course, loiter_at_present, gain_track_point,
                         detect_completed, eliminate_error_target, command_retry,
