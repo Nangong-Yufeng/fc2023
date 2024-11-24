@@ -12,7 +12,7 @@ from pymavlink import mavutil
 the_connection = mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)
 
 wp_home = Waypoint(22.8027619, 114.2959589, 0)
-#preflight_command(the_connection, wp_home)
+preflight_command(the_connection, wp_home)
 
 reboot(the_connection)
 
