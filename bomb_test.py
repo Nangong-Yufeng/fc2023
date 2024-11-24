@@ -1,7 +1,5 @@
-import random
-
 from navigation import (gain_position_now, bomb_drop, Waypoint, set_home, mode_set,
-                        gain_ground_speed, gain_posture_para, force_arm, arm_check, reboot, command_retry, gain_transform_frequency,
+                        gain_ground_speed, gain_posture_para, force_arm, reboot, command_retry, gain_transform_frequency,
                         wp_bombing_course, mission_upload, wp_detect_course, wp_circle_course)
 from pymavlink import mavutil
 import time

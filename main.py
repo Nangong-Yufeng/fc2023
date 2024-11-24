@@ -5,12 +5,12 @@ import time
 from geopy.distance import geodesic
 import numpy
 from vision.vision_class import Vision
-from navigation import (Waypoint, set_home, mode_set, arm, mission_upload,
+from navigation import (Waypoint, mode_set, mission_upload,
                         wp_detect_course, loiter_at_present, gain_track_point,
                         detect_completed, eliminate_error_target, command_retry,
-                        gain_position_now, set_ground_speed, target_transfer,
+                        gain_position_now, target_transfer,
                         wrong_number, wp_bombing_course, mission_current, bomb_drop,
-                        loiter, return_to_launch, initiate_bomb_drop)
+                        loiter, return_to_launch, initiate_bomb_drop, preflight_command)
 from pymavlink import mavutil
 # 目标字典的目标存储个数
 LEN_OF_TARGET_LIST = 100
@@ -256,15 +256,6 @@ def process_image_and_pose(track_queue, detect_result):
 线程3：航点任务循环
 '''
 def detect_mission_circling(the_connection, detect_result):
-    # set_home(the_connection, wp_home)
-
-    # 设置模式为纯手动
-    command_retry(the_connection, 'mode_set', 0)
-
-    # 解锁飞机
-
-    arm(the_connection)
-
     # 任务开始时间
     global mission_start_time
     mission_start_time = int(round(time.time() * 1000))
@@ -272,8 +263,6 @@ def detect_mission_circling(the_connection, detect_result):
     # 切换自动飞行
     if input("输入0切换自动模式开始任务（请检查目标点和home点已正确设置）（若已通过其他方式切换到自动，可输入其他跳过）： ") == '0':
         command_retry(the_connection, 'mode_set', 10)
-
-    set_ground_speed(the_connection, 15)
 
     # 侦察部分航线
     while not detect_result.empty():
@@ -285,7 +274,7 @@ def detect_mission_circling(the_connection, detect_result):
 
 
 if __name__ == "__main__":
-    '''
+    '''                                         
     帅
     '''
     title.printTitle()
@@ -295,7 +284,10 @@ if __name__ == "__main__":
     '''
     the_connection = mavutil.mavlink_connection('/COM5', baud=57600)
 
-    # 生成并上传任务
+    # 起飞前准备
+    preflight_command(the_connection, wp_home)
+
+    # 生成并上传任务，比赛时不需要
     detect_course = wp_detect_course(wp_detect, 16, 'north')
     mission_upload(the_connection, detect_course, wp_home)
 
@@ -333,7 +325,9 @@ if __name__ == "__main__":
     # 切换为自动模式，进入投弹航线
     mode_set(the_connection, 10)
 
-    while mission_current(the_connection) < len(wp_list) - 13:
+    # 到达预设投弹位置前，设置时间检查防止因为信号中断不投弹
+    while (mission_current(the_connection) < len(wp_list) - 13 and
+           (int(round(time.time() * 1000)) - mission_start_time) < int(5 * 60 * 1000)):
         pass
         print(mission_current(the_connection))
     bomb_drop(the_connection)
